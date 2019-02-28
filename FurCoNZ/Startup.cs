@@ -16,6 +16,7 @@ using Microsoft.Extensions.Configuration;
 using Microsoft.Extensions.DependencyInjection;
 using Npgsql;
 
+using FurCoNZ.Auth;
 using FurCoNZ.DAL;
 
 namespace FurCoNZ
@@ -72,6 +73,8 @@ namespace FurCoNZ
                 }
             });
 
+            services.AddTransient<NzFursJwtBearerEvents>();
+
             services.Configure<CookiePolicyOptions>(options =>
             {
                 // This lambda determines whether user consent for non-essential cookies is needed for a given request.
@@ -79,6 +82,18 @@ namespace FurCoNZ
                 options.MinimumSameSitePolicy = SameSiteMode.None;
             });
 
+            services.AddAuthentication(options =>
+            {
+                options.DefaultAuthenticateScheme = JwtBearerDefaults.AuthenticationScheme;
+                options.DefaultChallengeScheme = JwtBearerDefaults.AuthenticationScheme;
+            })
+            .AddJwtBearer(options =>
+            {
+                options.Authority = Configuration.GetValue<string>("Auth:Server");
+                options.RequireHttpsMetadata = !Configuration.GetValue("Auth:AllowInsecureHttp", false);
+                options.SaveToken = true;
+                options.EventsType = typeof(NzFursJwtBearerEvents);
+            });
 
             services.AddMvc().SetCompatibilityVersion(CompatibilityVersion.Version_2_2);
         }
