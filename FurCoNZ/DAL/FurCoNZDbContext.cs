@@ -13,5 +13,7 @@ namespace FurCoNZ.DAL
         public FurCoNZDbContext(DbContextOptions<FurCoNZDbContext> options) 
             : base(options)
         { }
+
+        public DbSet<User> Users { get; set; }
     }
 }
