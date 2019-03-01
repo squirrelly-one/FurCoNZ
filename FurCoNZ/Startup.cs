@@ -1,23 +1,24 @@
 using System;
 using System.Collections.Generic;
+using System.IdentityModel.Tokens.Jwt;
 using System.IO;
 using System.Linq;
 using System.Threading.Tasks;
 
-using Microsoft.AspNetCore.Authentication.JwtBearer;
+using Microsoft.AspNetCore.Authentication.Cookies;
 using Microsoft.AspNetCore.Builder;
 using Microsoft.AspNetCore.Hosting;
 using Microsoft.AspNetCore.Http;
-using Microsoft.AspNetCore.HttpsPolicy;
 using Microsoft.AspNetCore.Mvc;
 using Microsoft.Data.Sqlite;
 using Microsoft.EntityFrameworkCore;
 using Microsoft.Extensions.Configuration;
 using Microsoft.Extensions.DependencyInjection;
+using Microsoft.IdentityModel.Tokens;
 using Npgsql;
 
-using FurCoNZ.Auth;
 using FurCoNZ.DAL;
+using FurCoNZ.Services;
 
 namespace FurCoNZ
 {
@@ -26,6 +27,8 @@ namespace FurCoNZ
         public Startup(IConfiguration configuration)
         {
             Configuration = configuration;
+            // All the sames do this. I have no idea why.
+            JwtSecurityTokenHandler.DefaultInboundClaimTypeMap.Clear();
         }
 
         public IConfiguration Configuration { get; }
@@ -33,6 +36,8 @@ namespace FurCoNZ
         // This method gets called by the runtime. Use this method to add services to the container.
         public void ConfigureServices(IServiceCollection services)
         {
+            services.AddHttpClient();
+
             services.AddDbContext<FurCoNZDbContext>(options =>
             {
                 switch (Configuration.GetValue("Data:Database:Provider", string.Empty).ToLowerInvariant())
@@ -73,7 +78,7 @@ namespace FurCoNZ
                 }
             });
 
-            services.AddTransient<NzFursJwtBearerEvents>();
+            services.AddTransient<IUserService, EntityFrameworkUserService>();
 
             services.Configure<CookiePolicyOptions>(options =>
             {
@@ -84,15 +89,35 @@ namespace FurCoNZ
 
             services.AddAuthentication(options =>
             {
-                options.DefaultAuthenticateScheme = JwtBearerDefaults.AuthenticationScheme;
-                options.DefaultChallengeScheme = JwtBearerDefaults.AuthenticationScheme;
+                options.DefaultScheme = CookieAuthenticationDefaults.AuthenticationScheme;
+                options.DefaultChallengeScheme = "oidc";
             })
-            .AddJwtBearer(options =>
+            .AddCookie(options => 
+            {
+                options.ExpireTimeSpan = TimeSpan.FromHours(1);
+            })
+            .AddOpenIdConnect("oidc", options =>
             {
                 options.Authority = Configuration.GetValue<string>("Auth:Server");
                 options.RequireHttpsMetadata = !Configuration.GetValue("Auth:AllowInsecureHttp", false);
-                options.SaveToken = true;
-                options.EventsType = typeof(NzFursJwtBearerEvents);
+
+                options.ClientId = Configuration.GetValue<string>("Auth:ClientId");
+                options.ClientSecret = Configuration.GetValue<string>("Auth:ClientSecret");
+
+                options.ResponseType = "code id_token";
+
+                options.Scope.Clear();
+                options.Scope.Add("openid");
+                options.Scope.Add("profile");
+
+                options.GetClaimsFromUserInfoEndpoint = true;
+                options.SaveTokens = true;
+
+                options.TokenValidationParameters = new TokenValidationParameters
+                {
+                    NameClaimType = "name",
+                    RoleClaimType = "role",
+                };
             });
 
             services.AddMvc().SetCompatibilityVersion(CompatibilityVersion.Version_2_2);
@@ -112,6 +137,7 @@ namespace FurCoNZ
                 app.UseHsts();
             }
 
+            app.UseAuthentication();
             app.UseHttpsRedirection();
             app.UseStaticFiles();
             app.UseCookiePolicy();
