@@ -11,11 +11,11 @@ pool:
 
 variables:
   dockerId: nzfurs
-  imageName: 'furconz:$(build.buildId)'
+  imageName: 'furconz'
 
 steps:
 - script: |
-    docker build -f FurCoNZ/Dockerfile -t $(dockerId)/$(imageName) .
+    docker build -f FurCoNZ/Dockerfile -t $(dockerId)/$(imageName):$(build.buildId) -t $(dockerId)/$(imageName):latest .
   displayName: 'docker build'
 - script: |
     docker login -u $(dockerHubId) -p $(dockerHubPassword)
