@@ -10,7 +10,9 @@ using Microsoft.AspNetCore.Builder;
 using Microsoft.AspNetCore.Hosting;
 using Microsoft.AspNetCore.Http;
 using Microsoft.AspNetCore.Mvc;
+#if DEBUG
 using Microsoft.Data.Sqlite;
+#endif
 using Microsoft.EntityFrameworkCore;
 using Microsoft.Extensions.Configuration;
 using Microsoft.Extensions.DependencyInjection;
@@ -50,6 +52,7 @@ namespace FurCoNZ
                     case "sqlserver":
                         throw new NotSupportedException(@"Microsoft SQL Server is not currently supported. This may come in a future release because it's easy to implement, but it may be buggy and won't be officially maintained.");
                     case "sqlite":
+#if DEBUG
                         var databasePath = new DirectoryInfo(Path.Combine("data", "database"));
                         if (!databasePath.Exists)
                             databasePath.Create();
@@ -63,6 +66,9 @@ namespace FurCoNZ
                         };
                         options.UseSqlite(connectionStringBuilder.ToString());
                         break;
+#else
+                        throw new NotSupportedException("SQLite has been disbled fro Release builds due to migration issues");
+#endif
                     default:
                     case "postgres":
                     case "postgresql":
