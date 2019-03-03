@@ -1,21 +1,18 @@
-FROM microsoft/dotnet:2.2-aspnetcore-runtime-stretch-slim AS base
+FROM mcr.microsoft.com/dotnet/core/sdk:2.2 AS base
 WORKDIR /app
 EXPOSE 80
 EXPOSE 443
 
-FROM microsoft/dotnet:2.2-sdk-stretch AS build
-ENV ASPNETCORE_ENVIRONMENT=Production
+FROM mcr.microsoft.com/dotnet/core/sdk:2.2 AS build
 WORKDIR /src
 COPY ["FurCoNZ/FurCoNZ.csproj", "FurCoNZ/"]
 RUN dotnet restore "FurCoNZ/FurCoNZ.csproj"
 COPY . .
 WORKDIR "/src/FurCoNZ"
 RUN dotnet build "FurCoNZ.csproj" -c Release -o /app
-RUN dotnet ef migrations script --configuration Release --idempotent --output "/app/migrations.sql"
 
 FROM build AS publish
 RUN dotnet publish "FurCoNZ.csproj" -c Release -o /app
-COPY --from=build /app/migrations.sql /app
 
 FROM base AS final
 WORKDIR /app
