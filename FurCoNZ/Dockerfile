@@ -14,6 +14,8 @@ RUN dotnet build "FurCoNZ.csproj" -c Release -o /app
 FROM build AS publish
 RUN dotnet publish "FurCoNZ.csproj" -c Release -o /app
 
+RUN dotnet ef migrations script --idempotent --output "/app/migrations.sql"
+
 FROM base AS final
 WORKDIR /app
 COPY --from=publish /app .
