@@ -45,6 +45,25 @@ namespace FurCoNZ
                     case "mysql":
                     case "mariadb":
                         throw new NotSupportedException(@"MySQL/MariaDB is not currently supported.");
+                    case "oracle":
+                        throw new NotSupportedException(@"Ha, no. Oracle can fuck right off. https://web.archive.org/web/20150811052336/https://blogs.oracle.com/maryanndavidson/entry/no_you_really_can_t");
+                    case "sqlserver":
+                        throw new NotSupportedException(@"Microsoft SQL Server is not currently supported. This may come in a future release because it's easy to implement, but it may be buggy and won't be officially maintained.");
+                    case "sqlite":
+                        var databasePath = new DirectoryInfo(Path.Combine("data", "database"));
+                        if (!databasePath.Exists)
+                            databasePath.Create();
+
+                        var connectionStringBuilder = new SqliteConnectionStringBuilder
+                        {
+                            DataSource = Path.Combine(
+                                Environment.CurrentDirectory,
+                                Configuration.GetValue("Paths:Database", "data/database"),
+                                Configuration.GetValue("Data:Database:Filename", "data.db"))
+                        };
+                        options.UseSqlite(connectionStringBuilder.ToString());
+                        break;
+                    default:
                     case "postgres":
                     case "postgresql":
                         var connectionString =
@@ -62,26 +81,6 @@ namespace FurCoNZ
                             }.ToString();
 
                         options.UseNpgsql(connectionString);
-
-                        break;
-                    case "oracle":
-                        throw new NotSupportedException(@"Ha, no. Oracle can fuck right off. https://web.archive.org/web/20150811052336/https://blogs.oracle.com/maryanndavidson/entry/no_you_really_can_t");
-                    case "sqlserver":
-                        throw new NotSupportedException(@"Microsoft SQL Server is not currently supported. This may come in a future release because it's easy to implement, but it may be buggy and won't be officially maintained.");
-                    case "sqlite":
-                    default:
-                        var databasePath = new DirectoryInfo(Path.Combine("data", "database"));
-                        if (!databasePath.Exists)
-                            databasePath.Create();
-
-                        var connectionStringBuilder = new SqliteConnectionStringBuilder
-                        {
-                            DataSource = Path.Combine(
-                                Environment.CurrentDirectory,
-                                Configuration.GetValue("Paths:Database", "data/database"),
-                                Configuration.GetValue("Data:Database:Filename", "data.db"))
-                        };
-                        options.UseSqlite(connectionStringBuilder.ToString());
                         break;
                 }
             });
