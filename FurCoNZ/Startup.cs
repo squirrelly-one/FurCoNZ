@@ -47,14 +47,22 @@ namespace FurCoNZ
                         throw new NotSupportedException(@"MySQL/MariaDB is not currently supported.");
                     case "postgres":
                     case "postgresql":
-                        options.UseNpgsql(new NpgsqlConnectionStringBuilder
-                        {
-                            Database = Configuration.GetValue<string>("Data:Database:Database"),
-                            Host = Configuration.GetValue<string>("Data:Database:Host"),
-                            Port = Configuration.GetValue("Data:Database:Port", 5432),
-                            Username = Configuration.GetValue("Data:Database:Username", string.Empty),
-                            Password = Configuration.GetValue("Data:Database:Password", string.Empty),
-                        }.ToString());
+                        var connectionString =
+                            Configuration.GetValue<string>("Data:Database:ConnectionString", null)
+                            ?? new NpgsqlConnectionStringBuilder
+                            {
+                                Database = Configuration.GetValue<string>("Data:Database:Database"),
+                                Host = Configuration.GetValue<string>("Data:Database:Host"),
+                                Port = Configuration.GetValue("Data:Database:Port", 5432),
+                                Username = Configuration.GetValue("Data:Database:Username", string.Empty),
+                                Password = Configuration.GetValue("Data:Database:Password", string.Empty),
+                                SslMode = Configuration.GetValue<bool>("Data:Database:RequireSSL", false)
+                                    ? SslMode.Require
+                                    : SslMode.Prefer,
+                            }.ToString();
+
+                        options.UseNpgsql(connectionString);
+
                         break;
                     case "oracle":
                         throw new NotSupportedException(@"Ha, no. Oracle can fuck right off. https://web.archive.org/web/20150811052336/https://blogs.oracle.com/maryanndavidson/entry/no_you_really_can_t");
