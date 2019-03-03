@@ -5,6 +5,8 @@ using System.IO;
 using System.Linq;
 using System.Net.Security;
 using System.Security.Cryptography.X509Certificates;
+using System.Security.Cryptography;
+using System.Text;
 using System.Threading.Tasks;
 
 using Microsoft.AspNetCore.Authentication.Cookies;
@@ -85,7 +87,7 @@ namespace FurCoNZ
                         NpgsqlConnectionStringBuilder.Host = Configuration.GetValue<string>("Data:Database:Host", NpgsqlConnectionStringBuilder.Host);
                         NpgsqlConnectionStringBuilder.Port = Configuration.GetValue("Data:Database:Port", NpgsqlConnectionStringBuilder.Port);
                         NpgsqlConnectionStringBuilder.Username = Configuration.GetValue("Data:Database:Username", NpgsqlConnectionStringBuilder.Username);
-                        NpgsqlConnectionStringBuilder.Password = Configuration.GetValue("Data:Database:Password", NpgsqlConnectionStringBuilder.Passfile);
+                        NpgsqlConnectionStringBuilder.Password = Configuration.GetValue("Data:Database:Password", NpgsqlConnectionStringBuilder.Password);
 
                         if(!string.IsNullOrEmpty(Configuration.GetValue<string>("Data:Database:RequireSSL")))
                             NpgsqlConnectionStringBuilder.SslMode = Configuration.GetValue("Data:Database:RequireSSL", false)
@@ -98,16 +100,43 @@ namespace FurCoNZ
                             {
                                 npgsqlOptions.RemoteCertificateValidationCallback((object sender, X509Certificate certificate, X509Chain chain, SslPolicyErrors sslPolicyErrors) =>
                                 {
-                                    var certificateFingerprint = Configuration.GetValue("Data:Database:CAFingerprint", string.Empty);
-                                    if (string.IsNullOrEmpty(certificateFingerprint))
+                                    var caFingerprint = Configuration.GetValue("Data:Database:CAFingerprint", string.Empty);
+                                    // Perform default validation if a fingerprint was not provided.
+                                    if (string.IsNullOrEmpty(caFingerprint))
                                         return new X509Certificate2(certificate).Verify();
 
-                                    var certHash = certificate.GetCertHashString(System.Security.Cryptography.HashAlgorithmName.SHA256);
-                                    if(certHash.Equals(certificateFingerprint, StringComparison.OrdinalIgnoreCase))
-                                        return true;
+                                    bool hasRecognisedCA = false;
+                                    var certsLog = new StringBuilder();
+                                    // Check to see if any CA matches a stored fingerprint
+                                    foreach (var chainElement in chain.ChainElements)
+                                    {
+                                        certsLog.AppendLine($"- Certificate {chainElement.Certificate.SubjectName}: {chainElement.Certificate.GetCertHashString(HashAlgorithmName.SHA256)}");
+                                        if (chainElement.Certificate.GetCertHashString(HashAlgorithmName.SHA256).Equals(caFingerprint, StringComparison.OrdinalIgnoreCase))
+                                        {
+                                            hasRecognisedCA = true;
+                                            break;
+                                        }
+                                    }
 
-                                    _logger.LogCritical($"Could not verify certificate. SHA256 fingerprint {certHash} did not match. Expecting {certificateFingerprint}.");
-                                    return false;
+                                    if (!hasRecognisedCA)
+                                    {
+                                        certsLog.Insert(0, $"Could not verify certificate. did not match. Expecting {caFingerprint}.\n");
+                                        _logger.LogCritical(certsLog.ToString());
+                                        return false;
+                                    }
+                                    else if (sslPolicyErrors == SslPolicyErrors.RemoteCertificateChainErrors)
+                                    {
+                                        // Clear ssl policy error as we now trust the certificate chain.
+                                        sslPolicyErrors = SslPolicyErrors.None;
+                                    }
+
+                                    if (sslPolicyErrors != SslPolicyErrors.None)
+                                    {
+                                        _logger.LogCritical($"certificate failed validation: {sslPolicyErrors}");
+                                        return false;
+                                    }
+
+                                    return true;
                                 });
                             });
                         break;
