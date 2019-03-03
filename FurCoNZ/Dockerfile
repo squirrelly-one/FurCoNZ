@@ -10,11 +10,11 @@ RUN dotnet restore "FurCoNZ/FurCoNZ.csproj"
 COPY . .
 WORKDIR "/src/FurCoNZ"
 RUN dotnet build "FurCoNZ.csproj" -c Release -o /app
+RUN dotnet ef migrations script --configuration Release --idempotent --output "/app/migrations.sql"
 
 FROM build AS publish
 RUN dotnet publish "FurCoNZ.csproj" -c Release -o /app
-
-RUN dotnet ef migrations script --idempotent --output "/app/migrations.sql"
+COPY --from=build /app/app/migrations.sql /app
 
 FROM base AS final
 WORKDIR /app
