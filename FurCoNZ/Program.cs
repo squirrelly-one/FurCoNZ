@@ -48,34 +48,37 @@ namespace FurCoNZ
                 Environment.Exit(2);
             }
 
-            using (var context = webHost.Services.GetService<FurCoNZDbContext>())
+            using (var scopeServices = webHost.Services.CreateScope())
             {
-                if (verifyMigrate.HasValue())
+                using (var context = scopeServices.ServiceProvider.GetService<FurCoNZDbContext>())
                 {
-                    Console.WriteLine("Validating status of Entity Framework migrations");
-                    var pendingMigrations = context.Database.GetPendingMigrations();
-                    var migrations = pendingMigrations as IList<string> ?? pendingMigrations.ToList();
-                    if (!migrations.Any())
+                    if (verifyMigrate.HasValue())
                     {
-                        Console.WriteLine("No pending migratons");
+                        Console.WriteLine("Validating status of Entity Framework migrations");
+                        var pendingMigrations = context.Database.GetPendingMigrations();
+                        var migrations = pendingMigrations as IList<string> ?? pendingMigrations.ToList();
+                        if (!migrations.Any())
+                        {
+                            Console.WriteLine("No pending migratons");
+                            Environment.Exit(0);
+                        }
+
+                        Console.WriteLine("Pending migratons {0}", migrations.Count());
+                        foreach (var migration in migrations)
+                        {
+                            Console.WriteLine($"\t{migration}");
+                        }
+
+                        Environment.Exit(3);
+                    }
+                    else if (doMigrate.HasValue())
+                    {
+                        Console.WriteLine("Applyting Entity Framework migrations");
+
+                        context.Database.Migrate();
+                        Console.WriteLine("All done, closing app");
                         Environment.Exit(0);
                     }
-
-                    Console.WriteLine("Pending migratons {0}", migrations.Count());
-                    foreach (var migration in migrations)
-                    {
-                        Console.WriteLine($"\t{migration}");
-                    }
-
-                    Environment.Exit(3);
-                }
-                else if (doMigrate.HasValue())
-                {
-                    Console.WriteLine("Applyting Entity Framework migrations");
-
-                    context.Database.Migrate();
-                    Console.WriteLine("All done, closing app");
-                    Environment.Exit(0);
                 }
             }
 
