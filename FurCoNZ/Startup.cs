@@ -3,6 +3,8 @@ using System.Collections.Generic;
 using System.IdentityModel.Tokens.Jwt;
 using System.IO;
 using System.Linq;
+using System.Net.Security;
+using System.Security.Cryptography.X509Certificates;
 using System.Threading.Tasks;
 
 using Microsoft.AspNetCore.Authentication.Cookies;
@@ -16,6 +18,7 @@ using Microsoft.Data.Sqlite;
 using Microsoft.EntityFrameworkCore;
 using Microsoft.Extensions.Configuration;
 using Microsoft.Extensions.DependencyInjection;
+using Microsoft.Extensions.Logging;
 using Microsoft.IdentityModel.Tokens;
 using Npgsql;
 
@@ -26,9 +29,12 @@ namespace FurCoNZ
 {
     public class Startup
     {
-        public Startup(IConfiguration configuration)
+        private readonly ILogger _logger;
+
+        public Startup(IConfiguration configuration, ILogger<Startup> logger)
         {
             Configuration = configuration;
+            _logger = logger;
             // All the sames do this. I have no idea why.
             JwtSecurityTokenHandler.DefaultInboundClaimTypeMap.Clear();
         }
@@ -86,7 +92,24 @@ namespace FurCoNZ
                                 ? SslMode.Require
                                 : SslMode.Prefer;
 
-                        options.UseNpgsql(NpgsqlConnectionStringBuilder.ToString());
+                        options.UseNpgsql(
+                            NpgsqlConnectionStringBuilder.ToString(),
+                            npgsqlOptions =>
+                            {
+                                npgsqlOptions.RemoteCertificateValidationCallback((object sender, X509Certificate certificate, X509Chain chain, SslPolicyErrors sslPolicyErrors) =>
+                                {
+                                    var certificateFingerprint = Configuration.GetValue("Data:Database:CAFingerprint", string.Empty);
+                                    if (string.IsNullOrEmpty(certificateFingerprint))
+                                        return new X509Certificate2(certificate).Verify();
+
+                                    var certHash = certificate.GetCertHashString(System.Security.Cryptography.HashAlgorithmName.SHA256);
+                                    if(certHash.Equals(certificateFingerprint, StringComparison.OrdinalIgnoreCase))
+                                        return true;
+
+                                    _logger.LogCritical($"Could not verify certificate. SHA256 fingerprint {certHash} did not match. Expecting {certificateFingerprint}.");
+                                    return false;
+                                });
+                            });
                         break;
                 }
             });
