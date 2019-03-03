@@ -72,21 +72,21 @@ namespace FurCoNZ
                     default:
                     case "postgres":
                     case "postgresql":
-                        var connectionString =
-                            Configuration.GetValue<string>("Data:Database:ConnectionString", null)
-                            ?? new NpgsqlConnectionStringBuilder
-                            {
-                                Database = Configuration.GetValue<string>("Data:Database:Database"),
-                                Host = Configuration.GetValue<string>("Data:Database:Host"),
-                                Port = Configuration.GetValue("Data:Database:Port", 5432),
-                                Username = Configuration.GetValue("Data:Database:Username", string.Empty),
-                                Password = Configuration.GetValue("Data:Database:Password", string.Empty),
-                                SslMode = Configuration.GetValue<bool>("Data:Database:RequireSSL", false)
-                                    ? SslMode.Require
-                                    : SslMode.Prefer,
-                            }.ToString();
+                        var NpgsqlConnectionStringBuilder =
+                            new NpgsqlConnectionStringBuilder(Configuration.GetValue("Data:Database:ConnectionString", string.Empty));
 
-                        options.UseNpgsql(connectionString);
+                        NpgsqlConnectionStringBuilder.Database = Configuration.GetValue<string>("Data:Database:Database", NpgsqlConnectionStringBuilder.Database);
+                        NpgsqlConnectionStringBuilder.Host = Configuration.GetValue<string>("Data:Database:Host", NpgsqlConnectionStringBuilder.Host);
+                        NpgsqlConnectionStringBuilder.Port = Configuration.GetValue("Data:Database:Port", NpgsqlConnectionStringBuilder.Port);
+                        NpgsqlConnectionStringBuilder.Username = Configuration.GetValue("Data:Database:Username", NpgsqlConnectionStringBuilder.Username);
+                        NpgsqlConnectionStringBuilder.Password = Configuration.GetValue("Data:Database:Password", NpgsqlConnectionStringBuilder.Passfile);
+
+                        if(!string.IsNullOrEmpty(Configuration.GetValue<string>("Data:Database:RequireSSL")))
+                            NpgsqlConnectionStringBuilder.SslMode = Configuration.GetValue("Data:Database:RequireSSL", false)
+                                ? SslMode.Require
+                                : SslMode.Prefer;
+
+                        options.UseNpgsql(NpgsqlConnectionStringBuilder.ToString());
                         break;
                 }
             });
