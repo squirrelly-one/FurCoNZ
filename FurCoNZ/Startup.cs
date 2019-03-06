@@ -3,6 +3,7 @@ using System.Collections.Generic;
 using System.IdentityModel.Tokens.Jwt;
 using System.IO;
 using System.Linq;
+using System.Net;
 using System.Net.Security;
 using System.Security.Cryptography.X509Certificates;
 using System.Security.Cryptography;
@@ -203,11 +204,17 @@ namespace FurCoNZ
                 app.UseHsts();
 
             }
-
-            app.UseForwardedHeaders(new ForwardedHeadersOptions
+            var forwardedHeaderOptions = new ForwardedHeadersOptions
             {
-                ForwardedHeaders = ForwardedHeaders.XForwardedFor | ForwardedHeaders.XForwardedProto
-            });
+                ForwardedHeaders = ForwardedHeaders.XForwardedFor | ForwardedHeaders.XForwardedProto,
+            };
+            // Allow fowrwarded headers from IP address in Configuration["ReverseProxy:Networks"]
+            foreach (var network in Configuration.GetSection("ReverseProxy:Networks").GetChildren())
+            {
+                var address = network.Value.Split("/"); // 0.0.0.0/0
+                forwardedHeaderOptions.KnownNetworks.Add(new IPNetwork(IPAddress.Parse(address[0]), int.Parse(address[1])));
+            }
+            app.UseForwardedHeaders(forwardedHeaderOptions);
 
             app.UseAuthentication();
             app.UseHttpsRedirection();
