@@ -15,5 +15,8 @@ namespace FurCoNZ.DAL
         { }
 
         public DbSet<User> Users { get; set; }
+        public DbSet<Order> Orders { get; set; }
+        public DbSet<Ticket> Tickets { get; set; }
+        public DbSet<TicketType> TicketTypes { get; set; }
     }
 }
