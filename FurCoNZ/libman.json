@@ -1,0 +1,26 @@
+{
+  "version": "1.0",
+  "defaultProvider": "cdnjs",
+  "libraries": [
+    {
+      "library": "jquery@3.3.1",
+      "files": [
+        "jquery.slim.min.js",
+        "jquery.slim.js"
+      ],
+      "destination": "wwwroot/lib/jquery/"
+    },
+    {
+      "library": "twitter-bootstrap@4.3.1",
+      "destination": "wwwroot/lib/bootstrap/"
+    },
+    {
+      "library": "popper.js@1.14.7",
+      "files": [
+        "esm/popper.min.js",
+        "esm/popper.js"
+      ],
+      "destination": "wwwroot/lib/popper/"
+    }
+  ]
+}
