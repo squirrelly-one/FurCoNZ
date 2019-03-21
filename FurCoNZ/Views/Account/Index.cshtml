@@ -1,0 +1,22 @@
+﻿@model AccountViewModel
+@{
+    ViewData["Title"] = "Account";
+    ViewData["CalledName"] = "Tequin Dragon";
+}
+<h2>
+    @ViewData["Title"]
+    <small class="text-muted">@ViewData["CalledName"]</small>
+</h2>
+
+<ul class="nav nav-pills">
+    <li class="nav-item">
+        <a class="nav-link active" href="#">Overview</a>
+    </li>
+    <li class="nav-item">
+        <a class="nav-link" href="#">Orders</a>
+    </li>
+    <li class="nav-item">
+        <a class="nav-link" href="#">Tickets</a>
+    </li>
+</ul>
+
