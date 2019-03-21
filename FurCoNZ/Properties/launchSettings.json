@@ -6,7 +6,7 @@
       "environmentVariables": {
         "ASPNETCORE_ENVIRONMENT": "Development"
       },
-      "applicationUrl": "http://localhost:62434"
+      "applicationUrl": "http://local.dev.furco.nz:62434"
     },
     "Docker": {
       "commandName": "Docker",

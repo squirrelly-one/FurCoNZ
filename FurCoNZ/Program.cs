@@ -40,6 +40,10 @@ namespace FurCoNZ
         {
             var webHost = WebHost.CreateDefaultBuilder(args)
                 .UseStartup<Startup>()
+                .UseKestrel((hostContext, options) =>
+                {
+                    options.Configure(hostContext.Configuration.GetSection("HttpServer"));
+                })
                 .Build();
 
             if (verifyMigrate.HasValue() && doMigrate.HasValue())
