@@ -23,7 +23,7 @@
   </ItemGroup>
 
   <ItemGroup>
-    <Folder Include="Pages\Tickets\" />
-    <Folder Include="Pages\Tickets\Order\" />
+    <Folder Include="ViewModels\" />
+    <Folder Include="Views\Order\" />
   </ItemGroup>
 </Project>
