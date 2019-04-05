@@ -1,9 +1,9 @@
-﻿@model FurCoNZ.ViewModels.TicketIndexViewModel
+﻿@model FurCoNZ.ViewModels.OrderIndexViewModel
 @{
     ViewData["Title"] = "Order Tickets";
 }
 
-<form>
+<form asp-action="Index" method="post">
     <table>
         <tr>
             <th>Type</th>
@@ -14,14 +14,15 @@
         @foreach (var ticketType in Model.AvailableTicketTypes)
         {
             <tr>
-                <td>@ticketType.Name</td>
-                <td>$@((ticketType.PriceCents / 100).ToString("f2"))</td>
-                <td>@ticketType.TotalAvailable remaining</td>
+                <td>@ticketType.Value.Name</td>
+                <td>$@((ticketType.Value.PriceCents / 100).ToString("f2"))</td>
+                <td>@ticketType.Value.TotalAvailable remaining</td>
                 <td>
-                    <input type="number" name="ticketnumber[@ticketType.Id]" value="0" min="0" max="@ticketType.TotalAvailable" />
+                    <input asp-for="AvailableTicketTypes[ticketType.Key].QuantityOrdered" min="0" max="@ticketType.Value.TotalAvailable" />
+                    @*<input type="number" name="ticketnumber[@ticketType.Key]" value="0" min="0" max="@ticketType.Value.TotalAvailable" />*@
                 </td>
             </tr>
         }
     </table>
-    <input type="submit" name="submit" value="Details >"/>
-</form>
+    <input type="submit" name="submit" value="Details >" />
+ </form>

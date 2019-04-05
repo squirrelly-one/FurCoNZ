@@ -5,8 +5,8 @@ using FurCoNZ.Models;
 
 namespace FurCoNZ.ViewModels
 {
-    public class TicketIndexViewModel
+    public class OrderIndexViewModel
     {
-        public IEnumerable<TicketType> AvailableTicketTypes { get; set; }
+        public Dictionary<int, OrderTicketTypeViewModel> AvailableTicketTypes { get; set; }
     }
 }

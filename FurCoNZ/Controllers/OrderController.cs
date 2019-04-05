@@ -1,4 +1,7 @@
-﻿using System.Threading;
+﻿using System;
+using System.Collections.Generic;
+using System.Linq;
+using System.Threading;
 using System.Threading.Tasks;
 using FurCoNZ.Services;
 using FurCoNZ.ViewModels;
@@ -20,12 +23,38 @@ namespace FurCoNZ.Controllers
         // GET: /<controller>/
         public async Task<IActionResult> Index(CancellationToken cancellationToken)
         {
-            var viewModel = new TicketIndexViewModel
+            var availableTicketTypes = await _orderService.GetTicketTypesAsync(cancellationToken: cancellationToken);
+
+            var viewModel = new OrderIndexViewModel
             {
-                AvailableTicketTypes = await _orderService.GetTicketTypesAsync(cancellationToken: cancellationToken)
+                AvailableTicketTypes = availableTicketTypes.Select(a => new KeyValuePair<int, OrderTicketTypeViewModel>
+                (
+                    a.Id,
+                    new OrderTicketTypeViewModel
+                    {
+                        Name = a.Name,
+                        Description = a.Description,
+                        PriceCents = a.PriceCents,
+                        TotalAvailable = a.TotalAvailable,
+                        QuantityOrdered = 0, // default to zero tickets
+                    }
+                )).ToDictionary(a => a.Key, a => a.Value)
             };
 
             return View(viewModel);
+        }
+
+        [HttpPost]
+        public async Task<IActionResult> Index(OrderIndexViewModel orderIndexViewModel, CancellationToken cancellationToken)
+        {
+            if (ModelState.IsValid)
+            {
+                var viewModel = new List<TicketDetailViewModel>();
+
+                return View("TicketDetail", viewModel);
+            }
+
+            return View(orderIndexViewModel);
         }
     }
 }
