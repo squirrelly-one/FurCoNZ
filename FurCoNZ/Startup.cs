@@ -146,6 +146,7 @@ namespace FurCoNZ
             });
 
             services.AddTransient<IUserService, EntityFrameworkUserService>();
+            services.AddTransient<IOrderService, OrderService>();
 
             services.Configure<CookiePolicyOptions>(options =>
             {
