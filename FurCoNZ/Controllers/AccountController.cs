@@ -28,16 +28,31 @@ namespace FurCoNZ.Controllers
             _userService = userService;
         }
 
-        private T PrefillAccountViewModel<T>(T account) where T : AccountViewModel
+        private async Task<T> PrefillAccountViewModel<T>(T account, CancellationToken cancellationToken = default) where T : AccountViewModel
         {
-            account.CalledName = User.FindFirst("name").Value;
+            var user = await _userService.GetUserAsync(User.FindFirst("sub").Value, cancellationToken);
+            account.Name = user.Name;
+            account.Email = user.Email;
 
             return account;
         }
 
-        public IActionResult Index()
+        public async Task<IActionResult> Index()
         {
-            return View(PrefillAccountViewModel(new AccountViewModel()));
+            return View(await PrefillAccountViewModel(new AccountViewModel()));
+        }
+
+        [HttpPost]
+        public async Task<IActionResult> UpdateAccount(AccountViewModel account, CancellationToken cancellationToken = default)
+        {
+            var user = await _userService.GetUserAsync(User.FindFirst("sub").Value, cancellationToken);
+
+            user.Name = account.Name;
+            user.Email = account.Email;
+
+            await _userService.UpdateUserAsync(user, cancellationToken);
+
+            return RedirectToAction("Index");
         }
 
         public async Task<IActionResult> Orders(CancellationToken cancellationToken = default)
@@ -50,7 +65,7 @@ namespace FurCoNZ.Controllers
 
             var orders = await _orderService.GetUserOrders(user, cancellationToken);
 
-            return View("Index", PrefillAccountViewModel(new AccountOrdersViewModel {
+            return View("Index", await PrefillAccountViewModel(new AccountOrdersViewModel {
                 Orders = orders.ToList()
             }));
         }

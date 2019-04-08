@@ -1,19 +1,46 @@
 ﻿@model AccountViewModel
 
-<table class="table">
-    <thead>
-        <tr>
-            <th scope="col">Type</th>
-            <th scope="col">Value</th>
-        </tr>
-    </thead>
-    <tbody>
-        @foreach (var claim in User.Claims)
-        {
-            <tr>
-                <td>@claim.Type</td>
-                <td>@claim.Value</td>
-            </tr>
-        }
-    </tbody>
-</table>
+    <div class="card mb-3">
+        <div class="card-body">
+            <h5 class="card-title">Your Account</h5>
+
+            <form method="post" asp-action="UpdateAccount">
+                <div class="form-group">
+                    <label for="Name">Prefered Called Name</label>
+                    <input asp-for="Name" class="form-control" aria-describedby="NameHelp" placeholder="Alex Bird-Person">
+                    <small id="NameHelp" class="form-text text-muted">How would you like us to address you?</small>
+                </div>
+                <div class="form-group">
+                    <label for="Email">Email address</label>
+                    <input asp-for="Email" class="form-control" aria-describedby="EmailHelp" placeholder="burb@furry.nz">
+                    <small id="EmailHelp" class="form-text text-muted">We'll never share your email with anyone else.</small>
+                </div>
+                <button type="submit" class="btn btn-primary">Update</button>
+            </form>
+        </div>
+    </div>
+    <environment names="Development">
+        <div class="card mb-3">
+            <div class="card-body">
+                <h5 class="card-title">Your Claims</h5>
+                <h6 class="card-subtitle mb-2 text-muted">Visible for development environments only</h6>
+                <table class="table">
+                    <thead>
+                        <tr>
+                            <th scope="col">Type</th>
+                            <th scope="col">Value</th>
+                        </tr>
+                    </thead>
+                    <tbody>
+                        @foreach (var claim in User.Claims)
+                        {
+                            <tr>
+                                <td>@claim.Type</td>
+                                <td>@claim.Value</td>
+                            </tr>
+                        }
+                    </tbody>
+                </table>
+            </div>
+        </div>
+    </environment>
