@@ -41,5 +41,11 @@ namespace FurCoNZ.Services
         {
             throw new NotImplementedException();
         }
+
+        public async Task<IEnumerable<Order>> GetUserOrders(User user, CancellationToken cancellationToken = default)
+        {
+            // TODO: Should we support pagination?
+            return await _db.Orders.Where(o => o.OrderedBy == user).ToListAsync(cancellationToken);
+        }
     }
 }
