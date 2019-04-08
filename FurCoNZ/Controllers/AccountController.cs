@@ -59,7 +59,9 @@ namespace FurCoNZ.Controllers
         {
             var user = await _userService.GetUserAsync(User.FindFirst("sub").Value, cancellationToken);
             if (user == null)
+            {
                 throw new Exception("We are unable to find your user details within our database. Which may indicate that you did not log in properly");
+            }
 
             cancellationToken.ThrowIfCancellationRequested();
 
