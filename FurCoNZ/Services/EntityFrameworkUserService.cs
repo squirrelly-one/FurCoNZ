@@ -43,6 +43,13 @@ namespace FurCoNZ.Services
             return await _dbContext.Users.FindAsync(new[] { id }, cancellationToken);
         }
 
+        public async Task UpdateUserAsync(User user, CancellationToken cancellationToken = default)
+        {
+            _dbContext.Users.Update(user);
+
+            await _dbContext.SaveChangesAsync(cancellationToken);
+        }
+
         public async Task<IEnumerable<User>> ListUsersAsync(CancellationToken cancellationToken = default)
         {
             return await _dbContext.Users.ToListAsync(cancellationToken);

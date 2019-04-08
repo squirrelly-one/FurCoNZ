@@ -1,0 +1,23 @@
+﻿@model AccountOrdersViewModel
+
+<table class="table">
+    <thead>
+        <tr>
+            <th scope="col">Id</th>
+            <th scope="col">Paid</th>
+            <th scope="col">Owing</th>
+            <th scope="col">Total</th>
+        </tr>
+    </thead>
+    <tbody>
+        @foreach (var order in Model.Orders)
+        {
+        <tr>
+            <td scope="row">@order.Id</td>
+            <td>@order.AmountPaidCents</td>
+            <td>@order.AmountOwingCents</td>
+            <td>@order.TotalAmountCents</td>
+        </tr>
+        }
+    </tbody>
+</table>

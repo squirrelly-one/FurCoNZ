@@ -27,9 +27,8 @@ namespace FurCoNZ.Auth
             {
                 Id = context.User.Value<string>("sub"),
                 Name = context.User.Value<string>("name"),
+                Email = context.User.Value<string>("email"),
             });
-            
-            return;
         }
     }
 }
