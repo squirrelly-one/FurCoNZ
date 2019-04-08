@@ -1,22 +1,29 @@
 ﻿@model AccountViewModel
-@{
-    ViewData["Title"] = "Account";
-    ViewData["CalledName"] = "Tequin Dragon";
-}
+
 <h2>
-    @ViewData["Title"]
-    <small class="text-muted">@ViewData["CalledName"]</small>
+    Account
+    <small class="text-muted">@Model.CalledName</small>
 </h2>
 
 <ul class="nav nav-pills">
     <li class="nav-item">
-        <a class="nav-link active" href="#">Overview</a>
+        <a class="nav-link" asp-active-actions="Index" asp-action="Index">Overview</a>
     </li>
     <li class="nav-item">
-        <a class="nav-link" href="#">Orders</a>
+        <a class="nav-link" asp-active-actions="Orders" asp-action="Orders">Orders</a>
     </li>
     <li class="nav-item">
-        <a class="nav-link" href="#">Tickets</a>
+        <a class="nav-link" asp-active-actions="Tickets" asp-action="Tickets">Tickets</a>
     </li>
 </ul>
 
+@{ 
+    if (Model is AccountOrdersViewModel orders)
+    {
+        await Html.RenderPartialAsync("_Orders", orders);
+    }
+    else
+    {
+        await Html.RenderPartialAsync("_Overview", Model);
+    }
+}
