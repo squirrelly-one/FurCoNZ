@@ -28,6 +28,7 @@ using Npgsql;
 using FurCoNZ.DAL;
 using FurCoNZ.Services;
 using Microsoft.AspNetCore.HttpOverrides;
+using FurCoNZ.Auth;
 
 namespace FurCoNZ
 {
@@ -186,6 +187,8 @@ namespace FurCoNZ
                     NameClaimType = "name",
                     RoleClaimType = "role",
                 };
+
+                options.Events.OnUserInformationReceived = NzFursOpenIdConnectEvents.OnUserInformationReceived;
             });
 
             services.AddMvc().SetCompatibilityVersion(CompatibilityVersion.Version_2_2);
