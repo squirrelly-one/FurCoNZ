@@ -50,6 +50,24 @@ namespace FurCoNZ.Controllers
             if (ModelState.IsValid)
             {
                 var viewModel = new List<TicketDetailViewModel>();
+                var ticketTypes = await _orderService.GetTicketTypesAsync(false, cancellationToken);
+
+                var ticketIndex = 0;
+                foreach (var ticketTypeOrdered in orderIndexViewModel.AvailableTicketTypes.Where(x => x.Value.QuantityOrdered > 0))
+                {
+                    var ticketTypeId = ticketTypeOrdered.Key;
+                    var quantityOrderedForTicketType = ticketTypeOrdered.Value.QuantityOrdered;
+
+                    for (var i = 0; i < quantityOrderedForTicketType; i++)
+                    {
+                        viewModel.Add(new TicketDetailViewModel
+                        {
+                            Id = ++ticketIndex,
+                            TicketTypeId = ticketTypeId,
+                            TicketTypeName = ticketTypes.FirstOrDefault(x => x.Id == ticketTypeId).Name,
+                        });
+                    }
+                }
 
                 return View("TicketDetail", viewModel);
             }

@@ -4,13 +4,16 @@
 }
 
 <form asp-action="Index" method="post">
-    <table>
-        <tr>
-            <th>Type</th>
-            <th>Price</th>
-            <th>Quantity</th>
-            <th>Purchase</th>
-        </tr>
+    <table class="table">
+        <thead>
+            <tr>
+                <th scope="col">Type</th>
+                <th scope="col">Price</th>
+                <th scope="col">Quantity</th>
+                <th scope="col">Purchase</th>
+            </tr>
+        </thead>
+        <tbody>
         @foreach (var ticketType in Model.AvailableTicketTypes)
         {
             <tr>
@@ -19,10 +22,10 @@
                 <td>@ticketType.Value.TotalAvailable remaining</td>
                 <td>
                     <input asp-for="AvailableTicketTypes[ticketType.Key].QuantityOrdered" min="0" max="@ticketType.Value.TotalAvailable" />
-                    @*<input type="number" name="ticketnumber[@ticketType.Key]" value="0" min="0" max="@ticketType.Value.TotalAvailable" />*@
                 </td>
             </tr>
         }
+        </tbody>
     </table>
     <input type="submit" name="submit" value="Details >" />
  </form>

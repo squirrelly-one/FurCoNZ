@@ -1,0 +1,17 @@
+﻿@model FurCoNZ.ViewModels.TicketDetailViewModel
+
+<div class="card">
+    <div class="card-header" id="attendee-@Model.Id-header">
+        <h2 class="mb-0">
+            <button class="btn btn-link collapsed" type="button" data-toggle="collapse" data-target="#attendee-@Model.Id-detail" aria-expanded="false" aria-controls="attendee-@Model.Id-detail">
+                @Model.TicketTypeName - Ticket #@Model.Id
+            </button>
+        </h2>
+    </div>
+
+    <div id="attendee-@Model.Id-detail" class="collapse" aria-labelledby="attendee-@Model.Id-header" data-parent="#attendee-details-accordion">
+        <div class="card-body">
+            <input asp-for="EmailAddress" type="email" />
+        </div>
+    </div>
+</div>
