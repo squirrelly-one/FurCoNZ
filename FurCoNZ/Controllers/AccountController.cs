@@ -67,7 +67,7 @@ namespace FurCoNZ.Controllers
 
             var orders = await _orderService.GetUserOrders(user, cancellationToken);
 
-            return View("Index", await PrefillAccountViewModel(new AccountOrdersViewModel {
+            return View(await PrefillAccountViewModel(new AccountOrdersViewModel {
                 Orders = orders.ToList()
             }));
         }
