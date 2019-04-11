@@ -35,6 +35,7 @@ namespace FurCoNZ.ViewModels
         public string DietryRequirements { get; set; }
 
         [Required]
+        [DataType(DataType.Date)]
         public DateTime DateOfBirth { get; set; }
     }
 }
