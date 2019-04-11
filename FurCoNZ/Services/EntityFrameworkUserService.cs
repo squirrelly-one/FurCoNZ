@@ -9,16 +9,19 @@ using Microsoft.EntityFrameworkCore;
 using FurCoNZ.DAL;
 using FurCoNZ.Models;
 using System.Data;
+using Microsoft.AspNetCore.Http;
 
 namespace FurCoNZ.Services
 {
     public class EntityFrameworkUserService : IUserService
     {
         private readonly FurCoNZDbContext _dbContext;
+        private readonly IHttpContextAccessor _httpContextAccessor;
 
-        public EntityFrameworkUserService(FurCoNZDbContext dbContext)
+        public EntityFrameworkUserService(FurCoNZDbContext dbContext, IHttpContextAccessor httpContextAccessor)
         {
             _dbContext = dbContext;
+            _httpContextAccessor = httpContextAccessor;
         }
 
         public async Task CreateUserAsync(User user, CancellationToken cancellationToken = default)
@@ -33,6 +36,15 @@ namespace FurCoNZ.Services
             await _dbContext.Users.AddAsync(user, cancellationToken); // Seems silly to be async, but used in some SQL Server scenarios
 
             await _dbContext.SaveChangesAsync();
+        }
+
+        public async Task<User> GetCurrentUserAsync(CancellationToken cancellationToken = default)
+        {
+            var user = _httpContextAccessor.HttpContext.User.FindFirst("sub");
+            if (user == null)
+                return null;
+
+            return await _dbContext.Users.FindAsync(new[] { user.Value }, cancellationToken);
         }
 
         public async Task<User> GetUserAsync(string id, CancellationToken cancellationToken = default)

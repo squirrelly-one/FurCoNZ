@@ -146,6 +146,9 @@ namespace FurCoNZ
                 }
             });
 
+            // Allow accessing the HTTPContext from services.
+            services.AddHttpContextAccessor(); 
+
             services.AddTransient<IUserService, EntityFrameworkUserService>();
             services.AddTransient<IOrderService, OrderService>();
 
