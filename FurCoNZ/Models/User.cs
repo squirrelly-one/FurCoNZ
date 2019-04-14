@@ -13,14 +13,5 @@ namespace FurCoNZ.Models
 
         public string Email { get; set; }
 
-        public AgeBracket AgeBracket { get; set; }
-
-        public string Pronouns { get; set; }
-
-        public string Allergies { get; set; }
-
-        public string DietryRequirements { get; set; }
-
-        public DateTime DateOfBirth { get; set; }
     }
 }

@@ -41,10 +41,6 @@ namespace FurCoNZ.Controllers
             user.Name = account.Name;
             // TODO: Require email validation of this change
             user.Email = account.Email; 
-            user.Pronouns = account.Pronouns;
-            user.Allergies = account.Allergies;
-            user.DietryRequirements = account.DietryRequirements;
-            user.DateOfBirth = account.DateOfBirth;
 
             await _userService.UpdateUserAsync(user, cancellationToken);
 

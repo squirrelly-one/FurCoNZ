@@ -15,10 +15,6 @@ namespace FurCoNZ.ViewModels
         {
             Name = user.Name;
             Email = user.Email;
-            Pronouns = user.Pronouns;
-            Allergies = user.Allergies;
-            DietryRequirements = user.DietryRequirements;
-            DateOfBirth = user.DateOfBirth;
         }
 
         [Required]
@@ -27,15 +23,5 @@ namespace FurCoNZ.ViewModels
         [Required]
         [EmailAddress]
         public string Email { get; set; }
-
-        public string Pronouns { get; set; }
-
-        public string Allergies { get; set; }
-
-        public string DietryRequirements { get; set; }
-
-        [Required]
-        [DataType(DataType.Date)]
-        public DateTime DateOfBirth { get; set; }
     }
 }
