@@ -7,12 +7,12 @@ namespace FurCoNZ.Models
 {
     public class User
     {
-        public string Id { get; set; }
+        public int Id { get; set; }
 
         public string Name { get; set; }
 
         public string Email { get; set; }
 
-        public AgeBracket AgeBracket { get; set; }
+        public List<LinkedAccount> LinkedAccounts { get; set; }
     }
 }

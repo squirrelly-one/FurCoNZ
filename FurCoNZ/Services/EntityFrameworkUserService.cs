@@ -9,16 +9,19 @@ using Microsoft.EntityFrameworkCore;
 using FurCoNZ.DAL;
 using FurCoNZ.Models;
 using System.Data;
+using Microsoft.AspNetCore.Http;
 
 namespace FurCoNZ.Services
 {
     public class EntityFrameworkUserService : IUserService
     {
         private readonly FurCoNZDbContext _dbContext;
+        private readonly IHttpContextAccessor _httpContextAccessor;
 
-        public EntityFrameworkUserService(FurCoNZDbContext dbContext)
+        public EntityFrameworkUserService(FurCoNZDbContext dbContext, IHttpContextAccessor httpContextAccessor)
         {
             _dbContext = dbContext;
+            _httpContextAccessor = httpContextAccessor;
         }
 
         public async Task CreateUserAsync(User user, CancellationToken cancellationToken = default)
@@ -35,12 +38,33 @@ namespace FurCoNZ.Services
             await _dbContext.SaveChangesAsync();
         }
 
-        public async Task<User> GetUserAsync(string id, CancellationToken cancellationToken = default)
+        public async Task<User> GetCurrentUserAsync(CancellationToken cancellationToken = default)
         {
-            if (string.IsNullOrWhiteSpace(id))
-                throw new ArgumentNullException(nameof(id));
+            var userIdClaim = _httpContextAccessor.HttpContext.User.FindFirst("user")?.Value;
+            if (!int.TryParse(userIdClaim, out var userId))
+                return null;
 
-            return await _dbContext.Users.FindAsync(new[] { id }, cancellationToken);
+            return await _dbContext.Users.SingleOrDefaultAsync(u => u.Id == userId , cancellationToken);
+        }
+
+        public async Task<User> GetUserFromIssuerAsync(string issuer, string subject, CancellationToken cancellationToken = default)
+        {
+            if (string.IsNullOrWhiteSpace(issuer))
+                throw new ArgumentNullException(nameof(issuer));
+            if (string.IsNullOrWhiteSpace(subject))
+                throw new ArgumentNullException(nameof(subject));
+
+            var linkedAccount = await _dbContext.LinkedAccounts.FirstOrDefaultAsync(l => l.Issuer == issuer && l.Subject == subject ,cancellationToken);
+
+            if (linkedAccount == null)
+                return null;
+
+            return linkedAccount.User;
+        }
+
+        public async Task<User> GetUserAsync(int id, CancellationToken cancellationToken = default)
+        {
+            return await _dbContext.Users.SingleOrDefaultAsync(u => u.Id == id , cancellationToken);
         }
 
         public async Task UpdateUserAsync(User user, CancellationToken cancellationToken = default)

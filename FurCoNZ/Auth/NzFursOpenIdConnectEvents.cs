@@ -1,6 +1,7 @@
 ﻿using System;
 using System.Collections.Generic;
 using System.Linq;
+using System.Security.Claims;
 using System.Threading.Tasks;
 
 using Microsoft.AspNetCore.Authentication.OpenIdConnect;
@@ -16,19 +17,33 @@ namespace FurCoNZ.Auth
         public static async Task OnUserInformationReceived(UserInformationReceivedContext context)
         {
             var userService = context.HttpContext.RequestServices.GetService<IUserService>();
-            var user = await userService.GetUserAsync(context.User.Value<string>("sub"), context.HttpContext.RequestAborted);
+            var identity = (ClaimsIdentity)context.Principal.Identity;
+            var user = await userService.GetUserFromIssuerAsync(context.Principal.FindFirst("iss").Value, context.Principal.FindFirst("sub").Value, context.HttpContext.RequestAborted);
 
             // User already exists,m nothing to do?
             if (user != null)
                 return;
 
             // Create a new user, fill it in with defaults. 
-            await userService.CreateUserAsync(new User
+            user = new User
             {
-                Id = context.User.Value<string>("sub"),
                 Name = context.User.Value<string>("name"),
                 Email = context.User.Value<string>("email"),
-            });
+            };
+            user.LinkedAccounts = new List<LinkedAccount>
+            {
+                new LinkedAccount
+                {
+                    Issuer = context.Principal.FindFirst("iss").Value,
+                    Subject = context.Principal.FindFirst("sub").Value,
+                    User = user,
+                }
+            };
+
+            await userService.CreateUserAsync(user);
+
+            identity.AddClaim(new Claim("user", user.Id.ToString()));
+            //context.Result = HandleRequestResult.Success(new AuthenticationTicket())
         }
     }
 }

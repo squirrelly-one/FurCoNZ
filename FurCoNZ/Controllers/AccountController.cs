@@ -28,27 +28,19 @@ namespace FurCoNZ.Controllers
             _userService = userService;
         }
 
-        private async Task<T> PrefillAccountViewModel<T>(T account, CancellationToken cancellationToken = default) where T : AccountViewModel
+        public async Task<IActionResult> Index(CancellationToken cancellationToken = default)
         {
-            var user = await _userService.GetUserAsync(User.FindFirst("sub").Value, cancellationToken);
-            account.Name = user.Name;
-            account.Email = user.Email;
-
-            return account;
-        }
-
-        public async Task<IActionResult> Index()
-        {
-            return View(await PrefillAccountViewModel(new AccountViewModel()));
+            return View(new AccountViewModel(await _userService.GetCurrentUserAsync(cancellationToken)));
         }
 
         [HttpPost]
         public async Task<IActionResult> UpdateAccount(AccountViewModel account, CancellationToken cancellationToken = default)
         {
-            var user = await _userService.GetUserAsync(User.FindFirst("sub").Value, cancellationToken);
+            var user = await _userService.GetCurrentUserAsync(cancellationToken);
 
             user.Name = account.Name;
-            user.Email = account.Email;
+            // TODO: Require email validation of this change
+            user.Email = account.Email; 
 
             await _userService.UpdateUserAsync(user, cancellationToken);
 
@@ -57,7 +49,7 @@ namespace FurCoNZ.Controllers
 
         public async Task<IActionResult> Orders(CancellationToken cancellationToken = default)
         {
-            var user = await _userService.GetUserAsync(User.FindFirst("sub").Value, cancellationToken);
+            var user = await _userService.GetCurrentUserAsync(cancellationToken);
             if (user == null)
             {
                 throw new Exception("We are unable to find your user details within our database. Which may indicate that you did not log in properly");
@@ -67,9 +59,10 @@ namespace FurCoNZ.Controllers
 
             var orders = await _orderService.GetUserOrders(user, cancellationToken);
 
-            return View("Index", await PrefillAccountViewModel(new AccountOrdersViewModel {
-                Orders = orders.ToList()
-            }));
+            return View(new AccountOrdersViewModel (await _userService.GetCurrentUserAsync(cancellationToken))
+                {
+                    Orders = orders.ToList()
+                });
         }
     }
 }

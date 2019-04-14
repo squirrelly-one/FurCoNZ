@@ -1,4 +1,5 @@
-﻿using System;
+﻿using FurCoNZ.Models;
+using System;
 using System.Collections.Generic;
 using System.ComponentModel.DataAnnotations;
 using System.Linq;
@@ -8,6 +9,14 @@ namespace FurCoNZ.ViewModels
 {
     public class AccountViewModel
     {
+        public AccountViewModel() { }
+
+        public AccountViewModel(User user)
+        {
+            Name = user.Name;
+            Email = user.Email;
+        }
+
         [Required]
         public string Name { get; set; }
 

@@ -1,0 +1,22 @@
+﻿@{ 
+    Layout = "~/Views/Shared/_Layout.cshtml";
+}
+
+<h2>
+    Account
+    <small class="text-muted">@Model.Name</small>
+</h2>
+
+<ul class="nav nav-pills mb-3">
+    <li class="nav-item">
+        <a class="nav-link" asp-active-actions="Index" asp-action="Index">Overview</a>
+    </li>
+    <li class="nav-item">
+        <a class="nav-link" asp-active-actions="Orders" asp-action="Orders">Orders</a>
+    </li>
+    <li class="nav-item">
+        <a class="nav-link" asp-active-actions="Tickets" asp-action="Tickets">Tickets</a>
+    </li>
+</ul>
+
+@RenderBody()
