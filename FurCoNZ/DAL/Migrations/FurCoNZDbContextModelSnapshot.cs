@@ -16,6 +16,26 @@ namespace FurCoNZ.DAL.Migrations
             modelBuilder
                 .HasAnnotation("ProductVersion", "2.2.2-servicing-10034");
 
+            modelBuilder.Entity("FurCoNZ.Models.LinkedAccount", b =>
+                {
+                    b.Property<int>("Id")
+                        .ValueGeneratedOnAdd();
+
+                    b.Property<string>("Issuer");
+
+                    b.Property<string>("Subject");
+
+                    b.Property<int>("UserId");
+
+                    b.HasKey("Id");
+
+                    b.HasIndex("UserId");
+
+                    b.HasIndex("Issuer", "Subject");
+
+                    b.ToTable("LinkedAccounts");
+                });
+
             modelBuilder.Entity("FurCoNZ.Models.Order", b =>
                 {
                     b.Property<int>("Id")
@@ -25,11 +45,9 @@ namespace FurCoNZ.DAL.Migrations
 
                     b.Property<int>("OrderedById");
 
-                    b.Property<string>("OrderedById1");
-
                     b.HasKey("Id");
 
-                    b.HasIndex("OrderedById1");
+                    b.HasIndex("OrderedById");
 
                     b.ToTable("Orders");
                 });
@@ -44,8 +62,6 @@ namespace FurCoNZ.DAL.Migrations
                     b.Property<string>("Address");
 
                     b.Property<int>("AttendeeAccountId");
-
-                    b.Property<string>("AttendeeAccountId1");
 
                     b.Property<string>("CabinGrouping");
 
@@ -81,7 +97,7 @@ namespace FurCoNZ.DAL.Migrations
 
                     b.HasKey("Id");
 
-                    b.HasIndex("AttendeeAccountId1");
+                    b.HasIndex("AttendeeAccountId");
 
                     b.HasIndex("OrderId");
 
@@ -110,40 +126,42 @@ namespace FurCoNZ.DAL.Migrations
 
             modelBuilder.Entity("FurCoNZ.Models.User", b =>
                 {
-                    b.Property<string>("Id")
+                    b.Property<int>("Id")
                         .ValueGeneratedOnAdd();
 
-                    b.Property<int>("AgeBracket");
-
-                    b.Property<string>("Allergies");
-
                     b.Property<DateTime>("DateOfBirth");
-
-                    b.Property<string>("DietryRequirements");
 
                     b.Property<string>("Email");
 
                     b.Property<string>("Name");
-
-                    b.Property<string>("Pronouns");
 
                     b.HasKey("Id");
 
                     b.ToTable("Users");
                 });
 
+            modelBuilder.Entity("FurCoNZ.Models.LinkedAccount", b =>
+                {
+                    b.HasOne("FurCoNZ.Models.User", "User")
+                        .WithMany("LinkedAccounts")
+                        .HasForeignKey("UserId")
+                        .OnDelete(DeleteBehavior.Cascade);
+                });
+
             modelBuilder.Entity("FurCoNZ.Models.Order", b =>
                 {
                     b.HasOne("FurCoNZ.Models.User", "OrderedBy")
                         .WithMany()
-                        .HasForeignKey("OrderedById1");
+                        .HasForeignKey("OrderedById")
+                        .OnDelete(DeleteBehavior.Cascade);
                 });
 
             modelBuilder.Entity("FurCoNZ.Models.Ticket", b =>
                 {
                     b.HasOne("FurCoNZ.Models.User", "AttendeeAccount")
                         .WithMany()
-                        .HasForeignKey("AttendeeAccountId1");
+                        .HasForeignKey("AttendeeAccountId")
+                        .OnDelete(DeleteBehavior.Cascade);
 
                     b.HasOne("FurCoNZ.Models.Order", "Order")
                         .WithMany("TicketsPurchased")
