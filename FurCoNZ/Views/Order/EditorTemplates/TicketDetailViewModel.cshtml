@@ -11,7 +11,83 @@
 
     <div id="attendee-@Model.Id-detail" class="collapse" aria-labelledby="attendee-@Model.Id-header" data-parent="#attendee-details-accordion">
         <div class="card-body">
-            <input asp-for="EmailAddress" type="email" />
+            <!-- #region Attendee Details Form -->
+
+            <input asp-for="Id" type="hidden" />
+            <input asp-for="TicketTypeId" type="hidden" />
+
+            <div class="form-group">
+                <label asp-for="EmailAddress">Email address</label>
+                <input type="email" class="form-control" asp-for="EmailAddress" placeholder="Enter email" />
+            </div>
+
+            <ul class="nav nav-pills mb-3" id="attendee-@Model.Id-pills-tab" role="tablist">
+                <li class="nav-item">
+                    <a class="nav-link" id="attendee-@Model.Id-pills-self-tab" data-toggle="pill" href="#attendee-@Model.Id-pills-self" role="tab" aria-controls="attendee-@Model.Id-pills-self" aria-selected="false">This is my ticket, or I am filling this out for someone else</a>
+                </li>
+                <li class="nav-item">
+                    <a class="nav-link" id="attendee-@Model.Id-pills-share-tab" data-toggle="pill" href="#attendee-@Model.Id-pills-share" role="tab" aria-controls="attendee-@Model.Id-pills-share" aria-selected="false">This is for someone else</a>
+                </li>
+            </ul>
+
+            <div class="tab-content" id="attendee-@Model.Id-pills-tabContent">
+                <div class="tab-pane fade" id="attendee-@Model.Id-pills-self" role="tabpanel" aria-labelledby="attendee-@Model.Id-pills-self-tab">
+                    <div class="form-group">
+                        <label asp-for="BadgeName">Badge Name</label>
+                        <input class="form-control" asp-for="BadgeName" placeholder="Enter email">
+                    </div>
+                    <div class="form-group">
+                        <label asp-for="PreferredFullName">Full Name</label>
+                        <input asp-for="PreferredFullName" class="form-control" />
+                    </div>
+                    <div class="form-group">
+                        <label asp-for="PreferredKnownAs">What should we call you, for short?</label>
+                        <input asp-for="PreferredKnownAs" class="form-control" aria-describedby="attendee-@Model.Id-preferredNameHelp" />
+                        <small id="attendee-@Model.Id-preferredNameHelp" class="form-text text-muted">(usually your first name, e.g. "Matt" or "Sarah")</small>
+                    </div>
+
+                    <div class="form-check">
+                        <input class="form-check-input" type="checkbox" value="" id="attendee-@Model.Id-isSameAsId">
+                        <label class="form-check-label" for="attendee-@Model.Id-isSameAsId">
+                            This is the same name as on my identification
+                        </label>
+                    </div>
+
+                    <div class="alert alert-info">
+                        <div class="form-group">
+                            <label asp-for="IdentificationFullName">Identification Name (as appears on your legal identification)</label>
+                            <p class="form-text small">
+                                This name will be kept strictly private, and will only be available to:
+                                <ul class="small">
+                                    <li>FurCoNZ Staff, where required (i.e. for identification reasons during registration)</li>
+                                    <li>NZ Officials, where we are legally required to disclose it</li>
+                                    <li>Where required for health and safety reasons, such as in a medical emergency</li>
+                                </ul>
+                            </p>
+                            <input asp-for="IdentificationFullName" class="form-control" />
+                        </div>
+                    </div>
+
+                    <div class="form-group">
+                        <label asp-for="KnownAllergies">Known Allergies</label>
+                        <textarea asp-for="KnownAllergies" class="form-control" aria-describedby="attendee-@Model.Id-knownAllergiesHelp" rows="6"></textarea>
+                        <small id="attendee-@Model.Id-knownAllergiesHelp" class="form-text text-muted">Including any dietary requirements, medical allergies or other halth and safety issues that staff need to be aware of.</small>
+                    </div>
+
+                    <div class="form-group">
+                        <label asp-for="OtherNotes">Other Notes</label>
+                        <textarea asp-for="OtherNotes" class="form-control" aria-describedby="attendee-@Model.Id-otherNotesHelp" rows="6"></textarea>
+                        <small id="attendee-@Model.Id-otherNotesHelp" class="form-text text-muted">Including any dietary requirements, medical allergies or other halth and safety issues that staff need to be aware of.</small>
+                    </div>
+
+
+                </div>
+                <div class="tab-pane fade" id="attendee-@Model.Id-pills-share" role="tabpanel" aria-labelledby="attendee-@Model.Id-pills-share-tab">
+                    A link will be given to you to send to your friend, as well as an email being sent to their email address.
+                </div>
+            </div>
+
+            <!-- #endregion -->
         </div>
     </div>
 </div>

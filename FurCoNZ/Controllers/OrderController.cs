@@ -74,5 +74,16 @@ namespace FurCoNZ.Controllers
 
             return View(orderIndexViewModel);
         }
+
+        [HttpPost]
+        public async Task<IActionResult> Confirm(IList<TicketDetailViewModel> model, CancellationToken cancellationToken)
+        {
+            if (ModelState.IsValid)
+            {
+                return View("Confirm", model);
+            }
+
+            return View("TicketDetail", model);
+        }
     }
 }
