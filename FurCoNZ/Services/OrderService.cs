@@ -47,5 +47,21 @@ namespace FurCoNZ.Services
             // TODO: Should we support pagination?
             return await _db.Orders.Where(o => o.OrderedBy == user).ToListAsync(cancellationToken);
         }
+
+        public async Task<Order> GetUserOrderAsync(User user, int orderId, CancellationToken cancellationToken = default)
+        {
+            return await _db.Orders
+                .Include(o => o.TicketsPurchased)
+                .ThenInclude(t => t.TicketType)
+                .SingleOrDefaultAsync(o => o.OrderedById == user.Id && o.Id == orderId, cancellationToken);
+        }
+
+        public async Task<Order> GetUserPendingOrderAsync(User user, CancellationToken cancellationToken = default)
+        {
+            return await _db.Orders
+                .Include(o => o.TicketsPurchased)
+                .ThenInclude(t => t.TicketType)
+                .SingleOrDefaultAsync(o => o.OrderedById == user.Id && o.AmountPaidCents == 0, cancellationToken);
+        }
     }
 }
