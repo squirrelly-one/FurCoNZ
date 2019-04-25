@@ -1,0 +1,29 @@
+﻿@model CheckoutViewModel
+
+<h2>
+    Checkout
+    <small class="text-muted">Order: @Model.Order.Id</small>
+</h2>
+
+<table>
+    @foreach (var ticket in Model.Order.Tickets )
+    {
+    <tr>
+        <td>@ticket.TicketType.Name</td>
+        <td>@ticket.PreferredName</td>
+        <td>@ticket.TicketType.PriceCents</td>
+    </tr>
+    }
+</table>
+
+<form>
+    @foreach (var payment in Model.PaymentProviders)
+    {
+    <div class="form-check">
+        <input class="form-check-input" type="radio" name="selectedPayment" id="payment{@payment.Name}" value="@payment.GetType().Name">
+        <label class="form-check-label" for="id="payment{@payment.Name}"">
+            @payment.Name
+        </label>
+    </div>
+    }
+</form>
