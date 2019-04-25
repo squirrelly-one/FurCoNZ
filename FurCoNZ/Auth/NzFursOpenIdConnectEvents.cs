@@ -22,7 +22,10 @@ namespace FurCoNZ.Auth
 
             // User already exists,m nothing to do?
             if (user != null)
+            {
+                identity.AddClaim(new Claim("user", user.Id.ToString()));
                 return;
+            }
 
             // Create a new user, fill it in with defaults. 
             user = new User

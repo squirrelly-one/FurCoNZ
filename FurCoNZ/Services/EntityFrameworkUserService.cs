@@ -54,7 +54,9 @@ namespace FurCoNZ.Services
             if (string.IsNullOrWhiteSpace(subject))
                 throw new ArgumentNullException(nameof(subject));
 
-            var linkedAccount = await _dbContext.LinkedAccounts.FirstOrDefaultAsync(l => l.Issuer == issuer && l.Subject == subject ,cancellationToken);
+            var linkedAccount = await _dbContext.LinkedAccounts
+                .Include(la => la.User)
+                .FirstOrDefaultAsync(l => l.Issuer == issuer && l.Subject == subject ,cancellationToken);
 
             if (linkedAccount == null)
                 return null;
