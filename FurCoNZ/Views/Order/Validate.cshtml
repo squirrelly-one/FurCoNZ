@@ -1,0 +1,18 @@
+﻿@model IList<FurCoNZ.ViewModels.TicketDetailViewModel>
+@{
+    ViewData["Title"] = "Confirm Tickets";
+}
+
+<p>Please confirm the following order. Once you click "Confirm", an invoice will be generated and you will be required to pay within 7 days, else the order will be cancelled and the tickets will be released.</p>
+
+@for (int i = 0; i < Model.Count; i++)
+{
+    @Html.DisplayFor(model => model[i])
+}
+
+<form asp-action="Confirm" asp-controller="Order" method="post">
+    <div class="">
+        <a asp-action="Index" class="btn btn-primary float-md-left" role="button">&lt; Back</a><button type="submit" class="btn btn-primary float-md-right">Confirm Order &gt;</button>
+        <div class="clearfix"></div>
+    </div>
+</form>

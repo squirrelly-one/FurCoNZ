@@ -1,6 +1,6 @@
 ﻿@model IList<FurCoNZ.ViewModels.TicketDetailViewModel>
 
-<form asp-action="Confirm" asp-controller="Order" method="post">
+<form asp-action="Validate" asp-controller="Order" method="post">
     <div class="accordion" id="attendee-details-accordion">
         @for (int i = 0; i < Model.Count; i++)
         {
@@ -8,5 +8,8 @@
         }
     </div>
 
-    <button type="submit" class="btn btn-primary">Confirm Order &gt;</button>
+    <div class="">
+        <a asp-action="Index" class="btn btn-primary float-md-left" role="button">&lt; Back</a><button type="submit" class="btn btn-primary float-md-right">Confirm Order &gt;</button>
+        <div class="clearfix"></div>
+    </div>
 </form>

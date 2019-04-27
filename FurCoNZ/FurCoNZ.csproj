@@ -26,5 +26,7 @@
     <Folder Include="ViewModels\" />
     <Folder Include="Views\Order\" />
     <Folder Include="Views\Order\EditorTemplates\" />
+    <Folder Include="Helpers\" />
+    <Folder Include="Views\Order\DisplayTemplates\" />
   </ItemGroup>
 </Project>
