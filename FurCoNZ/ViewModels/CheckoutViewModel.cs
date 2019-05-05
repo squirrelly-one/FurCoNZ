@@ -8,10 +8,14 @@ namespace FurCoNZ.ViewModels
 {
     public class CheckoutViewModel
     {
+        public int OrderId { get; set; }
+
         public OrderViewModel Order { get; set; }
 
-        public decimal AmnountDue => Order.TotalAmount;
+        public decimal AmnountDue => Order.AmountTotal;
 
         public ICollection<PaymentProviderViewmodel> PaymentProviders { get; set; }
+
+        public string SelectedPaymentProvider { get; set; }
     }
 }

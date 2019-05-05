@@ -28,20 +28,8 @@ namespace FurCoNZ.Controllers
             _paymentProvider = paymentProvider;
         }
 
-        public async Task<IActionResult> Index(CancellationToken cancellationToken = default)
-        {
-            var user = await _userService.GetCurrentUserAsync(cancellationToken);
-
-            // TODO: Verify the order is pending payment
-            var order = await _orderService.GetUserPendingOrderAsync(user, cancellationToken);
-            if (order == null)
-                return RedirectToAction("Index","Account");
-
-            return View(GetCheckoutViewModelFromOrder(order));
-        }
-
-        [Route("/Checkout/Order/{orderId}")]
-        public async Task<IActionResult> Order(int orderId, CancellationToken cancellationToken = default)
+        [HttpGet("/Checkout/{orderId}")]
+        public async Task<IActionResult> Index(int orderId, CancellationToken cancellationToken = default)
         {
             var user = await _userService.GetCurrentUserAsync(cancellationToken);
 
@@ -50,13 +38,14 @@ namespace FurCoNZ.Controllers
             if (order == null)
                 return NotFound();
 
-            return View("Index", GetCheckoutViewModelFromOrder(order));
+            return View(GetCheckoutViewModelFromOrder(order));
         }
 
         private CheckoutViewModel GetCheckoutViewModelFromOrder(Order order)
         {
             return new CheckoutViewModel
             {
+                OrderId = order.Id,
                 Order = new OrderViewModel(order),
                 PaymentProviders = _paymentProvider.PaymentServicees.Select(p => new PaymentProviderViewmodel
                 {
