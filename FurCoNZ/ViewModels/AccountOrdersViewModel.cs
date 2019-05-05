@@ -13,6 +13,6 @@ namespace FurCoNZ.ViewModels
         public AccountOrdersViewModel(User user)
             : base(user) { }
 
-        public ICollection<Order> Orders { get; set; }
+        public ICollection<OrderViewModel> Orders { get; set; }
     }
 }
