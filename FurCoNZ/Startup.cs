@@ -155,6 +155,7 @@ namespace FurCoNZ
 
             services.AddTransient<IPaymentService, PaymentService>();
             services.AddTransient<IPaymentProvider, Services.Payment.StripeService>();
+            services.AddTransient<IPaymentProvider, Services.Payment.BankPaymentProvider>();
 
             services.AddTransient<Services.Payment.StripeService>();
             services.AddHostedService<Services.Payment.Stripe.StripeHostedService>();
