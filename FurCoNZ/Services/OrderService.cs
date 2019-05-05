@@ -63,5 +63,58 @@ namespace FurCoNZ.Services
                 .ThenInclude(t => t.TicketType)
                 .SingleOrDefaultAsync(o => o.OrderedById == user.Id && o.AmountPaidCents == 0, cancellationToken);
         }
+
+        public async Task AddReceivedFundsForOrder(int orderId, int amountCents, string paymentProvider, string paymentReference, DateTimeOffset when, CancellationToken cancellationToken = default)
+        {
+            var order = await _db.Orders
+                .Include(o => o.Audits)
+                .SingleAsync(o => o.Id == orderId, cancellationToken);
+
+            if (order.Audits.Any(a => a.PaymentProvider == paymentProvider && a.PaymentProviderReference == paymentReference && a.Type == AuditType.Received))
+                throw new InvalidOperationException($"Received funds for order {orderId} has already been applied for {paymentProvider}: {paymentReference}");
+
+            var audit = new OrderAudit
+            {
+                OrderId = orderId,
+                PaymentProvider = paymentProvider,
+                PaymentProviderReference = paymentReference,
+                Type = AuditType.Received,
+                When = when,
+                AmountCents = amountCents,
+            };
+
+            // Recalculate amount paid
+            order.AmountPaidCents = order.Audits.Sum(a => a.AmountCents) + audit.AmountCents;
+
+            await _db.OrderAudits.AddAsync(audit, cancellationToken);
+            await _db.SaveChangesAsync(cancellationToken);
+        }
+
+        public async Task RefundFundsForOrder(int orderId, int amountCents, string paymentProvider, string paymentReference, DateTimeOffset when, CancellationToken cancellationToken = default)
+        {
+            var order = await _db.Orders
+                .Include(o => o.Audits)
+                .SingleAsync(o => o.Id == orderId, cancellationToken);
+
+            if(order.Audits.Any(a => a.PaymentProvider == paymentProvider && a.PaymentProviderReference == paymentReference && a.Type == AuditType.Refunded))
+                throw new InvalidOperationException($"Refund for order {orderId} has already been applied for {paymentProvider}: {paymentReference}");
+            
+
+            var audit = new OrderAudit
+            {
+                OrderId = orderId,
+                PaymentProvider = paymentProvider,
+                PaymentProviderReference = paymentReference,
+                Type = AuditType.Refunded,
+                When = when,
+                AmountCents = -amountCents,
+            };
+
+            // Recalculate amount paid
+            order.AmountPaidCents = order.Audits.Sum(a => a.AmountCents) + audit.AmountCents;
+
+            await _db.OrderAudits.AddAsync(audit, cancellationToken);
+            await _db.SaveChangesAsync(cancellationToken);
+        }
     }
 }

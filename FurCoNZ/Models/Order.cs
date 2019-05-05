@@ -28,5 +28,7 @@ namespace FurCoNZ.Models
         }
 
         public virtual ICollection<Ticket> TicketsPurchased { get; set; }
+
+        public virtual ICollection<OrderAudit> Audits { get; set; }
     }
 }

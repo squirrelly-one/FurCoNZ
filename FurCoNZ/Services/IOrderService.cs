@@ -18,5 +18,9 @@ namespace FurCoNZ.Services
         Task<Order> GetUserOrderAsync(User user, int orderId, CancellationToken cancellationToken = default);
 
         Task<Order> GetUserPendingOrderAsync(User user, CancellationToken cancellationToken = default);
+
+        Task AddReceivedFundsForOrder(int orderId, int amountCents, string paymentProvider, string paymentReference, DateTimeOffset when, CancellationToken cancellationToken = default);
+
+        Task RefundFundsForOrder(int orderId, int amountCents, string paymentProvider, string paymentReference, DateTimeOffset when, CancellationToken cancellationToken = default);
     }
 }
