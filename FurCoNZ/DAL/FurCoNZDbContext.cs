@@ -17,6 +17,7 @@ namespace FurCoNZ.DAL
         public DbSet<User> Users { get; set; }
         public DbSet<LinkedAccount> LinkedAccounts { get; set; }
         public DbSet<Order> Orders { get; set; }
+        public DbSet<OrderAudit> OrderAudits { get; set; }
         public DbSet<Ticket> Tickets { get; set; }
         public DbSet<TicketType> TicketTypes { get; set; }
 
@@ -24,6 +25,9 @@ namespace FurCoNZ.DAL
         {
             modelBuilder.Entity<LinkedAccount>()
                 .HasIndex(l => new { l.Issuer, l.Subject });
+
+            modelBuilder.Entity<OrderAudit>()
+                .HasIndex(a => new { a.PaymentProvider, a.PaymentProviderReference });
         }
     }
 }
