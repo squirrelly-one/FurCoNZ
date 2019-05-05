@@ -8,10 +8,22 @@ namespace FurCoNZ.Controllers
 {
     public class StripeController : Controller
     {
-        [HttpPost]
-        public IActionResult Charge(string token)
+        [HttpGet]
+        public IActionResult Index()
         {
             return RedirectToAction("Index", "Home");
+        }
+
+        [HttpGet]
+        public IActionResult Success()
+        {
+            return View();
+        }
+
+        [HttpGet]
+        public IActionResult Cancelled()
+        {
+            return View();
         }
     }
 }

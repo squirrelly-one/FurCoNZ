@@ -9,5 +9,7 @@ namespace FurCoNZ.Configuration
     {
         public string SecretKey { get; set; }
         public string PublishableKey { get; set; }
+
+        public bool IncludeFee { get; set; } = false;
     }
 }

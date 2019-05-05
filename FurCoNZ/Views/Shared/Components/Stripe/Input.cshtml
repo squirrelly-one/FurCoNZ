@@ -1,5 +1,32 @@
-﻿<div class="card">
+﻿@model StripeChargeViewModel
+@inject Microsoft.Extensions.Options.IOptions<FurCoNZ.Configuration.StripeSettings> Stripe
+
+<div class="card">
     <div class="card-body">
-        A Strip backed payment form will go here.
+        <h5 class="card-title">Pay with Stripe</h5>
+        <p class="card-text">
+            Stripe supports paying by card, Apply Pay, and uh... magic!
+        </p>
+        @if (Model.Fee > 0)
+        {
+        <p class="card-text">
+            <i>Includes Stripe convenience fee of @Model.Fee.ToString("C").</i>
+        </p>
+        <p class="card-text">
+            Total: <strong>@Model.Total.ToString("C")</strong>
+        </p>
+        }
+
+        <button id="payWithStripeButton" type="button" class="btn btn-primary">Pay with Stripe</button>
+
+        <script src="https://js.stripe.com/v3/"></script>
+        <script>
+        const stripe = Stripe('@Stripe.Value.PublishableKey');
+        document.getElementById('payWithStripeButton').addEventListener('click', (event) => {
+            stripe.redirectToCheckout({
+                sessionId: '@Model.CheckoutSessionId',
+            });
+        })
+        </script>
     </div>
 </div>

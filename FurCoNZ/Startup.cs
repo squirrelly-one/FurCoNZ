@@ -154,7 +154,10 @@ namespace FurCoNZ
             services.AddTransient<IOrderService, OrderService>();
 
             services.AddTransient<IPaymentService, PaymentService>();
-            services.AddTransient<IPaymentProvider, Services.Payment.StripePaymentProvider>();
+            services.AddTransient<IPaymentProvider, Services.Payment.StripeService>();
+
+            services.AddTransient<Services.Payment.StripeService>();
+            services.AddHostedService<Services.Payment.Stripe.StripeHostedService>();
 
             services.Configure<CookiePolicyOptions>(options =>
             {
