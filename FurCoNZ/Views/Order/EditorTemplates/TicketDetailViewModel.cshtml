@@ -67,14 +67,14 @@
                     <div class="form-group">
                         <label asp-for="DateOfBirth">Date of Birth</label>
                         @* TODO: Need a proper date picker *@
-                        <input asp-for="DateOfBirth" class="form-control" placeholder="yyyy-mm-dd" />
+                        <input asp-for="DateOfBirth" class="form-control" placeholder="yyyy-mm-dd" min="1903-01-02" max="@DateTime.Today.ToString()" onchange="dateOfBirthChanged(this, @Model.Id)"/>
                     </div>
 
-                    <div class="alert alert-info" role="alert">
+                    <div id="attendee-@Model.Id-under18Notice" class="alert alert-info d-none" role="alert">
                         <strong>A parental consent form will be required to attend this event, or be accompanied by a parent or legal guardian.</strong> A copy will be sent out with your confirmed order, or <a href="#" class="alert-link">you can download it from here</a>.
                     </div>
 
-                    <div class="alert alert-warning" role="alert">
+                    <div id="attendee-@Model.Id-under16Notice" class="alert alert-warning d-none" role="alert">
                         <strong>A parent or legal guardian will be required to attend this event along with this attendee.</strong> Attendence will be refused during registration if this attendee's parent or legal guardian is not present. <a href="#" class="alert-link">Further information is available here</a>.
                     </div>
 
