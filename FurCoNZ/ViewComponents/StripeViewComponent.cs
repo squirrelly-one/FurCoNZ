@@ -4,14 +4,13 @@ using System.Linq;
 using System.Threading.Tasks;
 
 using Microsoft.AspNetCore.Mvc;
-
-using FurCoNZ.Services;
-using FurCoNZ.ViewModels;
-using FurCoNZ.Models;
-using Microsoft.CodeAnalysis.Options;
-using FurCoNZ.Configuration;
 using Microsoft.Extensions.Options;
+
+using FurCoNZ.Configuration;
+using FurCoNZ.Models;
+using FurCoNZ.Services;
 using FurCoNZ.Services.Payment;
+using FurCoNZ.ViewModels;
 
 namespace FurCoNZ.Components
 {
