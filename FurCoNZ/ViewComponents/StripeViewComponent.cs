@@ -21,12 +21,24 @@ namespace FurCoNZ.Components
         private readonly StripeService _stripeService;
         private readonly IOptions<StripeSettings> _stripeOptions;
 
+        private readonly Stripe.Checkout.SessionService _checkoutSessionService;
+        private readonly int _stripeFeePercent;
+        private readonly int _stripeFeeFixed;
+        private readonly int _stripeFeePercentInverse;
+
         public StripeViewComponent(IUserService userService, IOrderService orderService, StripeService stripeService, IOptions<StripeSettings> stripeOptions)
         {
             _userService = userService;
             _orderService = orderService;
             _stripeService = stripeService;
             _stripeOptions = stripeOptions;
+
+            _checkoutSessionService = new Stripe.Checkout.SessionService();
+
+            _stripeFeePercent = 29; // 2.9%
+            _stripeFeeFixed = 30; // $0.30
+
+            _stripeFeePercentInverse = 1000 - _stripeFeePercent; // 97.1%
         }
 
         public async Task<IViewComponentResult> InvokeAsync(int orderId)
@@ -76,14 +88,16 @@ namespace FurCoNZ.Components
 
             var subTotal = checkoutSessionOptions.LineItems.Sum(l => l.Amount.Value);
             // Calculate stripe fee to ensure received amount is what's requested.
-            var stripeFee = ((subTotal + 30) * 1000 / 971) - subTotal;
-            // calculate the actual fee that will be deducted by stripe during transfer.
-            var actualFee = ((subTotal + stripeFee) * 29 / 1000) + 30;
-            if (actualFee > stripeFee)
-                stripeFee += 1; // correct for 1 cent error.
-            
+            var stripeFee = ((subTotal + _stripeFeeFixed) * 1000 / _stripeFeePercentInverse) - subTotal;
+
             if (_stripeOptions.Value.IncludeFee)
             {
+                // calculate the actual fee that will be deducted by stripe during transfer.
+                var actualFee = ((subTotal + stripeFee) * _stripeFeePercent / 1000) + _stripeFeeFixed;
+                if (actualFee > stripeFee)
+                    stripeFee += 1; // correct for 1 cent error.
+
+                // Add the convenience fee to the order.
                 checkoutSessionOptions.LineItems.Add(new Stripe.Checkout.SessionLineItemOptions
                 {
                     Name = "Stripe processing fees",
@@ -95,8 +109,7 @@ namespace FurCoNZ.Components
 
             var total = checkoutSessionOptions.LineItems.Sum(l => l.Amount.Value);
 
-            var checkoutSessionService = new Stripe.Checkout.SessionService();
-            var checkoutSession = await checkoutSessionService.CreateAsync(checkoutSessionOptions, cancellationToken: HttpContext.RequestAborted);
+            var checkoutSession = await _checkoutSessionService.CreateAsync(checkoutSessionOptions, cancellationToken: HttpContext.RequestAborted);
 
             await _stripeService.AddStripeSessionToOrderAsync(order.Id, checkoutSession.Id, HttpContext.RequestAborted);
 

@@ -48,7 +48,8 @@ namespace FurCoNZ.Services
             return await _db.Orders
                 .Include(o => o.TicketsPurchased)
                 .ThenInclude(t => t.TicketType)
-                .Where(o => o.OrderedBy == user).ToListAsync(cancellationToken);
+                .Where(o => o.OrderedBy == user)
+                .ToListAsync(cancellationToken);
         }
 
         public async Task<Order> GetUserOrderAsync(User user, int orderId, CancellationToken cancellationToken = default)
@@ -116,7 +117,7 @@ namespace FurCoNZ.Services
             // Recalculate amount paid
             order.AmountPaidCents = order.Audits.Sum(a => a.AmountCents) + audit.AmountCents;
 
-            await _db.OrderAudits.AddAsync(audit, cancellationToken);
+            _db.OrderAudits.Add(audit);
             await _db.SaveChangesAsync(cancellationToken);
         }
     }

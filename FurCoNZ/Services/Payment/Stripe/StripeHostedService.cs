@@ -41,7 +41,9 @@ namespace FurCoNZ.Services.Payment.Stripe
             _eventService = new EventService();
 
             if (_hostingEnvironment.IsDevelopment())
+            {
                 PollInterval = TimeSpan.FromSeconds(30);
+            }
         }
 
         public void Dispose()

@@ -6,13 +6,13 @@ using System.Threading.Tasks;
 
 using Microsoft.EntityFrameworkCore;
 using Microsoft.Extensions.Logging;
-using Stripe.Checkout;
+using Microsoft.Extensions.Options;
 using Stripe;
+using Stripe.Checkout;
 
+using FurCoNZ.Configuration;
 using FurCoNZ.DAL;
 using FurCoNZ.Models;
-using Microsoft.Extensions.Options;
-using FurCoNZ.Configuration;
 
 namespace FurCoNZ.Services.Payment
 {
@@ -48,14 +48,14 @@ namespace FurCoNZ.Services.Payment
                 OrderId = orderId,
             };
 
-            await _dbContext.StripeSessions.AddAsync(stripeSession, cancellationToken);
+            _dbContext.StripeSessions.Add(stripeSession);
             await _dbContext.SaveChangesAsync(cancellationToken);
         }
 
         public async Task FufillOrderFromCompletedSessionAsync(Session session, CancellationToken cancellationToken = default)
         {
             var stripeSession = await _dbContext.StripeSessions
-                .SingleOrDefaultAsync(s => s.Id == session.Id, cancellationToken);
+                .FirstOrDefaultAsync(s => s.Id == session.Id, cancellationToken);
 
             if (stripeSession == null)
             {
@@ -72,11 +72,11 @@ namespace FurCoNZ.Services.Payment
 
             if (session.PaymentIntent == null)
                 session.PaymentIntent = await _paymentIntentService.GetAsync(session.PaymentIntentId, cancellationToken: cancellationToken);
-            
+
             // Record the patyment intent for future refunds.
             stripeSession.PaymentIntent = session.PaymentIntentId;
 
-            if ((stripeSession.State == StripeSessionState.None || stripeSession.State == StripeSessionState.Processing) && 
+            if ((stripeSession.State == StripeSessionState.None || stripeSession.State == StripeSessionState.Processing) &&
                 session.PaymentIntent.Status == "succeeded")
             {
                 var amountReceived = (int)session.PaymentIntent.AmountReceived.Value;
@@ -86,7 +86,7 @@ namespace FurCoNZ.Services.Payment
 
                 await _orderService.AddReceivedFundsForOrder(
                     stripeSession.OrderId, amountReceived,
-                    "stripe", session.PaymentIntentId, 
+                    "stripe", session.PaymentIntentId,
                     session.PaymentIntent.Created.Value,
                     cancellationToken);
 
@@ -100,10 +100,10 @@ namespace FurCoNZ.Services.Payment
         public async Task ProcessChargeAsync(Charge charge, CancellationToken cancellationToken)
         {
             // For now, only process refunds.
-            if(charge.Refunds.Any())
+            if (charge.Refunds.Any())
             {
                 var session = await _dbContext.StripeSessions
-                    .SingleOrDefaultAsync(ss => ss.PaymentIntent == charge.PaymentIntentId, cancellationToken);
+                    .FirstOrDefaultAsync(ss => ss.PaymentIntent == charge.PaymentIntentId, cancellationToken);
 
                 cancellationToken.ThrowIfCancellationRequested();
 
