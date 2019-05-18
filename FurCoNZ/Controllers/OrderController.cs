@@ -66,7 +66,7 @@ namespace FurCoNZ.Controllers
                         {
                             Id = ++ticketIndex,
                             TicketTypeId = ticketTypeId,
-                            TicketTypeName = ticketTypes.FirstOrDefault(x => x.Id == ticketTypeId).Name,
+                            TicketTypeName = ticketTypes.FirstOrDefault(x => x.Id == ticketTypeId)?.Name,
                         });
                     }
                 }
