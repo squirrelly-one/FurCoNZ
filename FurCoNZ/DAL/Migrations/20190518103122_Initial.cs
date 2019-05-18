@@ -3,7 +3,7 @@ using Microsoft.EntityFrameworkCore.Migrations;
 
 namespace FurCoNZ.DAL.Migrations
 {
-    public partial class ResetMigrations : Migration
+    public partial class Initial : Migration
     {
         protected override void Up(MigrationBuilder migrationBuilder)
         {
@@ -30,8 +30,7 @@ namespace FurCoNZ.DAL.Migrations
                     Id = table.Column<int>(nullable: false)
                         .Annotation("Sqlite:Autoincrement", true),
                     Name = table.Column<string>(nullable: true),
-                    Email = table.Column<string>(nullable: true),
-                    DateOfBirth = table.Column<DateTime>(nullable: false)
+                    Email = table.Column<string>(nullable: true)
                 },
                 constraints: table =>
                 {
@@ -75,6 +74,50 @@ namespace FurCoNZ.DAL.Migrations
                         name: "FK_Orders_Users_OrderedById",
                         column: x => x.OrderedById,
                         principalTable: "Users",
+                        principalColumn: "Id",
+                        onDelete: ReferentialAction.Cascade);
+                });
+
+            migrationBuilder.CreateTable(
+                name: "OrderAudits",
+                columns: table => new
+                {
+                    Id = table.Column<int>(nullable: false)
+                        .Annotation("Sqlite:Autoincrement", true),
+                    Type = table.Column<int>(nullable: false),
+                    AmountCents = table.Column<int>(nullable: false),
+                    When = table.Column<DateTimeOffset>(nullable: false),
+                    PaymentProvider = table.Column<string>(nullable: false),
+                    PaymentProviderReference = table.Column<string>(nullable: false),
+                    OrderId = table.Column<int>(nullable: false)
+                },
+                constraints: table =>
+                {
+                    table.PrimaryKey("PK_OrderAudits", x => x.Id);
+                    table.ForeignKey(
+                        name: "FK_OrderAudits_Orders_OrderId",
+                        column: x => x.OrderId,
+                        principalTable: "Orders",
+                        principalColumn: "Id",
+                        onDelete: ReferentialAction.Cascade);
+                });
+
+            migrationBuilder.CreateTable(
+                name: "StripeSessions",
+                columns: table => new
+                {
+                    Id = table.Column<string>(nullable: false),
+                    State = table.Column<int>(nullable: false),
+                    PaymentIntent = table.Column<string>(nullable: true),
+                    OrderId = table.Column<int>(nullable: false)
+                },
+                constraints: table =>
+                {
+                    table.PrimaryKey("PK_StripeSessions", x => x.Id);
+                    table.ForeignKey(
+                        name: "FK_StripeSessions_Orders_OrderId",
+                        column: x => x.OrderId,
+                        principalTable: "Orders",
                         principalColumn: "Id",
                         onDelete: ReferentialAction.Cascade);
                 });
@@ -139,9 +182,29 @@ namespace FurCoNZ.DAL.Migrations
                 columns: new[] { "Issuer", "Subject" });
 
             migrationBuilder.CreateIndex(
+                name: "IX_OrderAudits_OrderId",
+                table: "OrderAudits",
+                column: "OrderId");
+
+            migrationBuilder.CreateIndex(
+                name: "IX_OrderAudits_PaymentProvider_PaymentProviderReference",
+                table: "OrderAudits",
+                columns: new[] { "PaymentProvider", "PaymentProviderReference" });
+
+            migrationBuilder.CreateIndex(
                 name: "IX_Orders_OrderedById",
                 table: "Orders",
                 column: "OrderedById");
+
+            migrationBuilder.CreateIndex(
+                name: "IX_StripeSessions_OrderId",
+                table: "StripeSessions",
+                column: "OrderId");
+
+            migrationBuilder.CreateIndex(
+                name: "IX_StripeSessions_PaymentIntent",
+                table: "StripeSessions",
+                column: "PaymentIntent");
 
             migrationBuilder.CreateIndex(
                 name: "IX_Tickets_AttendeeAccountId",
@@ -163,6 +226,12 @@ namespace FurCoNZ.DAL.Migrations
         {
             migrationBuilder.DropTable(
                 name: "LinkedAccounts");
+
+            migrationBuilder.DropTable(
+                name: "OrderAudits");
+
+            migrationBuilder.DropTable(
+                name: "StripeSessions");
 
             migrationBuilder.DropTable(
                 name: "Tickets");

@@ -52,6 +52,53 @@ namespace FurCoNZ.DAL.Migrations
                     b.ToTable("Orders");
                 });
 
+            modelBuilder.Entity("FurCoNZ.Models.OrderAudit", b =>
+                {
+                    b.Property<int>("Id")
+                        .ValueGeneratedOnAdd();
+
+                    b.Property<int>("AmountCents");
+
+                    b.Property<int>("OrderId");
+
+                    b.Property<string>("PaymentProvider")
+                        .IsRequired();
+
+                    b.Property<string>("PaymentProviderReference")
+                        .IsRequired();
+
+                    b.Property<int>("Type");
+
+                    b.Property<DateTimeOffset>("When");
+
+                    b.HasKey("Id");
+
+                    b.HasIndex("OrderId");
+
+                    b.HasIndex("PaymentProvider", "PaymentProviderReference");
+
+                    b.ToTable("OrderAudits");
+                });
+
+            modelBuilder.Entity("FurCoNZ.Models.StripeSession", b =>
+                {
+                    b.Property<string>("Id");
+
+                    b.Property<int>("OrderId");
+
+                    b.Property<string>("PaymentIntent");
+
+                    b.Property<int>("State");
+
+                    b.HasKey("Id");
+
+                    b.HasIndex("OrderId");
+
+                    b.HasIndex("PaymentIntent");
+
+                    b.ToTable("StripeSessions");
+                });
+
             modelBuilder.Entity("FurCoNZ.Models.Ticket", b =>
                 {
                     b.Property<int>("Id")
@@ -129,8 +176,6 @@ namespace FurCoNZ.DAL.Migrations
                     b.Property<int>("Id")
                         .ValueGeneratedOnAdd();
 
-                    b.Property<DateTime>("DateOfBirth");
-
                     b.Property<string>("Email");
 
                     b.Property<string>("Name");
@@ -153,6 +198,22 @@ namespace FurCoNZ.DAL.Migrations
                     b.HasOne("FurCoNZ.Models.User", "OrderedBy")
                         .WithMany()
                         .HasForeignKey("OrderedById")
+                        .OnDelete(DeleteBehavior.Cascade);
+                });
+
+            modelBuilder.Entity("FurCoNZ.Models.OrderAudit", b =>
+                {
+                    b.HasOne("FurCoNZ.Models.Order", "Order")
+                        .WithMany("Audits")
+                        .HasForeignKey("OrderId")
+                        .OnDelete(DeleteBehavior.Cascade);
+                });
+
+            modelBuilder.Entity("FurCoNZ.Models.StripeSession", b =>
+                {
+                    b.HasOne("FurCoNZ.Models.Order", "Order")
+                        .WithMany("StripeSessions")
+                        .HasForeignKey("OrderId")
                         .OnDelete(DeleteBehavior.Cascade);
                 });
 
