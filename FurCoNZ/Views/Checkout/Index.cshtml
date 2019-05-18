@@ -1,0 +1,48 @@
+﻿@model CheckoutViewModel
+
+<h2>
+    Checkout
+    <small class="text-muted">Order: @Model.Order.Id</small>
+</h2>
+
+<table>
+    @foreach (var ticket in Model.Order.Tickets)
+    {
+        <tr>
+            <td>@ticket.TicketType.Name</td>
+            <td>@ticket.PreferredName</td>
+            <td>@ticket.TicketType.PriceCents</td>
+        </tr>
+    }
+</table>
+
+<div class="accordion" id="paymentProviders">
+    @foreach (var payment in Model.PaymentProviders)
+    {
+    <div class="card">
+        <div class="card-header" id="@Html.FormatValue(payment.Name, "payment{0}")" data-toggle="collapse" data-target="#@Html.FormatValue(payment.Name, "payment{0}View")" aria-controls="@Html.FormatValue(payment.Name, "payment{0}View")">
+            <h5 class="mb-0">
+                @payment.Name
+            </h5>
+        </div>
+
+        <div id="@Html.FormatValue(payment.Name, "payment{0}View")" class="collapse" aria-labelledby="@Html.FormatValue(payment.Name, "payment{0}")" data-parent="#paymentProviders">
+            <div class="card-body">
+                @await Component.InvokeAsync(payment.Name, new { orderId = Model.OrderId })
+            </div>
+        </div>
+    </div>
+    }
+</div>
+
+@*
+<div class="list-group">
+    @foreach (var payment in Model.PaymentProviders)
+    {
+        <input asp-for="SelectedPaymentProvider" type="radio" id="@Html.FormatValue(payment.Name, "payment{0}")" value="@payment.Name" />
+        <label class="list-group-item" for="@Html.FormatValue(payment.Name, "payment{0}")">
+            @payment.Name
+        </label>
+    }
+</div>
+*@

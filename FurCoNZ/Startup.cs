@@ -22,6 +22,7 @@ using Microsoft.Extensions.Logging;
 using Microsoft.IdentityModel.Tokens;
 using Npgsql;
 
+using FurCoNZ.Configuration;
 using FurCoNZ.DAL;
 using FurCoNZ.Services;
 using Microsoft.AspNetCore.HttpOverrides;
@@ -162,6 +163,13 @@ namespace FurCoNZ
             services.AddTransient<IUserService, EntityFrameworkUserService>();
             services.AddTransient<IOrderService, OrderService>();
 
+            services.AddTransient<IPaymentService, PaymentService>();
+            services.AddTransient<IPaymentProvider, Services.Payment.StripeService>();
+            services.AddTransient<IPaymentProvider, Services.Payment.BankPaymentProvider>();
+
+            services.AddTransient<Services.Payment.StripeService>();
+            services.AddHostedService<Services.Payment.Stripe.StripeHostedService>();
+
             services.Configure<CookiePolicyOptions>(options =>
             {
                 // This lambda determines whether user consent for non-essential cookies is needed for a given request.
@@ -205,6 +213,8 @@ namespace FurCoNZ
             });
 
             services.AddMvc().SetCompatibilityVersion(CompatibilityVersion.Version_2_2);
+
+            services.Configure<StripeSettings>(Configuration.GetSection("Stripe"));
         }
 
         // This method gets called by the runtime. Use this method to configure the HTTP request pipeline.
@@ -245,6 +255,9 @@ namespace FurCoNZ
                     name: "default",
                     template: "{controller=Home}/{action=Index}/{id?}");
             });
+
+            // Aparently stripe uses a singleton pattern 😟
+            Stripe.StripeConfiguration.SetApiKey(Configuration.GetValue<string>("Stripe:SecretKey"));
         }
     }
 }

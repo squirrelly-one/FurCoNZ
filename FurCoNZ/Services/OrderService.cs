@@ -45,7 +45,80 @@ namespace FurCoNZ.Services
         public async Task<IEnumerable<Order>> GetUserOrders(User user, CancellationToken cancellationToken = default)
         {
             // TODO: Should we support pagination?
-            return await _db.Orders.Where(o => o.OrderedBy == user).ToListAsync(cancellationToken);
+            return await _db.Orders
+                .Include(o => o.TicketsPurchased)
+                .ThenInclude(t => t.TicketType)
+                .Where(o => o.OrderedBy == user)
+                .ToListAsync(cancellationToken);
+        }
+
+        public async Task<Order> GetUserOrderAsync(User user, int orderId, CancellationToken cancellationToken = default)
+        {
+            return await _db.Orders
+                .Include(o => o.TicketsPurchased)
+                .ThenInclude(t => t.TicketType)
+                .SingleOrDefaultAsync(o => o.OrderedById == user.Id && o.Id == orderId, cancellationToken);
+        }
+
+        public async Task<Order> GetUserPendingOrderAsync(User user, CancellationToken cancellationToken = default)
+        {
+            return await _db.Orders
+                .Include(o => o.TicketsPurchased)
+                .ThenInclude(t => t.TicketType)
+                .SingleOrDefaultAsync(o => o.OrderedById == user.Id && o.AmountPaidCents == 0, cancellationToken);
+        }
+
+        public async Task AddReceivedFundsForOrder(int orderId, int amountCents, string paymentProvider, string paymentReference, DateTimeOffset when, CancellationToken cancellationToken = default)
+        {
+            var order = await _db.Orders
+                .Include(o => o.Audits)
+                .SingleAsync(o => o.Id == orderId, cancellationToken);
+
+            if (order.Audits.Any(a => a.PaymentProvider == paymentProvider && a.PaymentProviderReference == paymentReference && a.Type == AuditType.Received))
+                throw new InvalidOperationException($"Received funds for order {orderId} has already been applied for {paymentProvider}: {paymentReference}");
+
+            var audit = new OrderAudit
+            {
+                OrderId = orderId,
+                PaymentProvider = paymentProvider,
+                PaymentProviderReference = paymentReference,
+                Type = AuditType.Received,
+                When = when,
+                AmountCents = amountCents,
+            };
+
+            // Recalculate amount paid
+            order.AmountPaidCents = order.Audits.Sum(a => a.AmountCents) + audit.AmountCents;
+
+            await _db.OrderAudits.AddAsync(audit, cancellationToken);
+            await _db.SaveChangesAsync(cancellationToken);
+        }
+
+        public async Task RefundFundsForOrder(int orderId, int amountCents, string paymentProvider, string paymentReference, DateTimeOffset when, CancellationToken cancellationToken = default)
+        {
+            var order = await _db.Orders
+                .Include(o => o.Audits)
+                .SingleAsync(o => o.Id == orderId, cancellationToken);
+
+            if(order.Audits.Any(a => a.PaymentProvider == paymentProvider && a.PaymentProviderReference == paymentReference && a.Type == AuditType.Refunded))
+                throw new InvalidOperationException($"Refund for order {orderId} has already been applied for {paymentProvider}: {paymentReference}");
+            
+
+            var audit = new OrderAudit
+            {
+                OrderId = orderId,
+                PaymentProvider = paymentProvider,
+                PaymentProviderReference = paymentReference,
+                Type = AuditType.Refunded,
+                When = when,
+                AmountCents = -amountCents,
+            };
+
+            // Recalculate amount paid
+            order.AmountPaidCents = order.Audits.Sum(a => a.AmountCents) + audit.AmountCents;
+
+            _db.OrderAudits.Add(audit);
+            await _db.SaveChangesAsync(cancellationToken);
         }
     }
 }

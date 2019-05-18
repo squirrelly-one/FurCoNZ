@@ -61,7 +61,7 @@ namespace FurCoNZ.Controllers
 
             return View(new AccountOrdersViewModel (await _userService.GetCurrentUserAsync(cancellationToken))
                 {
-                    Orders = orders.ToList()
+                    Orders = orders.Select(o => new OrderViewModel(o)).ToList()
                 });
         }
     }
