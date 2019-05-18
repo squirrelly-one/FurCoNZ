@@ -1,13 +1,19 @@
-﻿@model IEnumerable<FurCoNZ.ViewModels.TicketDetailViewModel>
-@*
-    For more information on enabling MVC for empty projects, visit https://go.microsoft.com/fwlink/?LinkID=397860
-*@
-@{
-}
+﻿@model IList<FurCoNZ.ViewModels.TicketDetailViewModel>
 
-<form>
-@foreach (var ticketDetail in Model)
-{
-    <p>@ticketDetail.TicketType.Name</p>
-}
+<form asp-action="Validate" asp-controller="Order" method="post">
+    <div class="accordion" id="attendee-details-accordion">
+        @for (int i = 0; i < Model.Count; i++)
+        {
+            @Html.EditorFor(model => model[i])
+        }
+    </div>
+
+    <div class="">
+        <a asp-action="Index" class="btn btn-primary float-md-left" role="button">&lt; Back</a><button type="submit" class="btn btn-primary float-md-right">Confirm Order &gt;</button>
+        <div class="clearfix"></div>
+    </div>
 </form>
+
+@section Scripts {
+    <script src="~/js/order/index.js" asp-append-version="true"></script>
+}

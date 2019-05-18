@@ -4,25 +4,28 @@
 }
 
 <form asp-action="Index" method="post">
-    <table>
-        <tr>
-            <th>Type</th>
-            <th>Price</th>
-            <th>Quantity</th>
-            <th>Purchase</th>
-        </tr>
-        @foreach (var ticketType in Model.AvailableTicketTypes)
-        {
+    <table class="table">
+        <thead>
             <tr>
-                <td>@ticketType.Value.Name</td>
-                <td>$@((ticketType.Value.PriceCents / 100).ToString("f2"))</td>
-                <td>@ticketType.Value.TotalAvailable remaining</td>
-                <td>
-                    <input asp-for="AvailableTicketTypes[ticketType.Key].QuantityOrdered" min="0" max="@ticketType.Value.TotalAvailable" />
-                    @*<input type="number" name="ticketnumber[@ticketType.Key]" value="0" min="0" max="@ticketType.Value.TotalAvailable" />*@
-                </td>
+                <th scope="col">Type</th>
+                <th scope="col">Price</th>
+                <th scope="col">Quantity</th>
+                <th scope="col">Purchase</th>
             </tr>
-        }
+        </thead>
+        <tbody>
+            @foreach (var ticketType in Model.AvailableTicketTypes)
+            {
+                <tr>
+                    <td>@ticketType.Value.Name</td>
+                    <td>$@((ticketType.Value.PriceCents / 100).ToString("f2"))</td>
+                    <td>@ticketType.Value.TotalAvailable remaining</td>
+                    <td>
+                        <input asp-for="AvailableTicketTypes[ticketType.Key].QuantityOrdered" min="0" max="@ticketType.Value.TotalAvailable" />
+                    </td>
+                </tr>
+            }
+        </tbody>
     </table>
-    <input type="submit" name="submit" value="Details >" />
- </form>
+    <button type="submit" class="btn btn-primary float-md-right">Details &gt;</button>
+</form>
