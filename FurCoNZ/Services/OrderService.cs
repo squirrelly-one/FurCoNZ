@@ -18,7 +18,7 @@ namespace FurCoNZ.Services
             _db = db;
         }
 
-        public Task<Order> CreatePendingOrderAsync(User purchasingAccount, IEnumerable<Ticket> ticketsInBasket, CancellationToken cancellationToken = default)
+        public Task<Order> CreateOrderAsync(User purchasingAccount, IEnumerable<Ticket> ticketsInBasket, CancellationToken cancellationToken = default)
         {
             throw new NotImplementedException();
         }
