@@ -57,7 +57,7 @@ namespace FurCoNZ.Controllers
 
             cancellationToken.ThrowIfCancellationRequested();
 
-            var orders = await _orderService.GetUserOrders(user, cancellationToken);
+            var orders = await _orderService.GetUserOrdersAsync(user, cancellationToken);
 
             return View(new AccountOrdersViewModel (await _userService.GetCurrentUserAsync(cancellationToken))
                 {

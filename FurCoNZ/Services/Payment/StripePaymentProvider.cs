@@ -84,7 +84,7 @@ namespace FurCoNZ.Services.Payment
                 if (_options.Value.IncludeFee)
                     amountReceived = amountReceived - (amountReceived * 29 / 1000) - 30;
 
-                await _orderService.AddReceivedFundsForOrder(
+                await _orderService.AddReceivedFundsForOrderAsync(
                     stripeSession.OrderId, amountReceived,
                     "stripe", session.PaymentIntentId,
                     session.PaymentIntent.Created.Value,
@@ -125,7 +125,7 @@ namespace FurCoNZ.Services.Payment
                     if (_options.Value.IncludeFee)
                         amountReceived = amountReceived - (amountReceived * 29 / 1000) - 30;
 
-                    await _orderService.RefundFundsForOrder(
+                    await _orderService.RefundFundsForOrderAsync(
                         session.OrderId, amountReceived,
                         "stripe", charge.PaymentIntentId,
                         charge.Created,

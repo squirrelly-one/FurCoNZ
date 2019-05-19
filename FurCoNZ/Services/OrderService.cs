@@ -42,7 +42,7 @@ namespace FurCoNZ.Services
             throw new NotImplementedException();
         }
 
-        public async Task<IEnumerable<Order>> GetUserOrders(User user, CancellationToken cancellationToken = default)
+        public async Task<IEnumerable<Order>> GetUserOrdersAsync(User user, CancellationToken cancellationToken = default)
         {
             // TODO: Should we support pagination?
             return await _db.Orders
@@ -68,7 +68,7 @@ namespace FurCoNZ.Services
                 .SingleOrDefaultAsync(o => o.OrderedById == user.Id && o.AmountPaidCents == 0, cancellationToken);
         }
 
-        public async Task AddReceivedFundsForOrder(int orderId, int amountCents, string paymentProvider, string paymentReference, DateTimeOffset when, CancellationToken cancellationToken = default)
+        public async Task AddReceivedFundsForOrderAsync(int orderId, int amountCents, string paymentProvider, string paymentReference, DateTimeOffset when, CancellationToken cancellationToken = default)
         {
             var order = await _db.Orders
                 .Include(o => o.Audits)
@@ -94,7 +94,7 @@ namespace FurCoNZ.Services
             await _db.SaveChangesAsync(cancellationToken);
         }
 
-        public async Task RefundFundsForOrder(int orderId, int amountCents, string paymentProvider, string paymentReference, DateTimeOffset when, CancellationToken cancellationToken = default)
+        public async Task RefundFundsForOrderAsync(int orderId, int amountCents, string paymentProvider, string paymentReference, DateTimeOffset when, CancellationToken cancellationToken = default)
         {
             var order = await _db.Orders
                 .Include(o => o.Audits)
