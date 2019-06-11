@@ -39,6 +39,10 @@ namespace FurCoNZ.DAL
             modelBuilder.Entity<OrderAudit>()
                 .HasIndex(a => new { a.PaymentProvider, a.PaymentProviderReference });
 
+            modelBuilder.Entity<User>()
+                .Property(u => u.IsAdmin)
+                .HasDefaultValue(false);
+
         }
     }
 }
