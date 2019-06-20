@@ -33,11 +33,13 @@ namespace FurCoNZ
     public class Startup
     {
         private readonly ILogger _logger;
+        private readonly IHostingEnvironment _env;
 
-        public Startup(IConfiguration configuration, ILogger<Startup> logger)
+        public Startup(IConfiguration configuration, ILogger<Startup> logger, IHostingEnvironment env)
         {
             Configuration = configuration;
             _logger = logger;
+            _env = env;
             // All the sames do this. I have no idea why.
             JwtSecurityTokenHandler.DefaultInboundClaimTypeMap.Clear();
         }
@@ -52,10 +54,10 @@ namespace FurCoNZ
             services.AddSession(options =>
             {
                 options.IdleTimeout = TimeSpan.FromMinutes(30);
-                options.Cookie.Name = "Session";
+                options.Cookie.Name = "FurcoNZSessionCookie";
                 options.Cookie.HttpOnly = true;
-                options.Cookie.SameSite = SameSiteMode.Strict;
-                options.Cookie.SecurePolicy = CookieSecurePolicy.Always;
+                //options.Cookie.SameSite = SameSiteMode.Strict;
+                options.Cookie.SecurePolicy = _env.IsDevelopment() ? CookieSecurePolicy.SameAsRequest : CookieSecurePolicy.Always;
                 // Make the session cookie essential
                 options.Cookie.IsEssential = true;
             });

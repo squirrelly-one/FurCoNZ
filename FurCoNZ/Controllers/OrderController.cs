@@ -14,11 +14,15 @@ namespace FurCoNZ.Controllers
 {
     public class OrderController : Controller
     {
-        private readonly IOrderService _orderService;
+        private const string ActiveOrderSessionKey = "ActiveOrder";
 
-        public OrderController(IOrderService orderService)
+        private readonly IOrderService _orderService;
+        private readonly IUserService _userService;
+
+        public OrderController(IOrderService orderService, IUserService userService)
         {
             _orderService = orderService;
+            _userService = userService;
         }
 
         [HttpGet]
@@ -83,7 +87,7 @@ namespace FurCoNZ.Controllers
         {
             if (ModelState.IsValid)
             {
-                HttpContext.Session.Set("ActiveOrder", model);
+                HttpContext.Session.Set(ActiveOrderSessionKey, model);
 
                 var ticketTypes = await _orderService.GetTicketTypesAsync(cancellationToken: cancellationToken);
                 foreach (var ticket in model)
@@ -91,20 +95,87 @@ namespace FurCoNZ.Controllers
                     ticket.TicketTypeName = ticketTypes.FirstOrDefault(x => x.Id == ticket.TicketTypeId)?.Name;
                 }
 
-                return View(model);
+                var viewModel = new ValidateOrderViewModel
+                {
+                    TicketDetails = model,
+                    TicketOrderHashBase64 = Convert.ToBase64String(HttpContext.Session.GetValueHash(ActiveOrderSessionKey)),
+                };
+
+                return View(viewModel);
             }
 
-            // If we get here, something has done wrong...
+            // If we get here, something has gone wrong...
             return View("TicketDetail", model);
         }
 
         [HttpPost]
         [ValidateAntiForgeryToken]
-        public async Task<IActionResult> Confirm(CancellationToken cancellationToken)
+        public async Task<IActionResult> Confirm(ValidateOrderViewModel model, CancellationToken cancellationToken)
         {
-            throw new NotImplementedException();
+            // Get the ticket details (we'll want them for the validation page if something goes wrong)
+            model.TicketDetails = HttpContext.Session.Get<IList<TicketDetailViewModel>>(ActiveOrderSessionKey);
 
-            var model = HttpContext.Session.Get<IList<TicketDetailViewModel>>("ActiveOrder");
+            if (ModelState.IsValid)
+            {
+                // secureValidation = false since there is no risk to a malicous user correctly determining the hash through timing attacks
+                var sessionHasNotChanged = HttpContext.Session.ValidateValueHash(ActiveOrderSessionKey, Convert.FromBase64String(model.TicketOrderHashBase64), secureValidation: false);
+
+                if (sessionHasNotChanged)
+                {
+                    Models.User user = await _userService.GetCurrentUserAsync(cancellationToken);
+
+                    var tickets = new List<Models.Ticket>();
+
+                    foreach (var ticketViewModel in model.TicketDetails)
+                    {
+                        tickets.Add(GetTicketEntityFromViewModel(ticketViewModel));
+                    }
+
+                    var order = await _orderService.CreateOrderAsync(user, tickets, cancellationToken);
+
+                    return RedirectToAction("Index", "Checkout", new { orderId = order.Id });
+                }
+            }
+
+            // If we get here, something has gone wrong...
+            return View("Validate", model);
+
+            
+        }
+
+        // TODO: Lots of things missing here
+        private Models.Ticket GetTicketEntityFromViewModel(TicketDetailViewModel ticketViewModel)
+        {
+            return new Models.Ticket
+            {
+                // AttendeeAccountId
+
+                TicketTypeId = ticketViewModel.TicketTypeId,
+
+                TicketName = ticketViewModel.BadgeName,
+
+                PreferredName = ticketViewModel.PreferredFullName,
+                // PreferredPronouns
+
+                LegalName = String.IsNullOrWhiteSpace(ticketViewModel.IdentificationFullName) ? ticketViewModel.PreferredFullName : ticketViewModel.IdentificationFullName,
+                DateOfBirth = ticketViewModel.DateOfBirth,
+
+                EmailAddress = ticketViewModel.EmailAddress,
+
+                // Address
+                // Suburb
+                // CityTown
+                // Country
+
+                // PhoneNumber
+
+                // MealRequirements
+                KnownAllergens = ticketViewModel.KnownAllergies,
+                // CabinGrouping
+                // CabinNoisePreference
+
+                AdditionalNotes = ticketViewModel.OtherNotes,
+            };
         }
     }
 }
