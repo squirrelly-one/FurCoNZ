@@ -9,14 +9,14 @@ using Microsoft.EntityFrameworkCore.Storage.ValueConversion;
 namespace FurCoNZ.DAL.Migrations
 {
     [DbContext(typeof(FurCoNZDbContext))]
-    [Migration("20190518103122_Initial")]
+    [Migration("20190629081357_Initial")]
     partial class Initial
     {
         protected override void BuildTargetModel(ModelBuilder modelBuilder)
         {
 #pragma warning disable 612, 618
             modelBuilder
-                .HasAnnotation("ProductVersion", "2.2.2-servicing-10034");
+                .HasAnnotation("ProductVersion", "2.2.4-servicing-10062");
 
             modelBuilder.Entity("FurCoNZ.Models.LinkedAccount", b =>
                 {
@@ -110,7 +110,7 @@ namespace FurCoNZ.DAL.Migrations
 
                     b.Property<string>("Address");
 
-                    b.Property<int>("AttendeeAccountId");
+                    b.Property<int?>("AttendeeAccountId");
 
                     b.Property<string>("CabinGrouping");
 
@@ -180,6 +180,10 @@ namespace FurCoNZ.DAL.Migrations
 
                     b.Property<string>("Email");
 
+                    b.Property<bool>("IsAdmin")
+                        .ValueGeneratedOnAdd()
+                        .HasDefaultValue(false);
+
                     b.Property<string>("Name");
 
                     b.HasKey("Id");
@@ -223,8 +227,7 @@ namespace FurCoNZ.DAL.Migrations
                 {
                     b.HasOne("FurCoNZ.Models.User", "AttendeeAccount")
                         .WithMany()
-                        .HasForeignKey("AttendeeAccountId")
-                        .OnDelete(DeleteBehavior.Cascade);
+                        .HasForeignKey("AttendeeAccountId");
 
                     b.HasOne("FurCoNZ.Models.Order", "Order")
                         .WithMany("TicketsPurchased")

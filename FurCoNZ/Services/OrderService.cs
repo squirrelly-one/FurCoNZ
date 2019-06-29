@@ -18,9 +18,50 @@ namespace FurCoNZ.Services
             _db = db;
         }
 
-        public Task<Order> CreateOrderAsync(User purchasingAccount, IEnumerable<Ticket> ticketsInBasket, CancellationToken cancellationToken = default)
+        public async Task<Order> CreateOrderAsync(User purchasingAccount, IEnumerable<Ticket> ticketsInBasket, CancellationToken cancellationToken = default)
         {
-            throw new NotImplementedException();
+            if (purchasingAccount == null)
+                throw new ArgumentNullException(nameof(purchasingAccount), "Must supply a user when creating an order");
+            if (ticketsInBasket == null || !ticketsInBasket.Any())
+                throw new ArgumentNullException(nameof(ticketsInBasket), "No tickets are being purchased in the creation of this order");
+            if (ticketsInBasket.Any(t => t.Id != default))
+                throw new InvalidOperationException("Some of the tickets in this order already exist, and have been assigned an id.");
+
+            // Setup
+            var ticketList = ticketsInBasket.ToList();
+            var ticketTypeIdsInOrder = ticketList.Select(t => t.TicketTypeId).Distinct();
+            var ticketTypesInOrder = _db.TicketTypes.Where(tt => ticketTypeIdsInOrder.Contains(tt.Id));
+
+            // Check tickets are still available
+            foreach (var ticketType in ticketTypesInOrder)
+            {
+                var ticketsOfTypeAvailable = ticketType.TotalAvailable;
+                var ticketsOfTypeOrdered = ticketList.Count(t => t.TicketTypeId == ticketType.Id);
+
+                if (ticketsOfTypeOrdered > ticketsOfTypeAvailable)
+                {
+                    throw new InvalidOperationException($"There are not enough {ticketType.Name} tickets available for this order to be created.");
+                }
+
+                // Remove the appropriate number of tickets from the available pool
+                ticketType.TotalAvailable -= ticketsOfTypeOrdered;
+            }
+
+            // Set up tickets for tracking
+            _db.Tickets.AddRange(ticketList);
+
+            // Set up order for tracking
+            var order = new Order
+            {
+                OrderedById = purchasingAccount.Id,
+                TicketsPurchased = ticketList,
+            };
+            _db.Orders.Add(order);
+
+            // Commit to DB
+            await _db.SaveChangesAsync();
+
+            return order;
         }
 
         public async Task<IEnumerable<TicketType>> GetTicketTypesAsync(bool IncludeUnavailableTickets = true, CancellationToken cancellationToken = default)
