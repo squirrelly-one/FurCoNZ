@@ -6,10 +6,10 @@ using Microsoft.EntityFrameworkCore.Infrastructure;
 using Microsoft.EntityFrameworkCore.Migrations;
 using Microsoft.EntityFrameworkCore.Storage.ValueConversion;
 
-namespace FurCoNZ.Migrations
+namespace FurCoNZ.DAL.Migrations
 {
     [DbContext(typeof(FurCoNZDbContext))]
-    [Migration("20190629063823_Initial")]
+    [Migration("20190629081357_Initial")]
     partial class Initial
     {
         protected override void BuildTargetModel(ModelBuilder modelBuilder)
@@ -179,6 +179,10 @@ namespace FurCoNZ.Migrations
                         .ValueGeneratedOnAdd();
 
                     b.Property<string>("Email");
+
+                    b.Property<bool>("IsAdmin")
+                        .ValueGeneratedOnAdd()
+                        .HasDefaultValue(false);
 
                     b.Property<string>("Name");
 

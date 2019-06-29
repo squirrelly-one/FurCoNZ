@@ -1,7 +1,7 @@
 ﻿using System;
 using Microsoft.EntityFrameworkCore.Migrations;
 
-namespace FurCoNZ.Migrations
+namespace FurCoNZ.DAL.Migrations
 {
     public partial class Initial : Migration
     {
@@ -30,7 +30,8 @@ namespace FurCoNZ.Migrations
                     Id = table.Column<int>(nullable: false)
                         .Annotation("Sqlite:Autoincrement", true),
                     Name = table.Column<string>(nullable: true),
-                    Email = table.Column<string>(nullable: true)
+                    Email = table.Column<string>(nullable: true),
+                    IsAdmin = table.Column<bool>(nullable: false, defaultValue: false)
                 },
                 constraints: table =>
                 {
