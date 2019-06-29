@@ -27,8 +27,27 @@ namespace FurCoNZ.Services
             if (ticketsInBasket.Any(t => t.Id != default))
                 throw new InvalidOperationException("Some of the tickets in this order already exist, and have been assigned an id.");
 
-            // Set up tickets for tracking
+            // Setup
             var ticketList = ticketsInBasket.ToList();
+            var ticketTypeIdsInOrder = ticketList.Select(t => t.TicketTypeId).Distinct();
+            var ticketTypesInOrder = _db.TicketTypes.Where(tt => ticketTypeIdsInOrder.Contains(tt.Id));
+
+            // Check tickets are still available
+            foreach (var ticketType in ticketTypesInOrder)
+            {
+                var ticketsOfTypeAvailable = ticketType.TotalAvailable;
+                var ticketsOfTypeOrdered = ticketList.Count(t => t.TicketTypeId == ticketType.Id);
+
+                if (ticketsOfTypeOrdered > ticketsOfTypeAvailable)
+                {
+                    throw new InvalidOperationException($"There are not enough {ticketType.Name} tickets available for this order to be created.");
+                }
+
+                // Remove the appropriate number of tickets from the available pool
+                ticketType.TotalAvailable -= ticketsOfTypeOrdered;
+            }
+
+            // Set up tickets for tracking
             _db.Tickets.AddRange(ticketList);
 
             // Set up order for tracking
