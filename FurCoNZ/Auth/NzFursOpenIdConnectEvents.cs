@@ -24,6 +24,7 @@ namespace FurCoNZ.Auth
             if (user != null)
             {
                 identity.AddClaim(new Claim("user", user.Id.ToString()));
+                identity.AddClaim(new Claim("admin", user.IsAdmin.ToString()));
                 return;
             }
 

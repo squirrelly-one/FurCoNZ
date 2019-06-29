@@ -3,18 +3,20 @@ using System;
 using FurCoNZ.DAL;
 using Microsoft.EntityFrameworkCore;
 using Microsoft.EntityFrameworkCore.Infrastructure;
+using Microsoft.EntityFrameworkCore.Migrations;
 using Microsoft.EntityFrameworkCore.Storage.ValueConversion;
 
-namespace FurCoNZ.Migrations
+namespace FurCoNZ.DAL.Migrations
 {
     [DbContext(typeof(FurCoNZDbContext))]
-    partial class FurCoNZDbContextModelSnapshot : ModelSnapshot
+    [Migration("20190611123713_Add IsAdmin to Users")]
+    partial class AddIsAdmintoUsers
     {
-        protected override void BuildModel(ModelBuilder modelBuilder)
+        protected override void BuildTargetModel(ModelBuilder modelBuilder)
         {
 #pragma warning disable 612, 618
             modelBuilder
-                .HasAnnotation("ProductVersion", "2.2.4-servicing-10062");
+                .HasAnnotation("ProductVersion", "2.2.2-servicing-10034");
 
             modelBuilder.Entity("FurCoNZ.Models.LinkedAccount", b =>
                 {
@@ -108,7 +110,7 @@ namespace FurCoNZ.Migrations
 
                     b.Property<string>("Address");
 
-                    b.Property<int?>("AttendeeAccountId");
+                    b.Property<int>("AttendeeAccountId");
 
                     b.Property<string>("CabinGrouping");
 
@@ -225,7 +227,8 @@ namespace FurCoNZ.Migrations
                 {
                     b.HasOne("FurCoNZ.Models.User", "AttendeeAccount")
                         .WithMany()
-                        .HasForeignKey("AttendeeAccountId");
+                        .HasForeignKey("AttendeeAccountId")
+                        .OnDelete(DeleteBehavior.Cascade);
 
                     b.HasOne("FurCoNZ.Models.Order", "Order")
                         .WithMany("TicketsPurchased")

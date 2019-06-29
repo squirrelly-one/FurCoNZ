@@ -214,7 +214,18 @@ namespace FurCoNZ
                 options.Events.OnUserInformationReceived = NzFursOpenIdConnectEvents.OnUserInformationReceived;
             });
 
-            services.AddMvc().SetCompatibilityVersion(CompatibilityVersion.Version_2_2);
+            services.AddAuthorization(options => 
+            {
+                options.AddPolicy("AdminOnly", policyBuilder =>
+                {
+                    policyBuilder
+                        .RequireAuthenticatedUser()
+                        .RequireClaim("admin", true.ToString());
+                });
+            });
+
+            services.AddMvc()
+                .SetCompatibilityVersion(CompatibilityVersion.Version_2_2);
 
             services.Configure<StripeSettings>(Configuration.GetSection("Stripe"));
         }
@@ -253,6 +264,10 @@ namespace FurCoNZ
 
             app.UseMvc(routes =>
             {
+                routes.MapRoute(
+                    name: "areas",
+                    template: "{area:exists}/{controller=Home}/{action=Index}/{id?}");
+
                 routes.MapRoute(
                     name: "default",
                     template: "{controller=Home}/{action=Index}/{id?}");

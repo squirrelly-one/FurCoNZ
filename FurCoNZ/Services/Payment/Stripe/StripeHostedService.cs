@@ -62,7 +62,7 @@ namespace FurCoNZ.Services.Payment.Stripe
             // Initially get events from the past 24 hours.
             _eventListOptions = new EventListOptions
             {
-                CreatedRange = new DateRangeOptions {
+                Created = new DateRangeOptions {
                     GreaterThan = DateTime.Now.Subtract(TimeSpan.FromDays(1)),
                 },
             };
@@ -80,9 +80,13 @@ namespace FurCoNZ.Services.Payment.Stripe
             using (var serviceScope = _services.CreateScope())
             {
                 var stripeService = serviceScope.ServiceProvider.GetRequiredService<StripeService>();
-                StripeConfiguration.SetApiKey(_options.Value.SecretKey);
+                StripeConfiguration.ApiKey = _options.Value.SecretKey;
 
-                var lastEventDateTime = _eventListOptions.CreatedRange.GreaterThan;
+                DateTime? lastEventDateTime = DateTime.Now.Subtract(TimeSpan.FromDays(1));
+                if (_eventListOptions.Created.Value is DateRangeOptions range)
+                    lastEventDateTime = range.GreaterThan;
+                else if (_eventListOptions.Created.Type == typeof(DateTime?))
+                    lastEventDateTime = _eventListOptions.Created.Value as DateTime?;
 
                 // Clear the pagination cursor.
                 _eventListOptions.StartingAfter = null;
@@ -120,7 +124,7 @@ namespace FurCoNZ.Services.Payment.Stripe
                 } while (events.Any());
 
                 // Update the event window to prevent the same events from being processed again.
-                _eventListOptions.CreatedRange.GreaterThan = lastEventDateTime;
+                _eventListOptions.Created = lastEventDateTime;
             }
         }
 
