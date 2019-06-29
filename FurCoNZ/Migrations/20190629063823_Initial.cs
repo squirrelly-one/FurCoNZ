@@ -1,7 +1,7 @@
 ﻿using System;
 using Microsoft.EntityFrameworkCore.Migrations;
 
-namespace FurCoNZ.DAL.Migrations
+namespace FurCoNZ.Migrations
 {
     public partial class Initial : Migration
     {
@@ -128,7 +128,7 @@ namespace FurCoNZ.DAL.Migrations
                 {
                     Id = table.Column<int>(nullable: false)
                         .Annotation("Sqlite:Autoincrement", true),
-                    AttendeeAccountId = table.Column<int>(nullable: false),
+                    AttendeeAccountId = table.Column<int>(nullable: true),
                     OrderId = table.Column<int>(nullable: false),
                     TicketTypeId = table.Column<int>(nullable: false),
                     TicketName = table.Column<string>(nullable: true),
@@ -156,7 +156,7 @@ namespace FurCoNZ.DAL.Migrations
                         column: x => x.AttendeeAccountId,
                         principalTable: "Users",
                         principalColumn: "Id",
-                        onDelete: ReferentialAction.Cascade);
+                        onDelete: ReferentialAction.Restrict);
                     table.ForeignKey(
                         name: "FK_Tickets_Orders_OrderId",
                         column: x => x.OrderId,

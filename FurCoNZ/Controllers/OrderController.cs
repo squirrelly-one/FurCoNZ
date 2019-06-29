@@ -6,12 +6,14 @@ using System.Threading.Tasks;
 using FurCoNZ.Helpers; // Required for SessionExtensions
 using FurCoNZ.Services;
 using FurCoNZ.ViewModels;
+using Microsoft.AspNetCore.Authorization;
 using Microsoft.AspNetCore.Mvc;
 
 // For more information on enabling MVC for empty projects, visit https://go.microsoft.com/fwlink/?LinkID=397860
 
 namespace FurCoNZ.Controllers
 {
+    [Authorize]
     public class OrderController : Controller
     {
         private const string ActiveOrderSessionKey = "ActiveOrder";
@@ -139,8 +141,6 @@ namespace FurCoNZ.Controllers
 
             // If we get here, something has gone wrong...
             return View("Validate", model);
-
-            
         }
 
         // TODO: Lots of things missing here
@@ -148,7 +148,7 @@ namespace FurCoNZ.Controllers
         {
             return new Models.Ticket
             {
-                // AttendeeAccountId
+                // AttendeeAccountId // Set this if the user claims this as theirs, and leave null if it's for someone else
 
                 TicketTypeId = ticketViewModel.TicketTypeId,
 

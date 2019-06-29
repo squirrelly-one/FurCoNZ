@@ -18,9 +18,31 @@ namespace FurCoNZ.Services
             _db = db;
         }
 
-        public Task<Order> CreateOrderAsync(User purchasingAccount, IEnumerable<Ticket> ticketsInBasket, CancellationToken cancellationToken = default)
+        public async Task<Order> CreateOrderAsync(User purchasingAccount, IEnumerable<Ticket> ticketsInBasket, CancellationToken cancellationToken = default)
         {
-            throw new NotImplementedException();
+            if (purchasingAccount == null)
+                throw new ArgumentNullException(nameof(purchasingAccount), "Must supply a user when creating an order");
+            if (ticketsInBasket == null || !ticketsInBasket.Any())
+                throw new ArgumentNullException(nameof(ticketsInBasket), "No tickets are being purchased in the creation of this order");
+            if (ticketsInBasket.Any(t => t.Id != default))
+                throw new InvalidOperationException("Some of the tickets in this order already exist, and have been assigned an id.");
+
+            // Set up tickets for tracking
+            var ticketList = ticketsInBasket.ToList();
+            _db.Tickets.AddRange(ticketList);
+
+            // Set up order for tracking
+            var order = new Order
+            {
+                OrderedById = purchasingAccount.Id,
+                TicketsPurchased = ticketList,
+            };
+            _db.Orders.Add(order);
+
+            // Commit to DB
+            await _db.SaveChangesAsync();
+
+            return order;
         }
 
         public async Task<IEnumerable<TicketType>> GetTicketTypesAsync(bool IncludeUnavailableTickets = true, CancellationToken cancellationToken = default)

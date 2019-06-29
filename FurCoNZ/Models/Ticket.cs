@@ -5,7 +5,7 @@ namespace FurCoNZ.Models
     {
         public int Id { get; set; }
 
-        public int AttendeeAccountId { get; set; }
+        public int? AttendeeAccountId { get; set; }
         public virtual User AttendeeAccount { get; set; }
 
         public int OrderId { get; set; }
