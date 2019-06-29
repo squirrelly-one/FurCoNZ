@@ -56,7 +56,7 @@ namespace FurCoNZ.Components
 
             var lineItems = order.TicketsPurchased.GroupBy(t => t.TicketType, new TicketTypeComparer());
 
-            Stripe.StripeConfiguration.SetApiKey(_stripeOptions.Value.SecretKey);
+            Stripe.StripeConfiguration.ApiKey = _stripeOptions.Value.SecretKey;
 
             var checkoutSessionOptions = new Stripe.Checkout.SessionCreateOptions
             {
