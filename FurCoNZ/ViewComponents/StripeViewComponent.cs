@@ -86,7 +86,7 @@ namespace FurCoNZ.Components
                 CancelUrl = Url.Action("Cancelled", "Stripe", null, Request.Scheme),
             };
 
-            var subTotal = checkoutSessionOptions.LineItems.Sum(l => l.Amount.Value);
+            var subTotal = checkoutSessionOptions.LineItems.Sum(l => l.Amount.Value * l.Quantity);
             // Calculate stripe fee to ensure received amount is what's requested.
             var stripeFee = ((subTotal + _stripeFeeFixed) * 1000 / _stripeFeePercentInverse) - subTotal;
 
@@ -107,7 +107,7 @@ namespace FurCoNZ.Components
                 });
             }
 
-            var total = checkoutSessionOptions.LineItems.Sum(l => l.Amount.Value);
+            var total = checkoutSessionOptions.LineItems.Sum(l => l.Amount.Value * l.Quantity);
 
             var checkoutSession = await _checkoutSessionService.CreateAsync(checkoutSessionOptions, cancellationToken: HttpContext.RequestAborted);
 
