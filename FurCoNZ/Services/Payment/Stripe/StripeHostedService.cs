@@ -124,7 +124,10 @@ namespace FurCoNZ.Services.Payment.Stripe
                 } while (events.Any());
 
                 // Update the event window to prevent the same events from being processed again.
-                _eventListOptions.Created = lastEventDateTime;
+                _eventListOptions.Created = new DateRangeOptions
+                {
+                    GreaterThan = lastEventDateTime,
+                };
             }
         }
 
