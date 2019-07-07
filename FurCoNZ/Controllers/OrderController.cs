@@ -171,7 +171,7 @@ namespace FurCoNZ.Controllers
 
                 // MealRequirements
                 KnownAllergens = ticketViewModel.KnownAllergies,
-                // CabinGrouping
+                CabinGrouping = ticketViewModel.CabinPreferences,
                 // CabinNoisePreference
 
                 AdditionalNotes = ticketViewModel.OtherNotes,

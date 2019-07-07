@@ -67,7 +67,7 @@
                     <div class="form-group">
                         <label asp-for="DateOfBirth">Date of Birth</label>
                         @* TODO: Need a proper date picker *@
-                        <input asp-for="DateOfBirth" class="form-control" placeholder="yyyy-mm-dd" min="1903-01-02" max="@DateTime.Today.ToString()" onchange="dateOfBirthChanged(this, @Model.Id)"/>
+                        <input asp-for="DateOfBirth" class="form-control" placeholder="yyyy-mm-dd" min="1903-01-02" max="@DateTime.Today.ToString()" onchange="dateOfBirthChanged(this, @Model.Id)" />
                     </div>
 
                     <div id="attendee-@Model.Id-under18Notice" class="alert alert-info d-none" role="alert">
@@ -95,6 +95,12 @@
                         <label asp-for="KnownAllergies">Known Allergies</label>
                         <textarea asp-for="KnownAllergies" class="form-control" aria-describedby="attendee-@Model.Id-knownAllergiesHelp" rows="6"></textarea>
                         <small id="attendee-@Model.Id-knownAllergiesHelp" class="form-text text-muted">Including any dietary requirements, medical allergies or other halth and safety issues that staff need to be aware of.</small>
+                    </div>
+
+                    <div class="form-group">
+                        <label asp-for="CabinPreferences">Cabin Preferences</label>
+                        <textarea asp-for="CabinPreferences" class="form-control" aria-describedby="attendee-@Model.Id-cabinPrefencesHelp" rows="6"></textarea>
+                        <small id="attendee-@Model.Id-cabinPrefencesHelp" class="form-text text-muted">If you have any preferences in who you want to room with, let us know here.</small>
                     </div>
 
                     <div class="form-group">

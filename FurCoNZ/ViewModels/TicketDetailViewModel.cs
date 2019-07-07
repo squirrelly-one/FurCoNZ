@@ -44,6 +44,10 @@ namespace FurCoNZ.ViewModels
         public string KnownAllergies { get; set; }
 
         [DataType(DataType.MultilineText)]
+        [Display(Name = "Cabin Preferences")]
+        public string CabinPreferences { get; set; }
+
+        [DataType(DataType.MultilineText)]
         [Display(Name = "Other Notes")]
         public string OtherNotes { get; set; }
 
