@@ -40,7 +40,7 @@ namespace FurCoNZ.ViewModels
         // TODO: A real dietary requirements field
 
         [DataType(DataType.MultilineText)]
-        [Display(Name = "Known Allergies")]
+        [Display(Name = "Known Allergies / Medical Conditions")]
         public string KnownAllergies { get; set; }
 
         [DataType(DataType.MultilineText)]
