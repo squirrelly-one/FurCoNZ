@@ -67,7 +67,7 @@
                     <div class="form-group">
                         <label asp-for="DateOfBirth">Date of Birth</label>
                         @* TODO: Need a proper date picker *@
-                        <input asp-for="DateOfBirth" class="form-control" placeholder="yyyy-mm-dd" min="1903-01-02" max="@DateTime.Today.ToString()" onchange="dateOfBirthChanged(this, @Model.Id)"/>
+                        <input asp-for="DateOfBirth" class="form-control" placeholder="yyyy-mm-dd" data-date-format="yyyy-mm-dd" min="1903-01-02" max="@DateTime.Today.ToString()" onchange="dateOfBirthChanged(this, @Model.Id)"/>
                     </div>
 
                     <div id="attendee-@Model.Id-under18Notice" class="alert alert-info d-none" role="alert">
