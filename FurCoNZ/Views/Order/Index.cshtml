@@ -14,14 +14,15 @@
             </tr>
         </thead>
         <tbody>
-            @foreach (var ticketType in Model.AvailableTicketTypes)
+            @for (int i = 0; i < Model.AvailableTicketTypes.Count; i++)
             {
                 <tr>
-                    <td>@ticketType.Value.Name</td>
-                    <td>$@((ticketType.Value.PriceCents / 100).ToString("f2"))</td>
-                    <td>@ticketType.Value.TotalAvailable remaining</td>
+                    <td>@Model.AvailableTicketTypes[i].Name</td>
+                    <td>$@((Model.AvailableTicketTypes[i].PriceCents / 100).ToString("f2"))</td>
+                    <td>@Model.AvailableTicketTypes[i].TotalAvailable remaining</td>
                     <td>
-                        <input asp-for="AvailableTicketTypes[ticketType.Key].QuantityOrdered" min="0" max="@ticketType.Value.TotalAvailable" />
+                        <input asp-for="@Model.AvailableTicketTypes[i].Id" type="hidden" />
+                        <input asp-for="@Model.AvailableTicketTypes[i].QuantityOrdered" min="0" max="@Model.AvailableTicketTypes[i].TotalAvailable" />
                     </td>
                 </tr>
             }

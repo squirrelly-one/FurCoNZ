@@ -34,18 +34,15 @@ namespace FurCoNZ.Controllers
 
             var viewModel = new OrderIndexViewModel
             {
-                AvailableTicketTypes = availableTicketTypes.Select(a => new KeyValuePair<int, OrderTicketTypeViewModel>
-                (
-                    a.Id,
-                    new OrderTicketTypeViewModel
-                    {
-                        Name = a.Name,
-                        Description = a.Description,
-                        PriceCents = a.PriceCents,
-                        TotalAvailable = a.TotalAvailable,
-                        QuantityOrdered = 0, // default to zero tickets
-                    }
-                )).ToDictionary(a => a.Key, a => a.Value)
+                AvailableTicketTypes = availableTicketTypes.Select(a => new OrderTicketTypeViewModel
+                {
+                    Id = a.Id,
+                    Name = a.Name,
+                    Description = a.Description,
+                    PriceCents = a.PriceCents,
+                    TotalAvailable = a.TotalAvailable,
+                    QuantityOrdered = 0, // default to zero tickets
+                }).ToList()
             };
 
             return View(viewModel);
@@ -61,10 +58,10 @@ namespace FurCoNZ.Controllers
                 var ticketTypes = await _orderService.GetTicketTypesAsync(false, cancellationToken);
 
                 var ticketIndex = 0;
-                foreach (var ticketTypeOrdered in orderIndexViewModel.AvailableTicketTypes.Where(x => x.Value.QuantityOrdered > 0))
+                foreach (var ticketTypeOrdered in orderIndexViewModel.AvailableTicketTypes.Where(x => x.QuantityOrdered > 0))
                 {
-                    var ticketTypeId = ticketTypeOrdered.Key;
-                    var quantityOrderedForTicketType = ticketTypeOrdered.Value.QuantityOrdered;
+                    var ticketTypeId = ticketTypeOrdered.Id;
+                    var quantityOrderedForTicketType = ticketTypeOrdered.QuantityOrdered;
 
                     for (var i = 0; i < quantityOrderedForTicketType; i++)
                     {

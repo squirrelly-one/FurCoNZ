@@ -7,6 +7,6 @@ namespace FurCoNZ.ViewModels
 {
     public class OrderIndexViewModel
     {
-        public Dictionary<int, OrderTicketTypeViewModel> AvailableTicketTypes { get; set; }
+        public IList<OrderTicketTypeViewModel> AvailableTicketTypes { get; set; }
     }
 }
