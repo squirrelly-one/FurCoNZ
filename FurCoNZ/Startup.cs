@@ -1,3 +1,4 @@
+// Core
 using System;
 using System.IdentityModel.Tokens.Jwt;
 using System.IO;
@@ -7,10 +8,12 @@ using System.Security.Cryptography.X509Certificates;
 using System.Security.Cryptography;
 using System.Text;
 
+// Microsoft
 using Microsoft.AspNetCore.Authentication.Cookies;
 using Microsoft.AspNetCore.Builder;
 using Microsoft.AspNetCore.Hosting;
 using Microsoft.AspNetCore.Http;
+using Microsoft.AspNetCore.HttpOverrides;
 using Microsoft.AspNetCore.Mvc;
 #if DEBUG
 using Microsoft.Data.Sqlite;
@@ -20,13 +23,16 @@ using Microsoft.Extensions.Configuration;
 using Microsoft.Extensions.DependencyInjection;
 using Microsoft.Extensions.Logging;
 using Microsoft.IdentityModel.Tokens;
-using Npgsql;
 
+// Third-party
+using Npgsql;
+using SendGrid;
+
+// Local
+using FurCoNZ.Auth;
 using FurCoNZ.Configuration;
 using FurCoNZ.DAL;
 using FurCoNZ.Services;
-using Microsoft.AspNetCore.HttpOverrides;
-using FurCoNZ.Auth;
 
 namespace FurCoNZ
 {
@@ -160,7 +166,12 @@ namespace FurCoNZ
             });
 
             // Allow accessing the HTTPContext from services.
-            services.AddHttpContextAccessor(); 
+            services.AddHttpContextAccessor();
+
+            // Configure SendGrid
+            services.Configure<SendGridClientOptions>(options => Configuration.GetSection("SendGrid").Bind(options));
+            services.AddTransient<ISendGridClient, SendGridClient>();
+            services.AddTransient<IEmailService, SendGridEmailService>();
 
             services.AddTransient<IUserService, EntityFrameworkUserService>();
             services.AddTransient<IOrderService, OrderService>();
