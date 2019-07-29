@@ -18,7 +18,7 @@
     <PackageReference Include="Npgsql.EntityFrameworkCore.PostgreSQL" Version="2.2.4" />
     <PackageReference Include="Stripe.net" Version="27.4.0" />
     <PackageReference Include="TagHelperSamples.Authorization" Version="2.0.49" />
-    <PackageReference Include="SauceControl.Blake2Fast" Version="0.2.0" />
+    <PackageReference Include="SauceControl.Blake2Fast" Version="1.0.0" />
   </ItemGroup>
 
   <ItemGroup Condition=" '$(Configuration)' == 'Debug' ">
