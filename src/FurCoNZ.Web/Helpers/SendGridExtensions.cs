@@ -16,17 +16,28 @@ namespace FurCoNZ.Web.Helpers
 
         internal static List<EmailAddress> ToSendGridAddresses(this IEnumerable<MailAddress> mailAddresses)
         {
-            return mailAddresses.Select(mailAddress => mailAddress.ToSendGridAddress()).ToList();
+            return mailAddresses
+                .Select(mailAddress => mailAddress.ToSendGridAddress())
+                .ToList();
         }
 
         internal async static Task AddAttachmentAsync(this SendGridMessage sendGridMessage, System.Net.Mail.Attachment attachment, CancellationToken cancellationToken = default)
         {
-            await sendGridMessage.AddAttachmentAsync(attachment.ContentDisposition.FileName, attachment.ContentStream, attachment.ContentType.Name, attachment.ContentDisposition.Inline ? "inline" : "attachment", attachment.ContentId, cancellationToken);
+            await sendGridMessage.AddAttachmentAsync(
+                filename: attachment.ContentDisposition.FileName,
+                contentStream: attachment.ContentStream,
+                type: attachment.ContentType.Name,
+                disposition: attachment.ContentDisposition.Inline ? "inline" : "attachment",
+                content_id: attachment.ContentId,
+                cancellationToken: cancellationToken
+            );
         }
 
         internal static async Task AddAttachmentsAsync(this SendGridMessage sendGridMessage, IEnumerable<System.Net.Mail.Attachment> attachments, CancellationToken cancellationToken = default)
         {
-            await Task.WhenAll(attachments.Select(a => sendGridMessage.AddAttachmentAsync(a, cancellationToken)));
+            await Task.WhenAll(
+                attachments.Select(a => sendGridMessage.AddAttachmentAsync(a, cancellationToken))
+            );
         }
     }
 }

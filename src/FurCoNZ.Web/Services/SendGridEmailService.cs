@@ -45,7 +45,11 @@ namespace FurCoNZ.Web.Services
         {
             HtmlDocument document = new HtmlDocument();
             document.LoadHtml(html);
-            return document.DocumentNode == null ? string.Empty : document.DocumentNode.InnerText;
+            if (document.DocumentNode == null)
+            {
+                return string.Empty;
+            }
+            return document.DocumentNode.InnerText;
         }
     }
 }
