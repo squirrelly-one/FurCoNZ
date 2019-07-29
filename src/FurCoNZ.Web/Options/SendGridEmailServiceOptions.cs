@@ -1,4 +1,4 @@
-﻿namespace FurCoNZ.Options
+﻿namespace FurCoNZ.Web.Options
 {
     public class SendGridEmailServiceOptions
     {

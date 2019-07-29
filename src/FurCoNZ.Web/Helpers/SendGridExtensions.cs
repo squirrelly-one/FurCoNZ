@@ -5,7 +5,7 @@ using System.Threading;
 using System.Threading.Tasks;
 using SendGrid.Helpers.Mail;
 
-namespace FurCoNZ.Helpers
+namespace FurCoNZ.Web.Helpers
 {
     internal static class SendGridExtensions
     {

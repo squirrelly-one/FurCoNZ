@@ -2,7 +2,7 @@
 using System.Threading;
 using System.Threading.Tasks;
 
-namespace FurCoNZ.Services
+namespace FurCoNZ.Web.Services
 {
     public interface IEmailService
     {

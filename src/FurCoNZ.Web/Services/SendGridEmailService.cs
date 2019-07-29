@@ -1,14 +1,14 @@
 ﻿using System.Net.Mail;
 using System.Threading;
 using System.Threading.Tasks;
-using FurCoNZ.Helpers;
-using FurCoNZ.Options;
+using FurCoNZ.Web.Helpers;
+using FurCoNZ.Web.Options;
 using HtmlAgilityPack;
 using Microsoft.Extensions.Options;
 using SendGrid;
 using SendGrid.Helpers.Mail;
 
-namespace FurCoNZ.Services
+namespace FurCoNZ.Web.Services
 {
     public class SendGridEmailService : IEmailService
     {
