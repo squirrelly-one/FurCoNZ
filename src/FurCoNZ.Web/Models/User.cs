@@ -3,7 +3,7 @@ using System.Collections.Generic;
 using System.Linq;
 using System.Threading.Tasks;
 
-namespace FurCoNZ.Models
+namespace FurCoNZ.Web.Models
 {
     public class User
     {

@@ -1,5 +1,5 @@
 ﻿using System;
-namespace FurCoNZ.Models
+namespace FurCoNZ.Web.Models
 {
     public class TicketType
     {

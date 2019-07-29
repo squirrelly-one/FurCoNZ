@@ -1,11 +1,11 @@
-﻿using FurCoNZ.Models;
+﻿using FurCoNZ.Web.Models;
 using System;
 using System.Collections.Generic;
 using System.ComponentModel.DataAnnotations;
 using System.Linq;
 using System.Threading.Tasks;
 
-namespace FurCoNZ.ViewModels
+namespace FurCoNZ.Web.ViewModels
 {
     public class AccountViewModel
     {

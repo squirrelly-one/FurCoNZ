@@ -3,11 +3,11 @@ using System.Collections.Generic;
 using System.Linq;
 using System.Threading;
 using System.Threading.Tasks;
-using FurCoNZ.DAL;
-using FurCoNZ.Models;
+using FurCoNZ.Web.DAL;
+using FurCoNZ.Web.Models;
 using Microsoft.EntityFrameworkCore;
 
-namespace FurCoNZ.Services
+namespace FurCoNZ.Web.Services
 {
     public class OrderService : IOrderService
     {

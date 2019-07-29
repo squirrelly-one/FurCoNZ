@@ -3,7 +3,7 @@ using System.Collections.Generic;
 using System.Linq;
 using System.Threading.Tasks;
 
-namespace FurCoNZ.Services.Payment
+namespace FurCoNZ.Web.Services.Payment
 {
     public class BankPaymentProvider : IPaymentProvider
     {

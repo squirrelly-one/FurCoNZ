@@ -1,4 +1,4 @@
-﻿using FurCoNZ.ViewModels;
+﻿using FurCoNZ.Web.ViewModels;
 using Microsoft.AspNetCore.Mvc;
 using Microsoft.Extensions.Options;
 using System;
@@ -7,7 +7,7 @@ using System.Linq;
 using System.Threading;
 using System.Threading.Tasks;
 
-namespace FurCoNZ.Services
+namespace FurCoNZ.Web.Services
 {
     public interface IPaymentService
     {

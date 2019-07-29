@@ -1,4 +1,4 @@
-﻿namespace FurCoNZ.ViewModels
+﻿namespace FurCoNZ.Web.ViewModels
 {
     public class PaymentProviderViewmodel
     {

@@ -7,7 +7,7 @@ using System.Collections.Generic;
 using System.Linq;
 using System.Threading.Tasks;
 
-namespace FurCoNZ.TagHelpers
+namespace FurCoNZ.Web.TagHelpers
 {
     /// <summary>
     /// Source: https://gist.github.com/enohka/0d198ed758cd5b048d9d48dd61830f3c

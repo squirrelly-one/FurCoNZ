@@ -22,13 +22,13 @@ using Microsoft.Extensions.Logging;
 using Microsoft.IdentityModel.Tokens;
 using Npgsql;
 
-using FurCoNZ.Configuration;
-using FurCoNZ.DAL;
-using FurCoNZ.Services;
+using FurCoNZ.Web.Configuration;
+using FurCoNZ.Web.DAL;
+using FurCoNZ.Web.Services;
 using Microsoft.AspNetCore.HttpOverrides;
-using FurCoNZ.Auth;
+using FurCoNZ.Web.Auth;
 
-namespace FurCoNZ
+namespace FurCoNZ.Web
 {
     public class Startup
     {

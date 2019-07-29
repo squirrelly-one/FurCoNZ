@@ -2,7 +2,7 @@
 using System.Collections.Generic;
 using System.ComponentModel.DataAnnotations;
 
-namespace FurCoNZ.ViewModels
+namespace FurCoNZ.Web.ViewModels
 {
     public class TicketDetailViewModel : IValidatableObject
     {

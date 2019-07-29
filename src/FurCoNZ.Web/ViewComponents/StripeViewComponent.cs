@@ -6,13 +6,13 @@ using System.Threading.Tasks;
 using Microsoft.AspNetCore.Mvc;
 using Microsoft.Extensions.Options;
 
-using FurCoNZ.Configuration;
-using FurCoNZ.Models;
-using FurCoNZ.Services;
-using FurCoNZ.Services.Payment;
-using FurCoNZ.ViewModels;
+using FurCoNZ.Web.Configuration;
+using FurCoNZ.Web.Models;
+using FurCoNZ.Web.Services;
+using FurCoNZ.Web.Services.Payment;
+using FurCoNZ.Web.ViewModels;
 
-namespace FurCoNZ.Components
+namespace FurCoNZ.Web.Components
 {
     public class StripeViewComponent : ViewComponent
     {

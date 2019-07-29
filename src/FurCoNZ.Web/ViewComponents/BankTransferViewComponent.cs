@@ -4,7 +4,7 @@ using System.Collections.Generic;
 using System.Linq;
 using System.Threading.Tasks;
 
-namespace FurCoNZ.ViewComponents
+namespace FurCoNZ.Web.ViewComponents
 {
     public class BankTransferViewComponent : ViewComponent
     {

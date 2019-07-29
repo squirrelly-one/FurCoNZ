@@ -4,7 +4,7 @@ using System.Collections.Generic;
 using System.Linq;
 using System.Threading.Tasks;
 
-namespace FurCoNZ.Controllers
+namespace FurCoNZ.Web.Controllers
 {
     public class StripeController : Controller
     {

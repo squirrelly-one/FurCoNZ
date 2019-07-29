@@ -7,12 +7,12 @@ using System.Threading.Tasks;
 using Microsoft.AspNetCore.Authorization;
 using Microsoft.AspNetCore.Mvc;
 
-using FurCoNZ.DAL;
-using FurCoNZ.Services;
-using FurCoNZ.ViewModels;
-using FurCoNZ.Models;
+using FurCoNZ.Web.DAL;
+using FurCoNZ.Web.Services;
+using FurCoNZ.Web.ViewModels;
+using FurCoNZ.Web.Models;
 
-namespace FurCoNZ.Controllers
+namespace FurCoNZ.Web.Controllers
 {
     [Authorize]
     public class CheckoutController : Controller

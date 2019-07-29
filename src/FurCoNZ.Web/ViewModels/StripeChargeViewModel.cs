@@ -3,7 +3,7 @@ using System.Collections.Generic;
 using System.Linq;
 using System.Threading.Tasks;
 
-namespace FurCoNZ.ViewModels
+namespace FurCoNZ.Web.ViewModels
 {
     public class StripeChargeViewModel
     {

@@ -11,10 +11,10 @@ using Microsoft.Extensions.DependencyInjection;
 using Stripe;
 using Stripe.Checkout;
 
-using FurCoNZ.Configuration;
-using FurCoNZ.DAL;
+using FurCoNZ.Web.Configuration;
+using FurCoNZ.Web.DAL;
 
-namespace FurCoNZ.Services.Payment.Stripe
+namespace FurCoNZ.Web.Services.Payment.Stripe
 {
     public class StripeHostedService : IHostedService, IDisposable
     {

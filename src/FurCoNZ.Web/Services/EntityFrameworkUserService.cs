@@ -6,12 +6,12 @@ using System.Threading.Tasks;
 
 using Microsoft.EntityFrameworkCore;
 
-using FurCoNZ.DAL;
-using FurCoNZ.Models;
+using FurCoNZ.Web.DAL;
+using FurCoNZ.Web.Models;
 using System.Data;
 using Microsoft.AspNetCore.Http;
 
-namespace FurCoNZ.Services
+namespace FurCoNZ.Web.Services
 {
     public class EntityFrameworkUserService : IUserService
     {

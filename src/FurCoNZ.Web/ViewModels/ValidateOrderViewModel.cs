@@ -2,7 +2,7 @@
 using System.Collections.Generic;
 using Microsoft.AspNetCore.Mvc;
 
-namespace FurCoNZ.ViewModels
+namespace FurCoNZ.Web.ViewModels
 {
     public class ValidateOrderViewModel
     {

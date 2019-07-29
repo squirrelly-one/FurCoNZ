@@ -10,11 +10,11 @@ using Microsoft.Extensions.Options;
 using Stripe;
 using Stripe.Checkout;
 
-using FurCoNZ.Configuration;
-using FurCoNZ.DAL;
-using FurCoNZ.Models;
+using FurCoNZ.Web.Configuration;
+using FurCoNZ.Web.DAL;
+using FurCoNZ.Web.Models;
 
-namespace FurCoNZ.Services.Payment
+namespace FurCoNZ.Web.Services.Payment
 {
     public class StripeService : IPaymentProvider
     {

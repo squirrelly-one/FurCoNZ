@@ -7,10 +7,10 @@ using System.Threading.Tasks;
 using Microsoft.AspNetCore.Authentication.OpenIdConnect;
 using Microsoft.Extensions.DependencyInjection;
 
-using FurCoNZ.Services;
-using FurCoNZ.Models;
+using FurCoNZ.Web.Services;
+using FurCoNZ.Web.Models;
 
-namespace FurCoNZ.Auth
+namespace FurCoNZ.Web.Auth
 {
     public static class NzFursOpenIdConnectEvents
     {

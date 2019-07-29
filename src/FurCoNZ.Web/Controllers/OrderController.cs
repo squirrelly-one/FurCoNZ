@@ -3,15 +3,15 @@ using System.Collections.Generic;
 using System.Linq;
 using System.Threading;
 using System.Threading.Tasks;
-using FurCoNZ.Helpers; // Required for SessionExtensions
-using FurCoNZ.Services;
-using FurCoNZ.ViewModels;
+using FurCoNZ.Web.Helpers; // Required for SessionExtensions
+using FurCoNZ.Web.Services;
+using FurCoNZ.Web.ViewModels;
 using Microsoft.AspNetCore.Authorization;
 using Microsoft.AspNetCore.Mvc;
 
 // For more information on enabling MVC for empty projects, visit https://go.microsoft.com/fwlink/?LinkID=397860
 
-namespace FurCoNZ.Controllers
+namespace FurCoNZ.Web.Controllers
 {
     [Authorize]
     public class OrderController : Controller

@@ -1,4 +1,4 @@
-﻿namespace FurCoNZ.Models
+﻿namespace FurCoNZ.Web.Models
 {
     public enum AgeBracket
     {

@@ -1,7 +1,7 @@
 ﻿using System;
 using Microsoft.EntityFrameworkCore.Migrations;
 
-namespace FurCoNZ.DAL.Migrations
+namespace FurCoNZ.Web.DAL.Migrations
 {
     public partial class Initial : Migration
     {

@@ -1,7 +1,7 @@
 ﻿using System.Collections.Generic;
 using System.Linq;
 
-namespace FurCoNZ.Models
+namespace FurCoNZ.Web.Models
 {
     public class Order
     {

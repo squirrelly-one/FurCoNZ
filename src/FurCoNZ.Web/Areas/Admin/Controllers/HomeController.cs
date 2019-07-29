@@ -7,9 +7,9 @@ using System.Threading.Tasks;
 using Microsoft.AspNetCore.Authorization;
 using Microsoft.AspNetCore.Mvc;
 
-using FurCoNZ.ViewModels;
+using FurCoNZ.Web.ViewModels;
 
-namespace FurCoNZ.Areas.Admin.Controllers
+namespace FurCoNZ.Web.Areas.Admin.Controllers
 {
     [Area("Admin")]
     [Authorize(Policy = "AdminOnly")]

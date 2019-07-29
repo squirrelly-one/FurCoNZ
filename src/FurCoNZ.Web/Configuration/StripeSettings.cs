@@ -3,7 +3,7 @@ using System.Collections.Generic;
 using System.Linq;
 using System.Threading.Tasks;
 
-namespace FurCoNZ.Configuration
+namespace FurCoNZ.Web.Configuration
 {
     public class StripeSettings
     {

@@ -8,13 +8,13 @@ using System.Threading.Tasks;
 using Microsoft.AspNetCore.Authorization;
 using Microsoft.AspNetCore.Mvc;
 
-using FurCoNZ.Services;
-using FurCoNZ.Models;
-using FurCoNZ.ViewModels;
+using FurCoNZ.Web.Services;
+using FurCoNZ.Web.Models;
+using FurCoNZ.Web.ViewModels;
 
 // For more information on enabling MVC for empty projects, visit https://go.microsoft.com/fwlink/?LinkID=397860
 
-namespace FurCoNZ.Controllers
+namespace FurCoNZ.Web.Controllers
 {
     [Authorize]
     public class AccountController : Controller

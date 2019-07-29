@@ -1,4 +1,4 @@
-﻿namespace FurCoNZ.Services
+﻿namespace FurCoNZ.Web.Services
 {
     public interface IPaymentProvider
     {

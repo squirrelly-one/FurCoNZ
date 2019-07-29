@@ -1,9 +1,9 @@
 ﻿using System.Collections.Generic;
-using FurCoNZ.Models;
+using FurCoNZ.Web.Models;
 
 // For more information on enabling MVC for empty projects, visit https://go.microsoft.com/fwlink/?LinkID=397860
 
-namespace FurCoNZ.ViewModels
+namespace FurCoNZ.Web.ViewModels
 {
     public class OrderIndexViewModel
     {

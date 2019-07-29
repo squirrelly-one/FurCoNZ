@@ -2,9 +2,9 @@
 using System.Collections.Generic;
 using System.Threading;
 using System.Threading.Tasks;
-using FurCoNZ.Models;
+using FurCoNZ.Web.Models;
 
-namespace FurCoNZ.Services
+namespace FurCoNZ.Web.Services
 {
     public interface IOrderService
     {

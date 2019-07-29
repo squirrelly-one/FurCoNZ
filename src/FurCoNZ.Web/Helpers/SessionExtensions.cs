@@ -5,7 +5,7 @@ using Microsoft.AspNetCore.Http;
 using Newtonsoft.Json;
 using SauceControl.Blake2Fast;
 
-namespace FurCoNZ.Helpers
+namespace FurCoNZ.Web.Helpers
 {
     // https://docs.microsoft.com/en-us/aspnet/core/fundamentals/app-state?view=aspnetcore-2.2#session-state
     public static class SessionExtensions
