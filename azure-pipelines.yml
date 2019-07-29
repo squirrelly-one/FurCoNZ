@@ -15,7 +15,7 @@ variables:
 
 steps:
 - script: |
-    docker build -f FurCoNZ/Dockerfile -t $(dockerId)/$(imageName):$(build.buildId) -t $(dockerId)/$(imageName):latest .
+    docker build -f Dockerfile -t $(dockerId)/$(imageName):$(build.buildId) -t $(dockerId)/$(imageName):latest .
   displayName: 'docker build'
 - script: |
     docker login -u $(dockerHubId) -p $(dockerHubPassword)

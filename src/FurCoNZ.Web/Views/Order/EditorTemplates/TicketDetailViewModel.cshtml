@@ -1,0 +1,147 @@
+﻿@model TicketDetailViewModel
+
+<div class="card">
+    <div class="card-header" id="attendee-@Model.Id-header">
+        <h2 class="mb-0">
+            <button class="btn btn-link collapsed" type="button" data-toggle="collapse" data-target="#attendee-@Model.Id-detail" aria-expanded="false" aria-controls="attendee-@Model.Id-detail">
+                @Model.TicketTypeName - Ticket #@Model.Id
+            </button>
+        </h2>
+    </div>
+
+    <div id="attendee-@Model.Id-detail" class="collapse" aria-labelledby="attendee-@Model.Id-header" data-parent="#attendee-details-accordion">
+        <div class="card-body">
+            <!-- #region Attendee Details Form -->
+
+            <input asp-for="Id" type="hidden" />
+            <input asp-for="TicketTypeId" type="hidden" />
+
+            <div class="form-group">
+                <label asp-for="EmailAddress">Email address</label>
+                <input type="email" class="form-control" asp-for="EmailAddress" />
+            </div>
+
+            <ul class="nav nav-pills mb-3" id="attendee-@Model.Id-pills-tab" role="tablist">
+                <li class="nav-item">
+                    <a class="nav-link" id="attendee-@Model.Id-pills-self-tab" data-toggle="pill" href="#attendee-@Model.Id-pills-self" role="tab" aria-controls="attendee-@Model.Id-pills-self" aria-selected="false">This is my ticket, or I am filling this out for someone else</a>
+                </li>
+                <li class="nav-item">
+                    <a class="nav-link" id="attendee-@Model.Id-pills-share-tab" data-toggle="pill" href="#attendee-@Model.Id-pills-share" role="tab" aria-controls="attendee-@Model.Id-pills-share" aria-selected="false">This is for someone else</a>
+                </li>
+            </ul>
+
+            <div class="tab-content" id="attendee-@Model.Id-pills-tabContent">
+                <div class="tab-pane fade" id="attendee-@Model.Id-pills-self" role="tabpanel" aria-labelledby="attendee-@Model.Id-pills-self-tab">
+                    <div class="form-group">
+                        <label asp-for="BadgeName">Badge Name</label>
+                        <input class="form-control" asp-for="BadgeName">
+                    </div>
+
+                    <div class="form-group">
+                        <label asp-for="IdentificationFullName">Full Name (as it appears on your offical identification)</label>
+                        <input asp-for="IdentificationFullName" class="form-control" />
+                    </div>
+
+                    <div class="form-check">
+                        <input class="form-check-input" type="checkbox" value="" id="attendee-@Model.Id-differsFromId" data-toggle="collapse" data-target="#attendee-@Model.Id-PreferredName-alert">
+                        <label class="form-check-label" for="attendee-@Model.Id-differsFromId">
+                            I do not wish to be referred to by this name
+                        </label>
+                    </div>
+
+                    <div id="attendee-@Model.Id-PreferredName-alert" class="alert alert-info collapse" role="alert">
+                        <div class="form-group">
+                            <label asp-for="PreferredFullName">Preferred Full Name (if this differs to what is displayed on your official identification)</label>
+                            <p class="form-text small">
+                                This name will be used instead of your "legal" name. Your legal name will be kept strictly private and will only be available to:
+                                <ul class="small">
+                                    <li>FurCoNZ Staff only where required (i.e. for identification reasons during registration)</li>
+                                    <li>NZ Officials, where we are legally required to disclose it</li>
+                                    <li>Where required for health and safety reasons, such as in a medical emergency</li>
+                                </ul>
+                            </p>
+                            <input asp-for="PreferredFullName" class="form-control" />
+                        </div>
+                    </div>
+
+                    <div class="form-group">
+                        <label asp-for="DateOfBirth">Date of Birth</label>
+                        @* TODO: Need a proper date picker *@
+                        <input asp-for="DateOfBirth" class="form-control" placeholder="yyyy-mm-dd" data-date-format="yyyy-mm-dd" min="1903-01-02" max="@DateTime.Today.ToString()" onchange="dateOfBirthChanged(this, @Model.Id)"/>
+                    </div>
+
+                    <div id="attendee-@Model.Id-under18Notice" class="alert alert-info d-none" role="alert">
+                        <strong>A parental consent form will be required to attend this event, or be accompanied by a parent or legal guardian.</strong> A copy will be sent out with your confirmed order, or <a href="#" class="alert-link">you can download it from here</a>.
+                    </div>
+
+                    <div id="attendee-@Model.Id-under16Notice" class="alert alert-warning d-none" role="alert">
+                        <strong>A parent or legal guardian will be required to attend this event along with this attendee.</strong> Attendence will be refused during registration if this attendee's parent or legal guardian is not present. <a href="#" class="alert-link">Further information is available here</a>.
+                    </div>
+
+                    @* TODO: A real dietary requirements field *@
+                    <div class="form-group">
+                        <label for="exampleDietaryRequirements">Dietary Preferences (example)</label>
+                        <select class="form-control" id="exampleDietaryRequirements">
+                            <option>None</option>
+                            <option>Vegetarian</option>
+                            <option>Vegan</option>
+                            <option>Gluten Free</option>
+                            <option>Dairy Free</option>
+                        </select>
+                        <small class="form-text text-muted">Be sure to detail any allergens in the "Known Allergies" section below.</small>
+                    </div>
+
+                    <div class="form-group">
+                        <label asp-for="KnownAllergies">Known Allergies / Medical Conditions</label>
+                        <textarea asp-for="KnownAllergies" class="form-control" aria-describedby="attendee-@Model.Id-knownAllergiesHelp" rows="6"></textarea>
+                        <small id="attendee-@Model.Id-knownAllergiesHelp" class="form-text text-muted">Please include any dietary requirements, medical allergies or other health and safety issues that staff need to be aware of.</small>
+                    </div>
+
+                    <div class="form-group">
+                        <label asp-for="CabinPreferences">Cabin Preferences</label>
+                        <textarea asp-for="CabinPreferences" class="form-control" aria-describedby="attendee-@Model.Id-cabinPrefencesHelp" rows="6"></textarea>
+                        <small id="attendee-@Model.Id-cabinPrefencesHelp" class="form-text text-muted">If you have any preferences in who you want to room with, let us know here.</small>
+                    </div>
+
+                    <div class="form-group">
+                        <label asp-for="OtherNotes">Other Notes</label>
+                        <textarea asp-for="OtherNotes" class="form-control" aria-describedby="attendee-@Model.Id-otherNotesHelp" rows="6"></textarea>
+                        <small id="attendee-@Model.Id-otherNotesHelp" class="form-text text-muted">Please let us know if there is anything else you can think of that you'd like us to know!</small>
+                    </div>
+
+                    <div class="form-group">
+                        <label for="attendee-@Model.Id-acceptTerms">Terms and Conditions:</label>
+                        <div class="form-check">
+                            <input class="form-check-input" type="radio" name="attendee-@Model.Id-acceptTerms" id="attendee-@Model.Id-acceptTerms-no" value="no" checked>
+                            <label class="form-check-label" for="attendee-@Model.Id-acceptTerms-no">
+                                I do not accept
+                            </label>
+                        </div>
+                        <div class="form-check">
+                            <input class="form-check-input" type="radio" name="attendee-@Model.Id-acceptTerms" id="attendee-@Model.Id-acceptTerms-yes" value="yes">
+                            <label class="form-check-label" for="attendee-@Model.Id-acceptTerms-yes">
+                                I have read and accept the <a href="#">terms and conditions of attending FurCoNZ 2019</a>
+                            </label>
+                        </div>
+                        <div class="form-check">
+                            <input class="form-check-input" type="radio" name="attendee-@Model.Id-acceptTerms" id="attendee-@Model.Id-acceptTerms-notPresent" value="notpresent">
+                            <label class="form-check-label" for="attendee-@Model.Id-acceptTerms-notPresent">
+                                This ticket is for someone else, who will need to read and accept the <a href="#">terms and conditions of attending FurCoNZ 2019</a>.
+                            </label>
+                        </div>
+                    </div>
+
+                </div>
+                <div class="tab-pane fade" id="attendee-@Model.Id-pills-share" role="tabpanel" aria-labelledby="attendee-@Model.Id-pills-share-tab">
+                    A link will be given to you to send to your friend, as well as an email being sent to their email address.
+
+                    <div class="alert alert-warning" role="alert">
+                        <strong>Please note: Attendees under the age of 18 will require parental consent prior to attending this event.</strong> If this attendee is under 18, please confirm they are able to sign the Parental Consent sheet prior to purchasing these tickets.
+                    </div>
+                </div>
+            </div>
+
+            <!-- #endregion -->
+        </div>
+    </div>
+</div>
