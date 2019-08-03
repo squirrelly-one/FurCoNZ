@@ -1,4 +1,5 @@
-﻿using System;
+﻿#if DEBUG
+using System;
 using System.Collections.Generic;
 using System.Threading;
 using System.Threading.Tasks;
@@ -29,7 +30,6 @@ namespace FurCoNZ.Web.Areas.Debug.Controllers
             _userService = userService;
         }
 
-#if DEBUG
         [Authorize]
         [HttpGet]
         public async Task<IActionResult> MakeAdmin(CancellationToken cancellationToken)
@@ -47,7 +47,6 @@ namespace FurCoNZ.Web.Areas.Debug.Controllers
 
             return RedirectToAction("Index", "Home", new { Area = "" });
         }
-#endif
 
         [HttpGet]
         [Authorize(Policy = "AdminOnly")]
@@ -96,3 +95,4 @@ namespace FurCoNZ.Web.Areas.Debug.Controllers
         }
     }
 }
+#endif
