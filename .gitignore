@@ -17,6 +17,8 @@
 
 # Build results
 [Dd]ebug/
+# Not the Debug Area though
+!src/FurCoNZ.Web/Areas/Debug
 [Dd]ebugPublic/
 [Rr]elease/
 [Rr]eleases/

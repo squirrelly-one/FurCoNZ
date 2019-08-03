@@ -46,3 +46,24 @@ dotnet build
 ```bash
 dotnet run
 ```
+
+### Set current user as Admin
+Note: This will only work when:
+* The application is in DEBUG mode (`dotnet build` or `dotnet build --configuration Debug`, not `dotnet build --configuration Release`)
+* The application environment is set as a Development environment (the environment variable `ASPNETCORE_ENVIRONMENT` is `Development`)
+* There are no other administrators in the current database
+
+To set the current user as an administrator:
+* Run the application (`dotnet run`)
+* Navigate to `https://local.dev.furco.nz:62434/Debug/Tools/MakeAdmin` (you may be prompted to log in)
+* You may need to delete your cookies after this operation (this is a known bug)
+
+### Set some testing data in the database
+Note: This will only work when:
+* The application environment is set as a Development environment (the environment variable `ASPNETCORE_ENVIRONMENT` is `Development`)
+* The current user must be an administrator
+* No ticket types currently exist in the database
+
+To set up some sample ticket types:
+* Run the application (`dotnet run`)
+* Navigate to `https://local.dev.furco.nz:62434/Debug/Tools/SeedData` (you may be prompted to log in)
