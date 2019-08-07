@@ -3,9 +3,12 @@ using System.Collections.Generic;
 using System.Linq;
 using System.Threading;
 using System.Threading.Tasks;
-using FurCoNZ.Web.DAL;
-using FurCoNZ.Web.Models;
+
 using Microsoft.EntityFrameworkCore;
+
+using FurCoNZ.Web.DAL;
+using FurCoNZ.Web.Helpers;
+using FurCoNZ.Web.Models;
 
 namespace FurCoNZ.Web.Services
 {
@@ -160,6 +163,33 @@ namespace FurCoNZ.Web.Services
 
             _db.OrderAudits.Add(audit);
             await _db.SaveChangesAsync(cancellationToken);
+        }
+
+        public async Task<IEnumerable<Order>> GetAllOrdersAsync(CancellationToken cancellationToken = default)
+        {
+            // TODO: Should we support pagination?
+            return await _db.Orders
+                .Include(o => o.TicketsPurchased)
+                .ThenInclude(t => t.TicketType)
+                .Include(o => o.OrderedBy)
+                .Include(o => o.Audits)
+                .ToListAsync(cancellationToken);
+        }
+
+        public async Task<Order> GetOrderByRef(int orderRef, CancellationToken cancellationToken = default)
+        {
+            // Use Damm algorithum to verify order reference for mistyped value.
+            if (!DammAlgorithm.IsValid(orderRef))
+                throw new ArgumentOutOfRangeException("Invalid checksum value", nameof(orderRef));
+
+            // Strip the check value from our orderRef to get the orderId
+            var orderId = orderRef / 10;
+
+            return await _db.Orders
+                .Include(o => o.TicketsPurchased)
+                .ThenInclude(t => t.TicketType)
+                .Include(o => o.Audits)
+                .SingleOrDefaultAsync(o => o.Id == orderId, cancellationToken);
         }
     }
 }
