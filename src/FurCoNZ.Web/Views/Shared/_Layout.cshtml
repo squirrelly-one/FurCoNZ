@@ -58,17 +58,35 @@
     </footer>
 
     <environment include="Development">
-        <script src="~/lib/jquery/jquery.slim.js"></script>
+        <script src="~/lib/jquery/jquery.js"></script>
+        <script src="~/lib/jquery-validate/jquery.validate.js"></script>
+        <script src="~/lib/jquery-validate/additional-methods.js"></script>
+        <script src="~/lib/jquery-validation-unobtrusive/jquery.validate.unobtrusive.js"></script>
         <script src="~/lib/popper/esm/popper.js"></script>
         <script src="~/lib/bootstrap/js/bootstrap.bundle.js"></script>
         <script src="~/lib/date-input-polyfill/date-input-polyfill.dist.js"></script>
     </environment>
     <environment exclude="Development">
-        <script src="~/lib/jquery/jquery.slim.min.js"
+        <script src="~/lib/jquery/jquery.min.js"
                 asp-fallback-src="https://cdnjs.cloudflare.com/ajax/libs/jquery/3.3.1/jquery.min.js"
                 asp-fallback-test="window.jQuery"
                 crossorigin="anonymous"
                 integrity="sha386-q8i/X+965DzO0rT7abK41JStQIAqVgRVzpbzo5smXKp4YfRvH+8abtTE1Pi6jizo">
+        </script>
+        <script src="~/lib/jquery-validate/jquery.validate.min.js"
+                asp-fallback-src="https://cdnjs.cloudflare.com/ajax/libs/jquery-validate/1.19.1/jquery.validate.min.js"
+                integrity="sha384-6UVI3atWyL/qZbDIJb7HW8PyHhFNMiX5rYNY2gAYcaYJjYk5cNIQShSQPBleGMYu"
+                crossorigin="anonymous">
+        </script>
+        <script src="~/lib/jquery-validation-unobtrusive/jquery.validate.unobtrusive.min.js"
+                asp-fallback-src="https://cdnjs.cloudflare.com/ajax/libs/jquery-validation-unobtrusive/3.2.11/jquery.validate.unobtrusive.min.js"
+                integrity="sha384-R3vNCHsZ+A2Lo3d5A6XNP7fdQkeswQWTIPfiYwSpEP3YV079R+93YzTeZRah7f/F"
+                crossorigin="anonymous">
+        </script>
+        <script src="~/lib/jquery-validate/additional-methods.min.js"
+                asp-fallback-src="https://cdnjs.cloudflare.com/ajax/libs/jquery-validate/1.19.1/additional-methods.min.js"
+                integrity="sha384-+9oZBwhpg6hNnpXhuEkmAUXP1YGXnRZEH7KB6j6u73Ugx0YNlB/EdaNAs5mihho5"
+                crossorigin="anonymous">
         </script>
         <script src="~/lib/popper/esm/popper.min.js"
                 asp-fallback-src="https://cdnjs.cloudflare.com/ajax/libs/popper.js/1.14.7/esm/popper.min.js"
