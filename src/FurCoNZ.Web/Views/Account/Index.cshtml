@@ -8,6 +8,13 @@
     <div class="card-body">
         <h5 class="card-title">Your Account</h5>
 
+        @if (Model.IsConfirmingDetails)
+        {
+            <div class="alert alert-primary" role="alert">
+                Welcome! Please confirm your name and email and click Continue below!
+            </div>
+        }
+
         <form method="post" asp-action="UpdateAccount">
             <div class="form-group">
                 <label for="Name">Prefered Called Name</label>
@@ -19,7 +26,9 @@
                 <input asp-for="Email" class="form-control" aria-describedby="EmailHelp" placeholder="burb@furry.nz">
                 <small id="EmailHelp" class="form-text text-muted">We'll never share your email with anyone else.</small>
             </div>
-            <button type="submit" class="btn btn-primary">Update</button>
+            <button type="submit" class="btn btn-primary">
+                @(Model.IsConfirmingDetails ? "Continue" : "Update")
+            </button>
         </form>
     </div>
 </div>

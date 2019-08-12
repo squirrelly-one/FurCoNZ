@@ -8,6 +8,7 @@ using System.Threading.Tasks;
 using Microsoft.AspNetCore.Authorization;
 using Microsoft.AspNetCore.Mvc;
 
+using FurCoNZ.Web.Helpers;
 using FurCoNZ.Web.Services;
 using FurCoNZ.Web.Models;
 using FurCoNZ.Web.ViewModels;
@@ -19,6 +20,8 @@ namespace FurCoNZ.Web.Controllers
     [Authorize]
     public class AccountController : Controller
     {
+        public static readonly string RedirectAfterDetailsSessionKey = "RedirectAfterDetails";
+
         private readonly IUserService _userService;
         private readonly IOrderService _orderService;
 
@@ -33,18 +36,30 @@ namespace FurCoNZ.Web.Controllers
             return View(new AccountViewModel(await _userService.GetCurrentUserAsync(cancellationToken)));
         }
 
-        [HttpPost]
+        [HttpGet, HttpPost]
         public async Task<IActionResult> UpdateAccount(AccountViewModel account, CancellationToken cancellationToken = default)
         {
             var user = await _userService.GetCurrentUserAsync(cancellationToken);
+            var hasRedirect = HttpContext.Session.Keys.Contains(RedirectAfterDetailsSessionKey);
+            if (ModelState.IsValid) {
 
-            user.Name = account.Name;
-            // TODO: Require email validation of this change
-            user.Email = account.Email; 
+                user.Name = account.Name;
+                // TODO: Require email validation of this change
+                user.Email = account.Email;
 
-            await _userService.UpdateUserAsync(user, cancellationToken);
+                await _userService.UpdateUserAsync(user, cancellationToken);
 
-            return RedirectToAction("Index");
+                if (hasRedirect)
+                {
+                    var redirectTo = HttpContext.Session.Get<string>(RedirectAfterDetailsSessionKey);
+                    HttpContext.Session.Remove(RedirectAfterDetailsSessionKey);
+                    return Redirect(redirectTo);
+                }
+
+                return RedirectToAction(nameof(Index));
+            }
+
+            return View("Index", new AccountViewModel(user) { IsConfirmingDetails = hasRedirect });
         }
 
         public async Task<IActionResult> Orders(CancellationToken cancellationToken = default)

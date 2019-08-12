@@ -9,6 +9,9 @@ using Microsoft.Extensions.DependencyInjection;
 
 using FurCoNZ.Web.Services;
 using FurCoNZ.Web.Models;
+using FurCoNZ.Web.Controllers;
+using FurCoNZ.Web.Helpers;
+using Microsoft.AspNetCore.Routing;
 
 namespace FurCoNZ.Web.Auth
 {
@@ -17,37 +20,40 @@ namespace FurCoNZ.Web.Auth
         public static async Task OnUserInformationReceived(UserInformationReceivedContext context)
         {
             var userService = context.HttpContext.RequestServices.GetService<IUserService>();
+            var linkGenerator = context.HttpContext.RequestServices.GetService<LinkGenerator>();
             var identity = (ClaimsIdentity)context.Principal.Identity;
             var user = await userService.GetUserFromIssuerAsync(context.Principal.FindFirst("iss").Value, context.Principal.FindFirst("sub").Value, context.HttpContext.RequestAborted);
 
             // User already exists,m nothing to do?
-            if (user != null)
+            if (user == null)
             {
-                identity.AddClaim(new Claim("user", user.Id.ToString()));
-                identity.AddClaim(new Claim("admin", user.IsAdmin.ToString()));
-                return;
+                // Create a new user, fill it in with defaults. 
+                user = new User
+                {
+                    Name = context.User.Value<string>("name"),
+                    Email = context.User.Value<string>("email"),
+                };
+                user.LinkedAccounts = new List<LinkedAccount>
+                {
+                    new LinkedAccount
+                    {
+                        Issuer = context.Principal.FindFirst("iss").Value,
+                        Subject = context.Principal.FindFirst("sub").Value,
+                        User = user,
+                    }
+                };
+
+                await userService.CreateUserAsync(user);
+
+                // 1. Save redirect URL to session
+                context.HttpContext.Session.Set(AccountController.RedirectAfterDetailsSessionKey, context.Properties.RedirectUri);
+                // 2. Show firtst time page asking for name, details etc,
+                context.Properties.RedirectUri = linkGenerator.GetUriByAction(context.HttpContext, nameof(AccountController.UpdateAccount), "Account");
+                // 3. if skipped or accepted, redirect to initial redirect page (See AccountController.UpdateAccount)
             }
 
-            // Create a new user, fill it in with defaults. 
-            user = new User
-            {
-                Name = context.User.Value<string>("name"),
-                Email = context.User.Value<string>("email"),
-            };
-            user.LinkedAccounts = new List<LinkedAccount>
-            {
-                new LinkedAccount
-                {
-                    Issuer = context.Principal.FindFirst("iss").Value,
-                    Subject = context.Principal.FindFirst("sub").Value,
-                    User = user,
-                }
-            };
-
-            await userService.CreateUserAsync(user);
-
             identity.AddClaim(new Claim("user", user.Id.ToString()));
-            //context.Result = HandleRequestResult.Success(new AuthenticationTicket())
+            identity.AddClaim(new Claim("admin", user.IsAdmin.ToString()));
         }
     }
 }
