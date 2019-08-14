@@ -10,8 +10,8 @@
     {
         <tr>
             <td>@ticket.TicketType.Name</td>
-            <td>@ticket.PreferredName</td>
-            <td>@ticket.TicketType.PriceCents</td>
+            <td>@ticket.PreferredFullName</td>
+            <td>@ticket.TicketType.Price.ToString("C")</td>
         </tr>
     }
 </table>

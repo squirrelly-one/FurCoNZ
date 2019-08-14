@@ -68,11 +68,13 @@ namespace FurCoNZ.Web.Controllers
 
                     for (var i = 0; i < quantityOrderedForTicketType; i++)
                     {
+                        var ticketType = ticketTypes.FirstOrDefault(x => x.Id == ticketTypeId);
                         viewModel.Add(new TicketDetailViewModel
                         {
                             Id = ++ticketIndex,
-                            TicketTypeId = ticketTypeId,
-                            TicketTypeName = ticketTypes.FirstOrDefault(x => x.Id == ticketTypeId)?.Name,
+                            TicketType = ticketType != null 
+                                ? new TicketTypeViewModel(ticketType) 
+                                : null,
                         });
                     }
                 }
@@ -94,7 +96,10 @@ namespace FurCoNZ.Web.Controllers
                 var ticketTypes = await _orderService.GetTicketTypesAsync(cancellationToken: cancellationToken);
                 foreach (var ticket in model)
                 {
-                    ticket.TicketTypeName = ticketTypes.FirstOrDefault(x => x.Id == ticket.TicketTypeId)?.Name;
+                    var ticketType = ticketTypes.FirstOrDefault(x => x.Id == ticket.TicketType.Id);
+                    ticket.TicketType = ticketType != null 
+                        ? new TicketTypeViewModel(ticketType) 
+                        : null;
                 }
 
                 var viewModel = new ValidateOrderViewModel
@@ -150,7 +155,7 @@ namespace FurCoNZ.Web.Controllers
             {
                 // AttendeeAccountId // Set this if the user claims this as theirs, and leave null if it's for someone else
 
-                TicketTypeId = ticketViewModel.TicketTypeId,
+                TicketTypeId = ticketViewModel.TicketType.Id,
 
                 TicketName = ticketViewModel.BadgeName,
 
