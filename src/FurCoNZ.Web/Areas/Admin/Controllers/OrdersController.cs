@@ -25,8 +25,16 @@ namespace FurCoNZ.Web.Areas.Admin.Controllers
 
         }
 
-        public async Task<IActionResult> Index()
+        public async Task<IActionResult> Index(int id = 0)
         {
+            if(id != 0)
+            {
+                var order = await _orderService.GetOrderById(id, HttpContext.RequestAborted);
+                if (order == null)
+                    return NotFound();
+                return View("Order", new OrderViewModel(order));
+            }
+
             var orders = await _orderService.GetAllOrdersAsync(HttpContext.RequestAborted);
             return View(new OrdersViewModel
             {

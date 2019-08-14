@@ -18,5 +18,6 @@ namespace FurCoNZ.Web.Services
         Task RefundFundsForOrderAsync(int orderId, int amountCents, string paymentProvider, string paymentReference, DateTimeOffset when, CancellationToken cancellationToken = default);
         Task<DateTimeOffset> ReserveTicketsForPurchaseAsync(IDictionary<int, int> ticketsToReserveById, CancellationToken cancellationToken = default);
         Task<Order> GetOrderByRef(int orderRef, CancellationToken cancellationToken = default);
+        Task<Order> GetOrderById(int orderId, CancellationToken cancellationToken = default);
     }
 }

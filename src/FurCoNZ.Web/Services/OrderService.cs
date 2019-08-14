@@ -92,6 +92,7 @@ namespace FurCoNZ.Web.Services
             return await _db.Orders
                 .Include(o => o.TicketsPurchased)
                 .ThenInclude(t => t.TicketType)
+                .Include(o => o.Audits)
                 .Where(o => o.OrderedBy == user)
                 .ToListAsync(cancellationToken);
         }
@@ -101,6 +102,7 @@ namespace FurCoNZ.Web.Services
             return await _db.Orders
                 .Include(o => o.TicketsPurchased)
                 .ThenInclude(t => t.TicketType)
+                .Include(o => o.Audits)
                 .SingleOrDefaultAsync(o => o.OrderedById == user.Id && o.Id == orderId, cancellationToken);
         }
 
@@ -176,6 +178,15 @@ namespace FurCoNZ.Web.Services
                 .ToListAsync(cancellationToken);
         }
 
+        public async Task<Order> GetOrderById(int orderId, CancellationToken cancellationToken = default)
+        {
+            return await _db.Orders
+                .Include(o => o.TicketsPurchased)
+                .ThenInclude(t => t.TicketType)
+                .Include(o => o.Audits)
+                .SingleOrDefaultAsync(o => o.Id == orderId, cancellationToken);
+        }
+
         public async Task<Order> GetOrderByRef(int orderRef, CancellationToken cancellationToken = default)
         {
             // Use Damm algorithum to verify order reference for mistyped value.
@@ -183,13 +194,7 @@ namespace FurCoNZ.Web.Services
                 throw new ArgumentOutOfRangeException("Invalid checksum value", nameof(orderRef));
 
             // Strip the check value from our orderRef to get the orderId
-            var orderId = orderRef / 10;
-
-            return await _db.Orders
-                .Include(o => o.TicketsPurchased)
-                .ThenInclude(t => t.TicketType)
-                .Include(o => o.Audits)
-                .SingleOrDefaultAsync(o => o.Id == orderId, cancellationToken);
+            return await GetOrderById(orderRef / 10, cancellationToken);
         }
     }
 }

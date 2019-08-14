@@ -54,15 +54,9 @@
                 @item.AmountOwing.ToString("C")
             </td>
             <td>
-                <button class="btn btn-outline-info">
+                <a class="btn btn-outline-info" asp-action="Index" asp-route-id="@item.Id">
                     📜
-                </button>
-                <button class="btn btn-outline-warning">
-                    ✏
-                </button>
-                <button class="btn btn-outline-danger">
-                    🗑
-                </button>
+                </a>
             </td>
         </tr>
 }

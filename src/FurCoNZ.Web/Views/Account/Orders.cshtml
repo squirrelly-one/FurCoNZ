@@ -5,31 +5,20 @@
 }
 
 <table class="table">
-    <thead>
-        <tr>
-            <th scope="col">Id</th>
-            <th scope="col">Paid</th>
-            <th scope="col">Owing</th>
-            <th scope="col">Total</th>
-            <th scope="col">&nbsp;</th>
-        </tr>
-    </thead>
+
     <tbody>
         @foreach (var order in Model.Orders)
         {
-        <tr>
-            <td scope="row">@order.Id</td>
-            <td>@order.AmountPaid.ToString("C")</td>
-            <td>@order.AmountOwing.ToString("C")</td>
-            <td>@order.AmountTotal.ToString("C")</td>
-            <td>
-                <a role="button" class="btn btn-info" asp-controller="Order" asp-action="Index">View</a>
-                @if (order.AmountOwingCents > 0)
-                {
-                <a role="button" class="btn btn-warning" asp-controller="Checkout" asp-action="Index" asp-route-orderid="@order.Id">Pay</a>
-                }
-            </td>
-        </tr>
+            <tr>
+                <td scope="row">@Html.DisplayFor(_ => order)</td>
+                <td>
+                    <a role="button" class="btn btn-info" asp-controller="Order" asp-action="Index">View</a>
+                    @if (order.AmountOwingCents > 0)
+                    {
+                        <a role="button" class="btn btn-warning" asp-controller="Checkout" asp-action="Index" asp-route-orderid="@order.Id">Pay</a>
+                    }
+                </td>
+            </tr>
         }
     </tbody>
 </table>
