@@ -6,6 +6,8 @@
 
 * [Download and install the latest (current) .NET Core SDK](https://dotnet.microsoft.com/download/dotnet-core)
 * Clone this repo to your local machine: `git clone https://github.com/NZFurs/FurCoNZ.git`
+* Mac: Ensure `/usr/local/share/dotnet` and `~/.dotnet/tools` are in your path
+
 
 ### Set secrets:
 * Contact @tcfox or @nzsmartie for the latest copy of the development `secrets.json` file (they will want your PGP key or will send it to you via Keybase)
@@ -19,6 +21,16 @@
 **macOS/Linux:**
 ```
 ~/.microsoft/usersecrets/ae59f009-796a-43af-9da1-816735206ea9/secrets.json
+```
+
+### Install libman
+
+Libman installs client-side dependancies.
+
+```
+dotnet tool install -g Microsoft.Web.LibraryManager.Cli
+# restart your terminal
+libman restore
 ```
 
 ### Initialise Database:
