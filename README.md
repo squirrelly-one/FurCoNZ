@@ -25,7 +25,7 @@
 
 ### Install libman
 
-Libman installs client-side dependancies.
+Libman installs client-side dependencies.
 
 ```
 dotnet tool install -g Microsoft.Web.LibraryManager.Cli
