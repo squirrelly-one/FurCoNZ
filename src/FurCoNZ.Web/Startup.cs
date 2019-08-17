@@ -267,11 +267,11 @@ namespace FurCoNZ.Web
             }
             app.UseForwardedHeaders(forwardedHeaderOptions);
 
+            app.UseSession();
             app.UseAuthentication();
             app.UseHttpsRedirection();
             app.UseStaticFiles();
             app.UseCookiePolicy();
-            app.UseSession();
 
             app.UseMvc(routes =>
             {
