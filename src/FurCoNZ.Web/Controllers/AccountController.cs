@@ -33,15 +33,20 @@ namespace FurCoNZ.Web.Controllers
 
         public async Task<IActionResult> Index(CancellationToken cancellationToken = default)
         {
-            return View(new AccountViewModel(await _userService.GetCurrentUserAsync(cancellationToken)));
+            var hasRedirect = HttpContext.Session.Keys.Contains(RedirectAfterDetailsSessionKey);
+            var user = await _userService.GetCurrentUserAsync(cancellationToken);
+            return View(new AccountViewModel(user)
+                {
+                    IsConfirmingDetails = hasRedirect,
+                });
         }
 
-        [HttpGet, HttpPost]
+        [HttpPost]
+        [ValidateAntiForgeryToken]
         public async Task<IActionResult> UpdateAccount(AccountViewModel account, CancellationToken cancellationToken = default)
         {
-            var user = await _userService.GetCurrentUserAsync(cancellationToken);
-            var hasRedirect = HttpContext.Session.Keys.Contains(RedirectAfterDetailsSessionKey);
             if (ModelState.IsValid) {
+                var user = await _userService.GetCurrentUserAsync(cancellationToken);
 
                 user.Name = account.Name;
                 // TODO: Require email validation of this change
@@ -49,17 +54,14 @@ namespace FurCoNZ.Web.Controllers
 
                 await _userService.UpdateUserAsync(user, cancellationToken);
 
-                if (hasRedirect)
+                if (HttpContext.Session.Keys.Contains(RedirectAfterDetailsSessionKey))
                 {
                     var redirectTo = HttpContext.Session.Get<string>(RedirectAfterDetailsSessionKey);
                     HttpContext.Session.Remove(RedirectAfterDetailsSessionKey);
                     return Redirect(redirectTo);
                 }
-
-                return RedirectToAction(nameof(Index));
             }
-
-            return View("Index", new AccountViewModel(user) { IsConfirmingDetails = hasRedirect });
+            return RedirectToAction(nameof(Index));
         }
 
         public async Task<IActionResult> Orders(CancellationToken cancellationToken = default)

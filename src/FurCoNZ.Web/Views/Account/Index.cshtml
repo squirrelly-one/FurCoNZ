@@ -15,7 +15,7 @@
             </div>
         }
 
-        <form method="post" asp-action="UpdateAccount">
+        <form asp-controller="Account" asp-action="UpdateAccount" method="post">
             <div class="form-group">
                 <label for="Name">Prefered Called Name</label>
                 <input asp-for="Name" class="form-control" aria-describedby="NameHelp" placeholder="Alex Bird-Person">

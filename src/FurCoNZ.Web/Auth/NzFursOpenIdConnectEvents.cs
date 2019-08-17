@@ -24,10 +24,9 @@ namespace FurCoNZ.Web.Auth
             var identity = (ClaimsIdentity)context.Principal.Identity;
             var user = await userService.GetUserFromIssuerAsync(context.Principal.FindFirst("iss").Value, context.Principal.FindFirst("sub").Value, context.HttpContext.RequestAborted);
 
-            // User already exists,m nothing to do?
+            // Create a new user if they do not exist locally fill and in the defaults. 
             if (user == null)
             {
-                // Create a new user, fill it in with defaults. 
                 user = new User
                 {
                     Name = context.User.Value<string>("name"),
@@ -45,10 +44,11 @@ namespace FurCoNZ.Web.Auth
 
                 await userService.CreateUserAsync(user);
 
+                // Give new uers a chance to update their details
                 // 1. Save redirect URL to session
                 context.HttpContext.Session.Set(AccountController.RedirectAfterDetailsSessionKey, context.Properties.RedirectUri);
                 // 2. Show firtst time page asking for name, details etc,
-                context.Properties.RedirectUri = linkGenerator.GetUriByAction(context.HttpContext, nameof(AccountController.UpdateAccount), "Account");
+                context.Properties.RedirectUri = linkGenerator.GetUriByAction(context.HttpContext, nameof(AccountController.Index), "Account");
                 // 3. if skipped or accepted, redirect to initial redirect page (See AccountController.UpdateAccount)
             }
 
