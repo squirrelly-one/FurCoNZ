@@ -5,6 +5,7 @@
 ### Initial setup:
 
 * [Download and install the latest (current) .NET Core SDK](https://dotnet.microsoft.com/download/dotnet-core)
+* Download the latest Node.js for client-side builds.
 * Clone this repo to your local machine: `git clone https://github.com/NZFurs/FurCoNZ.git`
 * Mac: Ensure `/usr/local/share/dotnet` and `~/.dotnet/tools` are in your path
 
@@ -25,12 +26,18 @@
 
 ### Install libman
 
-Libman installs client-side dependencies.
+Libman installs client-side dependencies. It installs Bootstrap just for the client-side JavaScript; we're not using it for CSS.
 
-```
+```bash
 dotnet tool install -g Microsoft.Web.LibraryManager.Cli
 # restart your terminal
 libman restore
+```
+
+### Install front-end builder
+
+```bash
+npm i
 ```
 
 ### Initialise Database:
@@ -57,6 +64,16 @@ dotnet build
 
 ```bash
 dotnet run
+```
+
+### Run a front-end assets build
+
+All CSS is written in SCSS. The build starts in `FrontEnd/scss/index.scss` and is bundled into `wwwroot/css/bundle.*`
+
+```bash
+npm run build
+# OR run a watcher
+npm run watch
 ```
 
 ### Set current user as Admin

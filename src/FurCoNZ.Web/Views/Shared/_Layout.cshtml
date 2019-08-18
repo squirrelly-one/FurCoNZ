@@ -5,13 +5,7 @@
     <meta name="viewport" content="width=device-width, initial-scale=1.0" />
     <title>@ViewData["Title"] - FurCoNZ</title>
 
-    <environment include="Development">
-        <link rel="stylesheet" href="~/css/bootstrap-furconz.min.css" />
-    </environment>
-    <environment exclude="Development">
-        <link rel="stylesheet" href="~/css/bootstrap-furconz.min.css" integrity="sha384-hNA6fHxjyTWAlBSEs3D+g1uQz2M2UXBzuVxDqXxOfNd4z3LoDNqr4f5AgOsstRrC" />
-    </environment>
-    <link rel="stylesheet" href="~/css/site.css" />
+    <link rel="stylesheet" href="~/css/bundle.css" />
 </head>
 <body>
     <header>
@@ -53,7 +47,8 @@
 
     <footer class="footer text-muted">
         <div class="container">
-            &copy; 2019 - FurCoNZ - <a asp-area="" asp-controller="Home" asp-action="/Privacy">Privacy</a>
+            © 2019 FurCoNZ
+            <a asp-area="" asp-controller="Home" asp-action="/Privacy">Privacy</a>
         </div>
     </footer>
 
