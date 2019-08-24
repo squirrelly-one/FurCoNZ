@@ -25,7 +25,7 @@ FROM node AS build-frontend
 WORKDIR /app/src/FurCoNZ.Web
 
 COPY src/FurCoNZ.Web/package*.json ./
-RUN npm install --production
+RUN npm install
 
 COPY src/FurCoNZ.Web/ ./
 
