@@ -1,8 +1,9 @@
-﻿using FurCoNZ.Web.Models;
-using System;
+﻿using System;
 using System.Collections.Generic;
 using System.Linq;
 using System.Threading.Tasks;
+
+using FurCoNZ.Web.Models;
 
 namespace FurCoNZ.Web.ViewModels
 {
@@ -14,7 +15,11 @@ namespace FurCoNZ.Web.ViewModels
         {
             Id = order.Id;
             OrderedBy = order.OrderedBy;
-            Tickets = order.TicketsPurchased;
+            Tickets = order.TicketsPurchased.Select(t => new TicketDetailViewModel(t)).ToList();
+            if (order.Audits != null)
+            {
+                Audits = order.Audits.Select(a => new OrderAuditViewModel(a)).ToList();
+            }
             AmountTotalCents = order.TotalAmountCents;
             AmountOwingCents = order.AmountOwingCents;
             AmountPaidCents = order.AmountPaidCents;
@@ -28,7 +33,8 @@ namespace FurCoNZ.Web.ViewModels
         public decimal AmountPaid => (decimal)AmountPaidCents / 100;
         public decimal AmountOwing => (decimal)AmountOwingCents / 100;
 
-        public ICollection<Ticket> Tickets { get; set; }
+        public ICollection<TicketDetailViewModel> Tickets { get; set; } = new List<TicketDetailViewModel>();
+        public ICollection<OrderAuditViewModel> Audits { get; set; } = new List<OrderAuditViewModel>();
         public int AmountTotalCents { get; set; }
         public int AmountOwingCents { get; set; }
         public int AmountPaidCents { get; set; }

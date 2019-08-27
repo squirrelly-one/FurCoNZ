@@ -1,0 +1,32 @@
+﻿@model IEnumerable<FurCoNZ.Web.ViewModels.OrderAuditViewModel>
+
+@if (Model.Any())
+{
+    <table>
+        <thead>
+            <tr>
+                <th scope="col">&nbsp;</th>
+                <th scope="col">Amount</th>
+                <th scope="col">via</th>
+                <th scope="col">When</th>
+            </tr>
+        </thead>
+        @foreach (var audit in Model)
+        {
+            <tr>
+                <th scope="row">
+                    @audit.Type
+                </th>
+                <td>
+                    @audit.Amount.ToString("C")
+                </td>
+                <td>
+                    @audit.PaymentProvider
+                </td>
+                <td>
+                    @Html.DisplayFor(_ => audit.When)
+                </td>
+            </tr>
+        }
+    </table>
+}

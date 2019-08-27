@@ -1,0 +1,19 @@
+﻿@model ReceivedPayment
+
+    <form class="form-inline" asp-action="AddPayment" method="post">
+        <label asp-for="OrderReference" class="mb-2 mb-sm-0 mr-sm-2"></label>
+        <input asp-for="OrderReference" class="form-control form-control-sm mb-2 mb-sm-0 mr-sm-2" mr-sm-2" id="orderRef" />
+
+        <label asp-for="Amount" class="mb-2 mb-sm-0 mr-sm-2"></label>
+        <div class="input-group input-group-sm mb-2 mb-sm-0 mr-sm-2" mr-sm-2">
+            <div class="input-group-prepend">
+                <span class="input-group-text">$</span>
+            </div>
+            <input asp-for="Amount" class="form-control" id="orderValue" placeholder="amount" step="0.01" />
+        </div>
+        <label asp-for="When" class="mb-2 mb-sm-0 mr-sm-2"></label>
+        <input asp-for="When" class="form-control form-control-sm mb-2 mb-sm-0 mr-sm-2" mr-sm-2"/>
+        <button type="submit" class="btn btn-primary btn-sm">Add Received Payment</button>
+        <span class="d-block w-100 text-danger" asp-validation-for="OrderReference"></span>
+        <span class="d-block w-100 text-danger" asp-validation-for="Amount"></span>
+    </form>

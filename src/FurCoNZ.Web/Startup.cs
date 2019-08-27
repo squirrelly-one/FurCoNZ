@@ -276,8 +276,18 @@ namespace FurCoNZ.Web
             app.UseMvc(routes =>
             {
                 routes.MapRoute(
+                    name: "areas_without_action",
+                    template: "{area:exists}/{controller=Home}/{id:int}",
+                    defaults: new { action = "Index" });
+
+                routes.MapRoute(
                     name: "areas",
                     template: "{area:exists}/{controller=Home}/{action=Index}/{id?}");
+
+                routes.MapRoute(
+                    name: "default_without_action",
+                    template: "{controller=Home}/{id:int}",
+                    defaults: new { action = "Index" });
 
                 routes.MapRoute(
                     name: "default",
