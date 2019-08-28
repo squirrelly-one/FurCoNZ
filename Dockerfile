@@ -19,6 +19,18 @@ COPY src/ ./src/
 
 RUN dotnet publish -c Release -o out
 
+# "Front-End Build Stage" Container: "build-frontend"
+FROM node AS build-frontend
+
+WORKDIR /app/src/FurCoNZ.Web
+
+COPY src/FurCoNZ.Web/package*.json ./
+RUN npm install
+
+COPY src/FurCoNZ.Web/ ./
+
+RUN npm run build
+
 # "Runtime Stage" Container: "runtime"
 FROM mcr.microsoft.com/dotnet/core/aspnet:2.2 AS runtime
 
@@ -30,5 +42,6 @@ EXPOSE 80
 EXPOSE 443
 
 COPY --from=build-env /app/src/FurCoNZ.Web/out ./
+COPY --from=build-frontend /app/src/FurCoNZ.Web/wwwroot/css/bundle* ./wwwroot/css/
 
 ENTRYPOINT ["dotnet", "FurCoNZ.Web.dll"]
