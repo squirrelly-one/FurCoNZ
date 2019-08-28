@@ -7,6 +7,10 @@ a.navbar-brand {
   word-break: break-all;
 }
 
+.nav-link.active {
+    @extend .border-bottom
+}
+
 /* Sticky footer styles
 -------------------------------------------------- */
 html {
