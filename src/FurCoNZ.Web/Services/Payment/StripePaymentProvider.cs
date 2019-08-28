@@ -18,13 +18,18 @@ namespace FurCoNZ.Web.Services.Payment
 {
     public class StripeService : IPaymentProvider
     {
+        public const string NAME = "Stripe";
+
         private readonly FurCoNZDbContext _dbContext;
         private readonly IOptions<StripeSettings> _options;
         private readonly IOrderService _orderService;
         private readonly ILogger _logger;
         private readonly PaymentIntentService _paymentIntentService;
+        private readonly SessionService _checkoutService;
+        private readonly ChargeService _chargeService;
+        private readonly RefundService _refundService;
 
-        public string Name => "Stripe";
+        public string Name => NAME;
 
         public string SupportedMethods => "Credit Card";
 
@@ -37,6 +42,10 @@ namespace FurCoNZ.Web.Services.Payment
             _orderService = orderService;
             _logger = logger;
             _paymentIntentService = new PaymentIntentService();
+
+            _checkoutService = new SessionService();
+            _chargeService = new ChargeService();
+            _refundService = new RefundService();
         }
 
         public async Task AddStripeSessionToOrderAsync(int orderId, string sessionId, CancellationToken cancellationToken = default)
@@ -86,7 +95,7 @@ namespace FurCoNZ.Web.Services.Payment
 
                 await _orderService.AddReceivedFundsForOrderAsync(
                     stripeSession.OrderId, amountReceived,
-                    "stripe", session.PaymentIntentId,
+                    NAME, session.PaymentIntentId,
                     session.PaymentIntent.Created.Value,
                     cancellationToken);
 
@@ -127,7 +136,7 @@ namespace FurCoNZ.Web.Services.Payment
 
                     await _orderService.RefundFundsForOrderAsync(
                         session.OrderId, amountReceived,
-                        "stripe", charge.PaymentIntentId,
+                        NAME, charge.PaymentIntentId,
                         charge.Created,
                         cancellationToken);
 
@@ -136,6 +145,39 @@ namespace FurCoNZ.Web.Services.Payment
 
                 await _dbContext.SaveChangesAsync(cancellationToken);
             }
+        }
+
+        public async Task<bool> RefundAsync(string paymentReference, CancellationToken cancellationToken = default)
+        {
+            var session = await _dbContext.StripeSessions
+                    .FirstOrDefaultAsync(ss => ss.PaymentIntent == paymentReference, cancellationToken);
+
+            if (session == null)
+            {
+                _logger.LogCritical($"Could not find stripe session to process refund for payment intent ({paymentReference})");
+                return false;
+            }
+
+            var paymentIntent = await _paymentIntentService.GetAsync(session.PaymentIntent, cancellationToken: cancellationToken);
+
+            var charge = paymentIntent.Charges.SingleOrDefault(c => c.Paid);
+            if (charge == null)
+            {
+                _logger.LogCritical($"Could not find identify a paid charge for payment intent ({paymentReference})");
+                return false;
+            }
+
+            if (cancellationToken.IsCancellationRequested)
+                return false;
+
+            var refund = await _refundService.CreateAsync(new RefundCreateOptions
+            {
+                ChargeId = charge.Id,
+                Amount = charge.Amount,
+                Reason = RefundReasons.RequestedByCustomer,
+            }, cancellationToken: cancellationToken);
+
+            return true;
         }
     }
 }

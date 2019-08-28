@@ -1,0 +1,11 @@
+﻿@model PaymentsViewModel
+
+    <h1>Payment History</h1>
+
+    <div class="card">
+        <div class="card-body p-2">
+            @await Html.PartialAsync("_AddPaymentForm", Model.ReceivedPayment)
+        </div>
+    </div>
+
+    @Html.DisplayFor(orders => orders.Payments, "OrderAuditViewModel")

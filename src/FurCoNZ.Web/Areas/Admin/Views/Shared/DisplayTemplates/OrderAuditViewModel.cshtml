@@ -1,0 +1,59 @@
+﻿@model IEnumerable<OrderAuditViewModel>
+
+    <table class="table table-sm">
+        <thead>
+            <tr>
+                <th>
+                    Payment ID
+                </th>
+                <th>
+                    Order ID
+                </th>
+                <th>
+                    Type
+                </th>
+                <th>
+                    Amount
+                </th>
+                <th>
+                    Date
+                </th>
+                <th>
+                    Provider
+                </th>
+                <th>
+                    Reference
+                </th>
+            </tr>
+        </thead>
+        <tbody>
+            @foreach (var item in Model)
+            {
+                <tr>
+                    <td>
+                        @Html.DisplayFor(modelItem => item.Id)
+                    </td>
+                    <td>
+                        @Html.DisplayFor(modelItem => item.OrderId)
+                    </td>
+
+                    <td>
+                        @Html.DisplayFor(modelItem => item.Type)
+                    </td>
+                    <td>
+                        @item.Amount.ToString("C")
+                    </td>
+                    <td>
+                        @item.When.ToString("d")
+                    </td>
+                    <td>
+                        @Html.DisplayFor(modelItem => item.PaymentProvider)
+
+                    </td>
+                    <td>
+                        @Html.DisplayFor(modelItem => item.PaymentProviderReference)
+                    </td>
+                </tr>
+            }
+        </tbody>
+    </table>
