@@ -16,7 +16,7 @@
     <PackageReference Include="Microsoft.VisualStudio.Azure.Containers.Tools.Targets" Version="1.9.2" />
     <PackageReference Include="Microsoft.VisualStudio.Web.CodeGeneration.Design" Version="2.2.3" />
     <PackageReference Include="Npgsql.EntityFrameworkCore.PostgreSQL" Version="2.2.4" />
-    <PackageReference Include="Stripe.net" Version="28.5.0" />
+    <PackageReference Include="Stripe.net" Version="28.8.0" />
     <PackageReference Include="TagHelperSamples.Authorization" Version="2.0.49" />
     <PackageReference Include="SauceControl.Blake2Fast" Version="1.0.0" />
     <PackageReference Include="Sendgrid" Version="9.12.0" />
