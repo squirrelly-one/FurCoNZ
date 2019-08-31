@@ -82,7 +82,6 @@ namespace FurCoNZ.Web.Areas.Admin.Controllers
                 // Note that we're not populating all fields. 
                 PaymentProvider = orders.First().PaymentProvider,
                 PaymentProviderReference = paymentReference,
-                AmountCents = orders.Sum(a => a.AmountCents),
                 Type = orders.Any(o => o.Type == AuditType.Refunded) ? AuditType.Refunded : AuditType.Received,
             });
 
@@ -94,14 +93,7 @@ namespace FurCoNZ.Web.Areas.Admin.Controllers
                 var provider = _paymentService.GetPaymentService(payment.PaymentProvider);
 
                 // Try to perform a refund with the payment provider
-                if(await provider.RefundAsync(payment.PaymentProviderReference))
-                {
-                    // Add a refund to the order audit history.
-                    await _orderService.RefundFundsForOrderAsync(
-                        order.Id, payment.AmountCents, 
-                        payment.PaymentProvider, payment.PaymentProviderReference, DateTimeOffset.Now, 
-                        HttpContext.RequestAborted);
-                }
+                await provider.RefundAsync(order.Id, payment.PaymentProviderReference, HttpContext.RequestAborted);
             }
 
             return RedirectToAction(nameof(Index), new { id = order.Id });

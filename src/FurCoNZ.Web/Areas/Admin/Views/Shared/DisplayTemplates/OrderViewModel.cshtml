@@ -7,6 +7,7 @@
                 <th>@Html.DisplayNameFor(model => model.AmountTotal)</th>
                 <th>@Html.DisplayNameFor(model => model.AmountPaid)</th>
                 <th>@Html.DisplayNameFor(model => model.AmountOwing)</th>
+                <th>@Html.DisplayNameFor(model => model.Status)</th>
             </tr>
         </thead>
         <tbody>
@@ -15,6 +16,7 @@
                 <td>@Model.AmountTotal.ToString("C")</td>
                 <td>@Model.AmountPaid.ToString("C")</td>
                 <td>@Model.AmountOwing.ToString("C")</td>
+                <td>@Html.DisplayFor(model => model.Status)</td>
             </tr>
         </tbody>
     </table>

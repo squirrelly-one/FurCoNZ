@@ -9,6 +9,6 @@ namespace FurCoNZ.Web.Services
         string SupportedMethods { get; }
         string Description { get; }
 
-        Task<bool> RefundAsync(string paymentReference, CancellationToken cancellationToken = default);
+        Task<bool> RefundAsync(int orderId, string paymentReference, CancellationToken cancellationToken = default);
     }
 }

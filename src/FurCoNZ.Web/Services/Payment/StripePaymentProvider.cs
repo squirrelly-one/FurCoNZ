@@ -108,19 +108,19 @@ namespace FurCoNZ.Web.Services.Payment
 
         public async Task ProcessChargeAsync(Charge charge, CancellationToken cancellationToken)
         {
-            // For now, only process refunds.
+            var session = await _dbContext.StripeSessions
+                .FirstOrDefaultAsync(ss => ss.PaymentIntent == charge.PaymentIntentId, cancellationToken);
+
+            cancellationToken.ThrowIfCancellationRequested();
+
+            if (session == null)
+            {
+                _logger.LogCritical($"Could not find stripe session to process refund for payment intent ({charge.PaymentIntentId})");
+                return;
+            }
+
             if (charge.Refunds.Any())
             {
-                var session = await _dbContext.StripeSessions
-                    .FirstOrDefaultAsync(ss => ss.PaymentIntent == charge.PaymentIntentId, cancellationToken);
-
-                cancellationToken.ThrowIfCancellationRequested();
-
-                if (session == null)
-                {
-                    _logger.LogCritical($"Could not find stripe session to process refund for payment intent ({charge.PaymentIntentId})");
-                    return;
-                }
 
                 // If partial refund, mark as refund in process 
                 if (!charge.Refunded)
@@ -145,9 +145,10 @@ namespace FurCoNZ.Web.Services.Payment
 
                 await _dbContext.SaveChangesAsync(cancellationToken);
             }
+
         }
 
-        public async Task<bool> RefundAsync(string paymentReference, CancellationToken cancellationToken = default)
+        public async Task<bool> RefundAsync(int orderId, string paymentReference, CancellationToken cancellationToken = default)
         {
             var session = await _dbContext.StripeSessions
                     .FirstOrDefaultAsync(ss => ss.PaymentIntent == paymentReference, cancellationToken);
@@ -176,6 +177,11 @@ namespace FurCoNZ.Web.Services.Payment
                 Amount = charge.Amount,
                 Reason = RefundReasons.RequestedByCustomer,
             }, cancellationToken: cancellationToken);
+
+            // The database will be updated with the refund occurs through the poll/web-hook handler
+            session.State = StripeSessionState.Refunding;
+
+            await _dbContext.SaveChangesAsync(cancellationToken);
 
             return true;
         }
