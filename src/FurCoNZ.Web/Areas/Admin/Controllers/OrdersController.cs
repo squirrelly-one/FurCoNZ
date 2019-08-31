@@ -74,7 +74,9 @@ namespace FurCoNZ.Web.Areas.Admin.Controllers
             // TODO: Refund a select payment
             var order = await _orderService.GetOrderById(orderViewModel.Id, HttpContext.RequestAborted);
             if (order == null)
+            {
                 return NotFound();
+            }
 
 
             var payments = order.Audits.GroupBy(a => a.PaymentProviderReference, (paymentReference, orders) => new OrderAudit
@@ -86,7 +88,9 @@ namespace FurCoNZ.Web.Areas.Admin.Controllers
             });
 
             if (order.Audits.All(a => a.Type == AuditType.Refunded))
+            {
                 return BadRequest("Order has already been refunded");
+            }
 
             foreach(var payment in payments.Where(p => p.Type != AuditType.Refunded))
             {
@@ -113,7 +117,9 @@ namespace FurCoNZ.Web.Areas.Admin.Controllers
 
             var order = await _orderService.GetOrderByRef(orderRefAsInt, HttpContext.RequestAborted);
             if (order == null)
+            {
                 return Json("No order found with this id");
+            }
 
             return Json(true);
         }
@@ -129,7 +135,9 @@ namespace FurCoNZ.Web.Areas.Admin.Controllers
 
                 var order = await _orderService.GetOrderByRef(orderRefAsInt, HttpContext.RequestAborted);
                 if (order == null)
+                {
                     return NotFound();
+                }
 
                 await _orderService.AddReceivedFundsForOrderAsync(
                     order.Id,
@@ -139,13 +147,18 @@ namespace FurCoNZ.Web.Areas.Admin.Controllers
                     HttpContext.RequestAborted);
 
                 if (HttpContext.Request.Headers.ContainsKey("Referer"))
+                {
                     return Redirect(HttpContext.Request.Headers["Referer"].ToString());
+                }
 
                 return RedirectToAction("Index");
             }
 
             if (HttpContext.Request.Headers.ContainsKey("Referer"))
+            {
                 return Redirect(HttpContext.Request.Headers["Referer"].ToString());
+            }
+
             return RedirectToAction("Index");
         }
     }

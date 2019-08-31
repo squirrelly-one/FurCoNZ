@@ -169,7 +169,9 @@ namespace FurCoNZ.Web.Services.Payment
             }
 
             if (cancellationToken.IsCancellationRequested)
+            {
                 return false;
+            }
 
             var refund = await _refundService.CreateAsync(new RefundCreateOptions
             {

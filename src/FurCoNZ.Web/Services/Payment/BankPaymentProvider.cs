@@ -26,7 +26,9 @@ namespace FurCoNZ.Web.Services.Payment
         {
             var order = await _orderService.GetOrderById(orderId, cancellationToken);
             if (order == null)
+            {
                 return false;
+            }
 
             // Calculate the amount paid for the order.
             var paid = order.Audits
@@ -35,7 +37,9 @@ namespace FurCoNZ.Web.Services.Payment
                 .Sum();
 
             if (paid <= 0)
+            {
                 return true;
+            }
 
             await _orderService.RefundFundsForOrderAsync(
                         order.Id, paid,
