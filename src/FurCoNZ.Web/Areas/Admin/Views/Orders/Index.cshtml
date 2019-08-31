@@ -30,6 +30,9 @@
             <th>
                 Owing
             </th>
+                <th>
+                    Status
+                </th>
             <th>
                 &nbsp;
             </th>
@@ -53,6 +56,9 @@
             <td>
                 @item.AmountOwing.ToString("C")
             </td>
+                <td>
+                    @Html.DisplayFor(modelItem => item.Status)
+                </td>
             <td>
                 <a class="btn btn-outline-info" asp-action="Index" asp-route-id="@item.Id">
                     📜

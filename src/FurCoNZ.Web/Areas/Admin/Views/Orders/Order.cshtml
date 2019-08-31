@@ -1,5 +1,28 @@
-﻿@model OrderViewModel
+﻿@using FurCoNZ.Web.Helpers
+@model OrderViewModel
 
-<h1>Order details for @Model.Id</h1>
+    <h1>Order details for @Model.Id</h1>
 
-@Html.DisplayForModel()
+    <div class="card">
+        <ul class="list-group list-group-flush">
+            <li class="list-group-item p-2">
+                @await Html.PartialAsync("_AddPaymentForm", new ReceivedPayment { OrderReference = $"{Model.Id}{DammAlgorithm.GetCheck(Model.Id)}" })
+            </li>
+            <li class="list-group-item p-2">
+                <a class="btn btn-sm btn-primary" asp-active-actions="Orders" asp-action="Index" asp-route-id="">View All Orders</a>
+                <div class="dropdown d-inline-block">
+                    <button class="btn btn-sm btn-secondary dropdown-toggle" type="button" data-toggle="dropdown">
+                        Actions
+                    </button>
+                    <div class="dropdown-menu">
+                        <form asp-action="Refund" method="post">
+                            <input type="hidden" asp-for="Id" />
+                            <button class="dropdown-item text-danger" type="submit">Refund</button>
+                        </form>
+                    </div>
+                </div>
+            </li>
+        </ul>
+    </div>
+
+    @Html.DisplayForModel()

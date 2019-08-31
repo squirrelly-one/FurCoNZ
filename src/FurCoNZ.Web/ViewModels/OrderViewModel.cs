@@ -38,5 +38,19 @@ namespace FurCoNZ.Web.ViewModels
         public int AmountTotalCents { get; set; }
         public int AmountOwingCents { get; set; }
         public int AmountPaidCents { get; set; }
+
+        public string Status
+        {
+            get
+            {
+                if (Audits.Any(a => a.Type == nameof(AuditType.Refunded)))
+                    return "Refunded";
+
+                if (AmountOwing == 0)
+                    return "Paid";
+
+                return "Owing";
+            }
+        }
     }
 }
