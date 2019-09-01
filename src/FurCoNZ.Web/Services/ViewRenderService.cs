@@ -100,7 +100,8 @@ namespace FurCoNZ.Web.Services
 
             if (viewResult.View == null)
             {
-                throw new ArgumentNullException($"{viewName} does not match any available view");
+                var searchedLocations = String.Join("\n\t", viewResult.SearchedLocations);
+                throw new ArgumentNullException(nameof(viewName), $"{viewName} does not match any available view. Searched locations:\n\t{searchedLocations}");
             }
 
             using (var stringWriter = new StringWriter())
