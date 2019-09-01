@@ -38,7 +38,7 @@ namespace FurCoNZ.Web.Services
 
             foreach (var order in ordersExpiringInOneMonthAndUnreminded)
             {
-                var message = _viewRenderService.RenderToStringAsync("ThirtyDayReminder", new ThirtyDayReminderViewModel());
+                var message = await _viewRenderService.RenderToStringAsync("ThirtyDayReminder", new ThirtyDayReminderViewModel());
             }
         }
     }
