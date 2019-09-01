@@ -2,6 +2,7 @@
 using System.Threading;
 using System.Threading.Tasks;
 
+using Microsoft.Extensions.DependencyInjection;
 using Microsoft.Extensions.Hosting;
 using Microsoft.Extensions.Logging;
 
@@ -9,15 +10,15 @@ namespace FurCoNZ.Web.Services
 {
     internal class EmailRemindersHostedService : IHostedService, IDisposable
     {
-        private readonly IReminderService _reminderService;
+        private readonly IServiceProvider _serviceProvider;
         private readonly ILogger _logger;
 
         // Needs to be defined as a field otherwise it will get sweeped up by the GC
         private Timer _30DayUnfulfilledOrderTimer;
 
-        public EmailRemindersHostedService(IReminderService reminderService, ILogger<EmailRemindersHostedService> logger)
+        public EmailRemindersHostedService(IServiceProvider serviceProvider, ILogger<EmailRemindersHostedService> logger)
         {
-            _reminderService = reminderService;
+            _serviceProvider = serviceProvider;
             _logger = logger;
         }
 
@@ -40,7 +41,11 @@ namespace FurCoNZ.Web.Services
         {
             _logger.LogInformation($"Running Task: {nameof(Send30DayRemainingPendingOrders)}.");
 
-            Task.Run(() => _reminderService.Send30DayRemainingPendingOrdersAsync()).GetAwaiter().GetResult();
+            using (var serviceScope = _serviceProvider.CreateScope())
+            {
+                var reminderService = serviceScope.ServiceProvider.GetRequiredService<IReminderService>();
+                Task.Run(() => reminderService.Send30DayRemainingPendingOrdersAsync()).GetAwaiter().GetResult();
+            }
 
             _logger.LogInformation($"Completed Task: {nameof(Send30DayRemainingPendingOrders)}.");
         }
