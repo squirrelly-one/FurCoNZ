@@ -168,6 +168,9 @@ namespace FurCoNZ.Web
             services.Configure<SendGridClientOptions>(options => Configuration.GetSection("SendGrid").Bind(options));
             services.AddTransient<ISendGridClient, SendGridClient>();
             services.AddTransient<IEmailService, SendGridEmailService>();
+            services.AddTransient<IReminderService, ReminderService>();
+            services.AddTransient<IViewRenderService, ViewRenderService>();
+            services.AddHostedService<EmailRemindersHostedService>();
 
             services.AddTransient<IUserService, EntityFrameworkUserService>();
             services.AddTransient<IOrderService, OrderService>();
