@@ -2,6 +2,7 @@ using System;
 using System.IO;
 using System.Threading;
 using System.Threading.Tasks;
+
 using Microsoft.AspNetCore.Http;
 using Microsoft.AspNetCore.Mvc;
 using Microsoft.AspNetCore.Mvc.Abstractions;
@@ -10,24 +11,29 @@ using Microsoft.AspNetCore.Mvc.Razor;
 using Microsoft.AspNetCore.Mvc.Rendering;
 using Microsoft.AspNetCore.Mvc.ViewFeatures;
 using Microsoft.AspNetCore.Routing;
+using Microsoft.Extensions.DependencyInjection;
 
 namespace FurCoNZ.Web.Services
 {
     // Based off the following:
     // https://ppolyzos.com/2016/09/09/asp-net-core-render-view-to-string/
     // https://stackoverflow.com/a/50024209
+    // https://stackoverflow.com/a/53619710
 
     public class ViewRenderService : IViewRenderService
     {
+        private readonly HttpContext _httpContext;
         private readonly IRazorViewEngine _razorViewEngine;
         private readonly ITempDataProvider _tempDataProvider;
         private readonly IServiceProvider _serviceProvider;
 
         public ViewRenderService(
+            IHttpContextAccessor httpContextAccessor,
             IRazorViewEngine razorViewEngine,
             ITempDataProvider tempDataProvider,
             IServiceProvider serviceProvider)
         {
+            _httpContext = httpContextAccessor.HttpContext;
             _razorViewEngine = razorViewEngine;
             _tempDataProvider = tempDataProvider;
             _serviceProvider = serviceProvider;
@@ -60,21 +66,32 @@ namespace FurCoNZ.Web.Services
 
         public async Task<string> RenderToStringAsync<TModel>(string viewName, TModel model, bool partial = false, CancellationToken cancellationToken = default)
         {
-            if (String.IsNullOrWhiteSpace(viewName))
+            using (var serviceScope = _serviceProvider.CreateScope())
             {
-                throw new ArgumentNullException(nameof(viewName));
+                if (String.IsNullOrWhiteSpace(viewName))
+                {
+                    throw new ArgumentNullException(nameof(viewName));
+                }
+
+                ActionContext actionContext;
+                if (_httpContext != null)
+                {
+                    actionContext = new ActionContext(_httpContext, _httpContext.GetRouteData(), new ActionDescriptor());
+                }
+                else
+                {
+                    var defaultHttpContext = new DefaultHttpContext { RequestServices = serviceScope.ServiceProvider, RequestAborted = cancellationToken };
+                    actionContext = new ActionContext(defaultHttpContext, new RouteData(), new ActionDescriptor());
+                }
+
+                var viewData = new ViewDataDictionary(new EmptyModelMetadataProvider(), new ModelStateDictionary())
+                {
+                    Model = model
+                };
+                var tempData = new TempDataDictionary(actionContext.HttpContext, _tempDataProvider);
+
+                return await RenderToStringAsync(actionContext, viewName, viewData, tempData, partial);
             }
-
-            var httpContext = new DefaultHttpContext { RequestServices = _serviceProvider, RequestAborted = cancellationToken };
-
-            var actionContext = new ActionContext(httpContext, new RouteData(), new ActionDescriptor());
-            var viewData = new ViewDataDictionary(new EmptyModelMetadataProvider(), new ModelStateDictionary())
-            {
-                Model = model
-            };
-            var tempData = new TempDataDictionary(actionContext.HttpContext, _tempDataProvider);
-
-            return await RenderToStringAsync(actionContext, viewName, viewData, tempData, partial);
         }
 
         private async Task<string> RenderToStringAsync(ActionContext actionContext, string viewName, ViewDataDictionary viewData, ITempDataDictionary tempData, bool partial = false)
