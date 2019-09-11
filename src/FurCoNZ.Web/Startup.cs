@@ -295,7 +295,7 @@ namespace FurCoNZ.Web
             });
 
             // Aparently stripe uses a singleton pattern 😟
-            Stripe.StripeConfiguration.SetApiKey(Configuration.GetValue<string>("Stripe:SecretKey"));
+            Stripe.StripeConfiguration.ApiKey = Configuration.GetValue<string>("Stripe:SecretKey");
         }
     }
 }
