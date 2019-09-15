@@ -29,7 +29,8 @@ using Npgsql;
 using SendGrid;
 
 // Local
-using FurCoNZ.Web.Auth;using FurCoNZ.Web.Configuration;using FurCoNZ.Web.DAL;using FurCoNZ.Web.Services;
+using FurCoNZ.Web.Auth;using FurCoNZ.Web.Configuration;using FurCoNZ.Web.DAL;
+using FurCoNZ.Web.Options;using FurCoNZ.Web.Services;
 
 namespace FurCoNZ.Web
 {    public class Startup
@@ -166,7 +167,13 @@ namespace FurCoNZ.Web
 
             // Configure SendGrid
             services.Configure<SendGridClientOptions>(options => Configuration.GetSection("SendGrid").Bind(options));
-            services.AddTransient<ISendGridClient, SendGridClient>();
+            services.Configure<ReminderServiceOptions>(options =>
+            {
+                options.UnpaidOrderExpiryDays = Configuration.GetValue<int>("Orders:UnpaidOrderExpiryDays");
+                options.UnpaidOrderReminderDays = Configuration.GetValue<int[]>("Orders:UnpaidOrderReminderDays");
+            });
+
+            services.AddTransient<ISendGridClient>(c => new SendGridClient(Configuration["SendGrid:ApiKey"]));
             services.AddTransient<IEmailService, SendGridEmailService>();
             services.AddTransient<IReminderService, ReminderService>();
             services.AddTransient<IViewRenderService, ViewRenderService>();
@@ -181,6 +188,7 @@ namespace FurCoNZ.Web
 
             services.AddTransient<Services.Payment.StripeService>();
             services.AddHostedService<Services.Payment.Stripe.StripeHostedService>();
+            
 
             services.Configure<CookiePolicyOptions>(options =>
             {
