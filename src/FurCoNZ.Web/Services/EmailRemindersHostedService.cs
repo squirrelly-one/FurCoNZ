@@ -15,6 +15,7 @@ namespace FurCoNZ.Web.Services
 
         // Needs to be defined as a field otherwise it will get sweeped up by the GC
         private Timer _30DayUnfulfilledOrderTimer;
+        private Timer _CancelOrderNotificationTimer;
 
         public EmailRemindersHostedService(IServiceProvider serviceProvider, ILogger<EmailRemindersHostedService> logger)
         {
@@ -24,7 +25,7 @@ namespace FurCoNZ.Web.Services
 
         public Task StartAsync(CancellationToken cancellationToken)
         {
-            _logger.LogInformation("Timed Background Service is starting.");
+            _logger.LogInformation("Email Reminders hosted service is starting.");
 
             const int triggerHour24Hour = 9; // 9am
 
@@ -33,11 +34,12 @@ namespace FurCoNZ.Web.Services
             var timeUntilNextTrigger = nextTriggerTime - DateTime.Now;
 
             _30DayUnfulfilledOrderTimer = new Timer(Send30DayRemainingPendingOrders, null, timeUntilNextTrigger, TimeSpan.FromDays(1));
+            _CancelOrderNotificationTimer = new Timer(SendCancelOrderNotifications, null, timeUntilNextTrigger, TimeSpan.FromDays(1));
 
             return Task.CompletedTask;
         }
 
-        private void Send30DayRemainingPendingOrders(object state)
+        private void Send30DayRemainingPendingOrders(object state) // TODO: Arbitrary day counts
         {
             _logger.LogInformation($"Running Task: {nameof(Send30DayRemainingPendingOrders)}.");
 
@@ -50,11 +52,25 @@ namespace FurCoNZ.Web.Services
             _logger.LogInformation($"Completed Task: {nameof(Send30DayRemainingPendingOrders)}.");
         }
 
+        private void SendCancelOrderNotifications(object state)
+        {
+            _logger.LogInformation($"Running Task: {nameof(SendCancelOrderNotifications)}.");
+
+            using (var serviceScope = _serviceProvider.CreateScope())
+            {
+                var reminderService = serviceScope.ServiceProvider.GetRequiredService<IReminderService>();
+                Task.Run(() => reminderService.SendCancelledOrdersAsync()).GetAwaiter().GetResult();
+            }
+
+            _logger.LogInformation($"Completed Task: {nameof(SendCancelOrderNotifications)}.");
+        }
+
         public Task StopAsync(CancellationToken cancellationToken)
         {
-            _logger.LogInformation("Timed Background Service is stopping.");
+            _logger.LogInformation("Email Reminders hosted service is stopping.");
 
             _30DayUnfulfilledOrderTimer?.Change(Timeout.Infinite, 0);
+            _CancelOrderNotificationTimer?.Change(Timeout.Infinite, 0);
 
             return Task.CompletedTask;
         }
@@ -62,6 +78,7 @@ namespace FurCoNZ.Web.Services
         public void Dispose()
         {
             _30DayUnfulfilledOrderTimer?.Dispose();
+            _CancelOrderNotificationTimer?.Dispose();
         }
     }
 }
