@@ -1,4 +1,5 @@
-﻿using System.Collections.Generic;
+﻿using System;
+using System.Collections.Generic;
 using System.Linq;
 
 namespace FurCoNZ.Web.Models
@@ -9,6 +10,7 @@ namespace FurCoNZ.Web.Models
 
         public int OrderedById { get; set; }
         public virtual User OrderedBy { get; set; }
+        public DateTimeOffset CreatedAt { get; set; }
 
         public int TotalAmountCents
         {

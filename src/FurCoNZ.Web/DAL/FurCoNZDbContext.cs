@@ -18,6 +18,7 @@ namespace FurCoNZ.Web.DAL
         public DbSet<LinkedAccount> LinkedAccounts { get; set; }
         public DbSet<Order> Orders { get; set; }
         public DbSet<OrderAudit> OrderAudits { get; set; }
+        public DbSet<RemindersLastRun> RemindersLastRuns { get; set; }
         public DbSet<Ticket> Tickets { get; set; }
         public DbSet<TicketType> TicketTypes { get; set; }
 
