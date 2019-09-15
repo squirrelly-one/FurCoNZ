@@ -1,0 +1,70 @@
+﻿@model OrdersViewModel
+
+@{
+    ViewData["Title"] = "Manage Orders";
+}
+
+<h1>Manage Orders</h1>
+
+<div class="card">
+    <div class="card-body p-2">
+        @await Html.PartialAsync("_AddPaymentForm", Model.ReceivedPayment)
+    </div>
+</div>
+
+<table class="table table-sm">
+    <thead>
+        <tr>
+            <th>
+                Order ID
+            </th>
+            <th>
+                Ordered By
+            </th>
+            <th>
+                Total
+            </th>
+            <th>
+                Paid
+            </th>
+            <th>
+                Owing
+            </th>
+                <th>
+                    Status
+                </th>
+            <th>
+                &nbsp;
+            </th>
+        </tr>
+    </thead>
+    <tbody>
+@foreach (var item in Model.Orders) {
+        <tr>
+            <td>
+                    @Html.DisplayFor(_ => item.Id)
+            </td>
+            <td>
+                    @Html.DisplayFor(_ => item.OrderedBy.Name) &lt;@Html.DisplayFor(_ => item.OrderedBy.Email)&gt;
+            </td>
+            <td>
+                @item.AmountTotal.ToString("C")
+            </td>
+            <td>
+                @item.AmountPaid.ToString("C")
+            </td>
+            <td>
+                @item.AmountOwing.ToString("C")
+            </td>
+                <td>
+                    @Html.DisplayFor(_ => item.Status)
+                </td>
+            <td>
+                <a class="btn btn-outline-info" asp-action="Index" asp-route-id="@item.Id">
+                    📜
+                </a>
+            </td>
+        </tr>
+}
+    </tbody>
+</table>

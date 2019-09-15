@@ -188,7 +188,6 @@ namespace FurCoNZ.Web
 
             services.AddTransient<Services.Payment.StripeService>();
             services.AddHostedService<Services.Payment.Stripe.StripeHostedService>();
-            
 
             services.Configure<CookiePolicyOptions>(options =>
             {
@@ -274,17 +273,27 @@ namespace FurCoNZ.Web
             }
             app.UseForwardedHeaders(forwardedHeaderOptions);
 
+            app.UseSession();
             app.UseAuthentication();
             app.UseHttpsRedirection();
             app.UseStaticFiles();
             app.UseCookiePolicy();
-            app.UseSession();
 
             app.UseMvc(routes =>
             {
                 routes.MapRoute(
+                    name: "areas_without_action",
+                    template: "{area:exists}/{controller=Home}/{id:int}",
+                    defaults: new { action = "Index" });
+
+                routes.MapRoute(
                     name: "areas",
                     template: "{area:exists}/{controller=Home}/{action=Index}/{id?}");
+
+                routes.MapRoute(
+                    name: "default_without_action",
+                    template: "{controller=Home}/{id:int}",
+                    defaults: new { action = "Index" });
 
                 routes.MapRoute(
                     name: "default",
@@ -292,7 +301,7 @@ namespace FurCoNZ.Web
             });
 
             // Aparently stripe uses a singleton pattern 😟
-            Stripe.StripeConfiguration.SetApiKey(Configuration.GetValue<string>("Stripe:SecretKey"));
+            Stripe.StripeConfiguration.ApiKey = Configuration.GetValue<string>("Stripe:SecretKey");
         }
     }
 }

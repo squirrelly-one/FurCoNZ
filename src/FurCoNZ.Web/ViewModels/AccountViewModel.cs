@@ -17,6 +17,8 @@ namespace FurCoNZ.Web.ViewModels
             Email = user.Email;
         }
 
+        public bool IsConfirmingDetails { get; set; }
+
         [Required]
         public string Name { get; set; }
 

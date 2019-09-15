@@ -1,0 +1,29 @@
+﻿@model FurCoNZ.Web.ViewModels.OrderViewModel
+
+<div class="row">
+    <dl class="col-sm-1">
+        <dt>@Html.DisplayNameFor(model => model.Id)</dt>
+        <dd>@Html.DisplayFor(model => model.Id)</dd>
+    </dl>
+    <dl class="col-sm-2">
+        <dt>@Html.DisplayNameFor(model => model.AmountTotal)</dt>
+        <dd>@Model.AmountTotal.ToString("C")</dd>
+    </dl>
+    <dl class="col-sm-2">
+        <dt>@Html.DisplayNameFor(model => model.AmountPaid)</dt>
+        <dd>@Model.AmountPaid.ToString("C")</dd>
+    </dl>
+    <dl class="col-sm-2">
+        <dt>@Html.DisplayNameFor(model => model.AmountOwing)</dt>
+        <dd>@Model.AmountOwing.ToString("C")</dd>
+    </dl>
+</div>
+
+<h3>Received Payments</h3>
+@Html.DisplayFor(order => order.Audits, "OrderAuditsSummary")
+
+<h3>Tickets</h3>
+@foreach (var ticket in Model.Tickets)
+{
+    @Html.DisplayFor(_ => ticket, "TicketDetailViewModel")
+}

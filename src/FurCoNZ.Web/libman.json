@@ -5,10 +5,24 @@
     {
       "library": "jquery@3.3.1",
       "files": [
-        "jquery.slim.min.js",
-        "jquery.slim.js"
+        "jquery.min.js",
+        "jquery.js"
       ],
       "destination": "wwwroot/lib/jquery/"
+    },
+    {
+      "library": "jquery-validate@1.19.1",
+      "files": [
+        "jquery.validate.min.js",
+        "jquery.validate.js",
+        "additional-methods.min.js",
+        "additional-methods.js"
+      ],
+      "destination": "wwwroot/lib/jquery-validate/"
+    },
+    {
+      "library": "jquery-validation-unobtrusive@3.2.11",
+      "destination": "wwwroot/lib/jquery-validation-unobtrusive/"
     },
     {
       "library": "twitter-bootstrap@4.3.1",

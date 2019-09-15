@@ -8,6 +8,7 @@ using System.Threading.Tasks;
 using Microsoft.AspNetCore.Authorization;
 using Microsoft.AspNetCore.Mvc;
 
+using FurCoNZ.Web.Helpers;
 using FurCoNZ.Web.Services;
 using FurCoNZ.Web.Models;
 using FurCoNZ.Web.ViewModels;
@@ -19,6 +20,8 @@ namespace FurCoNZ.Web.Controllers
     [Authorize]
     public class AccountController : Controller
     {
+        public static readonly string RedirectAfterDetailsSessionKey = "RedirectAfterDetails";
+
         private readonly IUserService _userService;
         private readonly IOrderService _orderService;
 
@@ -30,21 +33,35 @@ namespace FurCoNZ.Web.Controllers
 
         public async Task<IActionResult> Index(CancellationToken cancellationToken = default)
         {
-            return View(new AccountViewModel(await _userService.GetCurrentUserAsync(cancellationToken)));
+            var hasRedirect = HttpContext.Session.Keys.Contains(RedirectAfterDetailsSessionKey);
+            var user = await _userService.GetCurrentUserAsync(cancellationToken);
+            return View(new AccountViewModel(user)
+                {
+                    IsConfirmingDetails = hasRedirect,
+                });
         }
 
         [HttpPost]
+        [ValidateAntiForgeryToken]
         public async Task<IActionResult> UpdateAccount(AccountViewModel account, CancellationToken cancellationToken = default)
         {
-            var user = await _userService.GetCurrentUserAsync(cancellationToken);
+            if (ModelState.IsValid) {
+                var user = await _userService.GetCurrentUserAsync(cancellationToken);
 
-            user.Name = account.Name;
-            // TODO: Require email validation of this change
-            user.Email = account.Email; 
+                user.Name = account.Name;
+                // TODO: Require email validation of this change
+                user.Email = account.Email;
 
-            await _userService.UpdateUserAsync(user, cancellationToken);
+                await _userService.UpdateUserAsync(user, cancellationToken);
 
-            return RedirectToAction("Index");
+                if (HttpContext.Session.Keys.Contains(RedirectAfterDetailsSessionKey))
+                {
+                    var redirectTo = HttpContext.Session.Get<string>(RedirectAfterDetailsSessionKey);
+                    HttpContext.Session.Remove(RedirectAfterDetailsSessionKey);
+                    return Redirect(redirectTo);
+                }
+            }
+            return RedirectToAction(nameof(Index));
         }
 
         public async Task<IActionResult> Orders(CancellationToken cancellationToken = default)

@@ -2,6 +2,8 @@
 using System.Collections.Generic;
 using System.ComponentModel.DataAnnotations;
 
+using FurCoNZ.Web.Models;
+
 namespace FurCoNZ.Web.ViewModels
 {
     public class TicketDetailViewModel : IValidatableObject
@@ -9,8 +11,7 @@ namespace FurCoNZ.Web.ViewModels
         public int Id { get; set; }
 
         [Required]
-        public int TicketTypeId { get; set; } // TODO: Probably need to map this to a ViewModel
-        public string TicketTypeName { get; set; }
+        public TicketTypeViewModel TicketType { get; set; }
 
         [Required]
         [EmailAddress]
@@ -54,6 +55,28 @@ namespace FurCoNZ.Web.ViewModels
         public IEnumerable<ValidationResult> Validate(ValidationContext validationContext)
         {
             return new List<ValidationResult>();
+        }
+
+        public TicketDetailViewModel()
+        { }
+
+        public TicketDetailViewModel(Ticket ticket)
+        {
+            Id = ticket.Id;
+
+            // TODO: Ticket Type View Model?
+            TicketType = new TicketTypeViewModel(ticket.TicketType);
+
+            EmailAddress = ticket.EmailAddress;
+            BadgeName = ticket.TicketName;
+            PreferredFullName = ticket.PreferredName;
+
+            DateOfBirth = ticket.DateOfBirth;
+
+            KnownAllergies = ticket.KnownAllergens;
+            CabinPreferences = ticket.CabinGrouping;
+
+            OtherNotes = ticket.AdditionalNotes;
         }
     }
 }

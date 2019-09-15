@@ -1,3 +1,4 @@
+src/FurCoNZ.Web/wwwroot/css/bundle.*
 
 # Created by https://www.gitignore.io/api/aspnetcore,visualstudio
 # Edit at https://www.gitignore.io/?templates=aspnetcore,visualstudio
@@ -17,6 +18,8 @@
 
 # Build results
 [Dd]ebug/
+# Not the Debug Area though
+!src/FurCoNZ.Web/Areas/Debug
 [Dd]ebugPublic/
 [Rr]elease/
 [Rr]eleases/
@@ -469,4 +472,3 @@ ASALocalRun/
 healthchecksdb
 
 # End of https://www.gitignore.io/api/aspnetcore,visualstudio
-
