@@ -1,4 +1,5 @@
-﻿using System.Net.Mail;
+﻿using System.Linq;
+using System.Net.Mail;
 using System.Threading;
 using System.Threading.Tasks;
 using FurCoNZ.Web.Helpers;
@@ -31,8 +32,11 @@ namespace FurCoNZ.Web.Services
                 htmlContent: htmlBody
             );
 
-            await sendGridMessage.AddAttachmentsAsync(attachments, cancellationToken);
-
+            if (attachments != null && attachments.Any())
+            {
+                await sendGridMessage.AddAttachmentsAsync(attachments, cancellationToken);
+            }
+            
             await _sendGridClient.SendEmailAsync(sendGridMessage, cancellationToken);
         }
 
