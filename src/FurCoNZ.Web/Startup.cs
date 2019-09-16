@@ -166,7 +166,7 @@ namespace FurCoNZ.Web
             services.AddHttpContextAccessor();
 
             // Configure SendGrid
-            services.Configure<SendGridClientOptions>(options => Configuration.GetSection("SendGrid").Bind(options));
+            services.Configure<SendGridEmailServiceOptions>(options => Configuration.GetSection("SendGrid").Bind(options));
             services.Configure<ReminderServiceOptions>(options =>
             {
                 options.UnpaidOrderExpiryDays = Configuration.GetValue<int>("Orders:UnpaidOrderExpiryDays");
