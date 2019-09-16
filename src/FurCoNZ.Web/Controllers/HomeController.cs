@@ -16,6 +16,11 @@ namespace FurCoNZ.Web.Controllers
             return View();
         }
 
+        public IActionResult GetNotified()
+        {
+            return View();
+        }
+
         public IActionResult Privacy()
         {
             return View();

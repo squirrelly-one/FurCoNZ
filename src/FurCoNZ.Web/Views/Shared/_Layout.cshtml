@@ -33,11 +33,23 @@
                         <li class="nav-item">
                             <a class="nav-link text-dark" asp-area="" asp-controller="Order" asp-action="Index" asp-active-controllers="Order">Order</a>
                         </li>
+                        <li class="nav-item dropdown">
+                            <a class="nav-link dropdown-toggle" role="button" data-toggle="dropdown" href="#" asp-active-controllers="Contact" aria-haspopup="true" aria-expanded="false">Contact</a>
+                            <div class="dropdown-menu">
+                                <a class="dropdown-item" asp-area="" asp-controller="Contact" asp-action="ActivityOrTalk">Activity Or Talk</a>
+                                <a class="dropdown-item" asp-area="" asp-controller="Contact" asp-action="Index">Contact Us</a>
+                                <a class="dropdown-item" asp-area="" asp-controller="Contact" asp-action="DealersDen">Dealers' Den</a>
+                                <a class="dropdown-item" asp-area="" asp-controller="Contact" asp-action="Volunteer">Volunteer</a>
+                            </div>
+                        </li>
                         <li class="nav-item" asp-authorize asp-policy="AdminOnly">
                             <a class="nav-link text-dark" asp-area="admin" asp-controller="Home" asp-action="Index">Admin</a>
                         </li>
                         <li class="nav-item">
                             <a class="nav-link text-dark" asp-area="" asp-controller="Home" asp-action="FAQ" asp-active-controllers="Home" asp-active-actions="FAQ">FAQ</a>
+                        </li>
+                        <li class="nav-item">
+                            <a class="nav-link text-dark" asp-area="" asp-controller="Home" asp-action="GetNotified" asp-active-controllers="Home" asp-active-actions="GetNotified">Get Notified</a>
                         </li>
                     </ul>
                 </div>
