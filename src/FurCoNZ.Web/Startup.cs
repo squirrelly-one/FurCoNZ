@@ -29,11 +29,15 @@ using Npgsql;
 using SendGrid;
 
 // Local
-using FurCoNZ.Web.Auth;using FurCoNZ.Web.Configuration;using FurCoNZ.Web.DAL;
-using FurCoNZ.Web.Options;using FurCoNZ.Web.Services;
+using FurCoNZ.Web.Auth;
+using FurCoNZ.Web.Configuration;
+using FurCoNZ.Web.DAL;
+using FurCoNZ.Web.Options;
+using FurCoNZ.Web.Services;
 
 namespace FurCoNZ.Web
-{    public class Startup
+{
+    public class Startup
     {
         private readonly ILogger _logger;
         private readonly IHostingEnvironment _env;
