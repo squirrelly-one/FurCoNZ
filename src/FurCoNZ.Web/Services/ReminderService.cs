@@ -35,7 +35,7 @@ namespace FurCoNZ.Web.Services
             _viewRenderService = viewRenderService;
         }
 
-        public async Task Send30DayRemainingPendingOrdersAsync(CancellationToken cancellationToken = default)
+        public async Task NotifyOfPendingOrderAsync(CancellationToken cancellationToken = default)
         {
             // Get the last time the reminders were sent
             var lastSend = await _dbContext.RemindersLastRuns.FindAsync(new[] { "SendUnpaidReminderForOrders" }, cancellationToken);
@@ -80,7 +80,7 @@ namespace FurCoNZ.Web.Services
 
                 // Prepare template
                 var model = new OrderExpiredNotificationViewModel();
-                var message = await _viewRenderService.RenderToStringAsync("EmailTemplate/ThirtyDayReminder", model, cancellationToken: cancellationToken);
+                var message = await _viewRenderService.RenderToStringAsync("EmailTemplate/UnpaidReminder", model, cancellationToken: cancellationToken);
 
                 // Send message
                 await _emailService.SendEmailAsync(toAddresses, subject, message, cancellationToken: cancellationToken);
@@ -93,7 +93,7 @@ namespace FurCoNZ.Web.Services
             await _dbContext.SaveChangesAsync(cancellationToken);
         }
 
-        public async Task SendCancelledOrdersAsync(CancellationToken cancellationToken = default)
+        public async Task NotifyOfCancelledOrderAsync(CancellationToken cancellationToken = default)
         {
             // Get the last time the reminders were sent
             var lastSend = await _dbContext.RemindersLastRuns.FindAsync(new[] { "SendCancelledOrders" }, cancellationToken);

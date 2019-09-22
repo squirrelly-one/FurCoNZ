@@ -1,6 +1,6 @@
 ﻿namespace FurCoNZ.Web.ViewModels
 {
-    public class ThirtyDayReminderViewModel
+    public class UnpaidReminderViewModel
     {
     }
 }

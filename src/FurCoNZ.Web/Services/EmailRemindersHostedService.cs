@@ -46,7 +46,7 @@ namespace FurCoNZ.Web.Services
             using (var serviceScope = _serviceProvider.CreateScope())
             {
                 var reminderService = serviceScope.ServiceProvider.GetRequiredService<IReminderService>();
-                Task.Run(() => reminderService.Send30DayRemainingPendingOrdersAsync()).GetAwaiter().GetResult();
+                Task.Run(() => reminderService.NotifyOfPendingOrderAsync()).GetAwaiter().GetResult();
             }
 
             _logger.LogInformation($"Completed Task: {nameof(Send30DayRemainingPendingOrders)}.");
@@ -59,7 +59,7 @@ namespace FurCoNZ.Web.Services
             using (var serviceScope = _serviceProvider.CreateScope())
             {
                 var reminderService = serviceScope.ServiceProvider.GetRequiredService<IReminderService>();
-                Task.Run(() => reminderService.SendCancelledOrdersAsync()).GetAwaiter().GetResult();
+                Task.Run(() => reminderService.NotifyOfCancelledOrderAsync()).GetAwaiter().GetResult();
             }
 
             _logger.LogInformation($"Completed Task: {nameof(SendCancelOrderNotifications)}.");
