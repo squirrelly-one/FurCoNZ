@@ -1,5 +1,6 @@
 ﻿using System;
 using Microsoft.EntityFrameworkCore.Migrations;
+using Npgsql.EntityFrameworkCore.PostgreSQL.Metadata;
 
 namespace FurCoNZ.Web.DAL.Migrations
 {
@@ -8,11 +9,23 @@ namespace FurCoNZ.Web.DAL.Migrations
         protected override void Up(MigrationBuilder migrationBuilder)
         {
             migrationBuilder.CreateTable(
+                name: "RemindersLastRuns",
+                columns: table => new
+                {
+                    ReminderService = table.Column<string>(nullable: false),
+                    LastRun = table.Column<DateTimeOffset>(nullable: false)
+                },
+                constraints: table =>
+                {
+                    table.PrimaryKey("PK_RemindersLastRuns", x => x.ReminderService);
+                });
+
+            migrationBuilder.CreateTable(
                 name: "TicketTypes",
                 columns: table => new
                 {
                     Id = table.Column<int>(nullable: false)
-                        .Annotation("Sqlite:Autoincrement", true),
+                        .Annotation("Npgsql:ValueGenerationStrategy", NpgsqlValueGenerationStrategy.SerialColumn),
                     Name = table.Column<string>(nullable: true),
                     Description = table.Column<string>(nullable: true),
                     PriceCents = table.Column<int>(nullable: false),
@@ -28,7 +41,7 @@ namespace FurCoNZ.Web.DAL.Migrations
                 columns: table => new
                 {
                     Id = table.Column<int>(nullable: false)
-                        .Annotation("Sqlite:Autoincrement", true),
+                        .Annotation("Npgsql:ValueGenerationStrategy", NpgsqlValueGenerationStrategy.SerialColumn),
                     Name = table.Column<string>(nullable: true),
                     Email = table.Column<string>(nullable: true),
                     IsAdmin = table.Column<bool>(nullable: false, defaultValue: false)
@@ -43,7 +56,7 @@ namespace FurCoNZ.Web.DAL.Migrations
                 columns: table => new
                 {
                     Id = table.Column<int>(nullable: false)
-                        .Annotation("Sqlite:Autoincrement", true),
+                        .Annotation("Npgsql:ValueGenerationStrategy", NpgsqlValueGenerationStrategy.SerialColumn),
                     Issuer = table.Column<string>(nullable: true),
                     Subject = table.Column<string>(nullable: true),
                     UserId = table.Column<int>(nullable: false)
@@ -64,8 +77,9 @@ namespace FurCoNZ.Web.DAL.Migrations
                 columns: table => new
                 {
                     Id = table.Column<int>(nullable: false)
-                        .Annotation("Sqlite:Autoincrement", true),
+                        .Annotation("Npgsql:ValueGenerationStrategy", NpgsqlValueGenerationStrategy.SerialColumn),
                     OrderedById = table.Column<int>(nullable: false),
+                    CreatedAt = table.Column<DateTimeOffset>(nullable: false),
                     AmountPaidCents = table.Column<int>(nullable: false)
                 },
                 constraints: table =>
@@ -84,7 +98,7 @@ namespace FurCoNZ.Web.DAL.Migrations
                 columns: table => new
                 {
                     Id = table.Column<int>(nullable: false)
-                        .Annotation("Sqlite:Autoincrement", true),
+                        .Annotation("Npgsql:ValueGenerationStrategy", NpgsqlValueGenerationStrategy.SerialColumn),
                     Type = table.Column<int>(nullable: false),
                     AmountCents = table.Column<int>(nullable: false),
                     When = table.Column<DateTimeOffset>(nullable: false),
@@ -128,7 +142,7 @@ namespace FurCoNZ.Web.DAL.Migrations
                 columns: table => new
                 {
                     Id = table.Column<int>(nullable: false)
-                        .Annotation("Sqlite:Autoincrement", true),
+                        .Annotation("Npgsql:ValueGenerationStrategy", NpgsqlValueGenerationStrategy.SerialColumn),
                     AttendeeAccountId = table.Column<int>(nullable: true),
                     OrderId = table.Column<int>(nullable: false),
                     TicketTypeId = table.Column<int>(nullable: false),
@@ -230,6 +244,9 @@ namespace FurCoNZ.Web.DAL.Migrations
 
             migrationBuilder.DropTable(
                 name: "OrderAudits");
+
+            migrationBuilder.DropTable(
+                name: "RemindersLastRuns");
 
             migrationBuilder.DropTable(
                 name: "StripeSessions");
