@@ -13,11 +13,13 @@ COPY *.sln .
 COPY src/FurCoNZ.Web/*.csproj ./src/FurCoNZ.Web/
 
 RUN dotnet restore
+run dotnet tool install -g Microsoft.Web.LibraryManager.Cli
 
 # copy everything else and publish
 COPY src/ ./src/
 
 RUN dotnet publish -c Release -o out
+RUN libman restore
 
 # "Front-End Build Stage" Container: "build-frontend"
 FROM node AS build-frontend
@@ -42,6 +44,7 @@ EXPOSE 80
 EXPOSE 443
 
 COPY --from=build-env /app/src/FurCoNZ.Web/out ./
+COPY --from=build-env /app/src/FurCoNZ.Web/wwwroot/lib ./
 COPY --from=build-frontend /app/src/FurCoNZ.Web/wwwroot/css/bundle* ./wwwroot/css/
 
 ENTRYPOINT ["dotnet", "FurCoNZ.Web.dll"]
