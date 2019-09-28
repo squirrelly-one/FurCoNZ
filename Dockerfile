@@ -20,6 +20,8 @@ RUN dotnet tool install -g Microsoft.Web.LibraryManager.Cli
 COPY src/ ./src/
 
 RUN dotnet publish -c Release -o out
+
+WORKDIR /app/src
 RUN libman restore
 
 # "Front-End Build Stage" Container: "build-frontend"
