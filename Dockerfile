@@ -21,7 +21,7 @@ COPY src/ ./src/
 
 RUN dotnet publish -c Release -o out
 
-WORKDIR /app/src/FurCoNZ.web/
+WORKDIR /app/src/FurCoNZ.Web
 RUN libman restore
 
 # "Front-End Build Stage" Container: "build-frontend"
