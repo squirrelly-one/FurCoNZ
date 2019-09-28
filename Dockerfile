@@ -1,7 +1,7 @@
 ﻿# Dockerfile based off samples in https://github.com/dotnet/dotnet-docker-samples
 
 # "Build Stage" Container: "build-env"
-FROM mcr.microsoft.com/dotnet/core/sdk:2.2 AS build-env
+FROM mcr.microsoft.com/dotnet/core/sdk:3.0.100 AS build-env
 
 ENV DOTNET_CLI_TELEMETRY_OPTOUT 1
 ENV DOTNET_SKIP_FIRST_TIME_EXPERIENCE 1
