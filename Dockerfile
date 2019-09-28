@@ -47,7 +47,7 @@ EXPOSE 80
 EXPOSE 443
 
 COPY --from=build-env /app/src/FurCoNZ.Web/out ./
-COPY --from=build-env /app/src/FurCoNZ.Web/wwwroot/lib ./
+COPY --from=build-env /app/src/FurCoNZ.Web/wwwroot/lib ./wwwroot/
 COPY --from=build-frontend /app/src/FurCoNZ.Web/wwwroot/css/bundle* ./wwwroot/css/
 
 ENTRYPOINT ["dotnet", "FurCoNZ.Web.dll"]
