@@ -32,6 +32,7 @@ using SendGrid;
 using FurCoNZ.Web.Auth;
 using FurCoNZ.Web.Configuration;
 using FurCoNZ.Web.DAL;
+using FurCoNZ.Web.Options;
 using FurCoNZ.Web.Services;
 
 namespace FurCoNZ.Web
@@ -169,9 +170,18 @@ namespace FurCoNZ.Web
             services.AddHttpContextAccessor();
 
             // Configure SendGrid
-            services.Configure<SendGridClientOptions>(options => Configuration.GetSection("SendGrid").Bind(options));
-            services.AddTransient<ISendGridClient, SendGridClient>();
+            services.Configure<SendGridEmailServiceOptions>(options => Configuration.GetSection("SendGrid").Bind(options));
+            services.Configure<ReminderServiceOptions>(options =>
+            {
+                options.UnpaidOrderExpiryDays = Configuration.GetValue<int>("Orders:UnpaidOrderExpiryDays");
+                options.UnpaidOrderReminderDays = Configuration.GetValue<int[]>("Orders:UnpaidOrderReminderDays");
+            });
+
+            services.AddTransient<ISendGridClient>(c => new SendGridClient(Configuration["SendGrid:ApiKey"]));
             services.AddTransient<IEmailService, SendGridEmailService>();
+            services.AddTransient<IReminderService, ReminderService>();
+            services.AddTransient<IViewRenderService, ViewRenderService>();
+            services.AddHostedService<EmailRemindersHostedService>();
 
             services.AddTransient<IUserService, EntityFrameworkUserService>();
             services.AddTransient<IOrderService, OrderService>();

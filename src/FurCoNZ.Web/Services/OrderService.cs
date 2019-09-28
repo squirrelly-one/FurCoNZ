@@ -57,6 +57,7 @@ namespace FurCoNZ.Web.Services
             var order = new Order
             {
                 OrderedById = purchasingAccount.Id,
+                CreatedAt = DateTimeOffset.Now,
                 TicketsPurchased = ticketList,
             };
             _db.Orders.Add(order);
