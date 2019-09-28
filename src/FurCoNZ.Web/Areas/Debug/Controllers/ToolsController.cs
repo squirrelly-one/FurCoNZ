@@ -55,35 +55,48 @@ namespace FurCoNZ.Web.Areas.Debug.Controllers
             if (!_hostingEnvironment.IsDevelopment()) throw new InvalidOperationException("This is not a development environment, operation is not allowed.");
             if (await _dbContext.TicketTypes.AnyAsync(cancellationToken)) throw new InvalidOperationException("Ticket Types already exist in the database.");
 
+            var localTimeSpan = new TimeSpan(13, 0, 0);
             var sampleTicketTypes = new List<TicketType>
             {
                 new TicketType
                 {
                     Name = "Super Sponsor",
                     Description = "Absolute Luxury for furs with a the cash!",
-                    PriceCents = 2000000,
+                    PriceCents = 20000000,
                     TotalAvailable = 2,
+                    SoldOutAt = new DateTimeOffset(2020, 12, 13, 17, 00, 00, localTimeSpan),
                 },
                 new TicketType
                 {
                     Name = "Sponsor",
                     Description = "Deluxe cabins and extra perks!",
-                    PriceCents = 200000,
+                    PriceCents = 2000000,
                     TotalAvailable = 20,
+                    SoldOutAt = new DateTimeOffset(2020, 12, 13, 17, 00, 00, localTimeSpan),
+                },
+                new TicketType
+                {
+                    Name = "Premium",
+                    Description = "Premium tickets for an awesomer time!",
+                    PriceCents = 200000,
+                    TotalAvailable = 200,
+                    SoldOutAt = new DateTimeOffset(2020, 02, 16, 17, 00, 00, localTimeSpan),
                 },
                 new TicketType
                 {
                     Name = "Standard",
                     Description = "Standard tickets for an awesome time!",
                     PriceCents = 20000,
-                    TotalAvailable = 200,
+                    TotalAvailable = 2000,
+                    SoldOutAt = new DateTimeOffset(2020, 02, 16, 17, 00, 00, localTimeSpan),
                 },
                 new TicketType
                 {
                     Name = "Day Pass",
                     Description = "Come along for just the day!",
                     PriceCents = 2000,
-                    TotalAvailable = 2000,
+                    TotalAvailable = 20000,
+                    SoldOutAt = new DateTimeOffset(2020, 02, 16, 17, 00, 00, localTimeSpan),
                 },
             };
 
