@@ -17,7 +17,6 @@ namespace FurCoNZ.Web.ViewModels
         [EmailAddress]
         [Display(Name = "Email Address")]
         public string EmailAddress { get; set; }
-        public bool SendTicketToOtherAccount { get; set; }
 
         [Display(Name = "Badge Name", Description = "This is the name displayed on your badge. This is typically your \"furry name\" or some other alias.")]
         public string BadgeName { get; set; }
@@ -35,7 +34,7 @@ namespace FurCoNZ.Web.ViewModels
         public string PreferredFullName { get; set; }
 
         [DataType(DataType.Date)]
-        [Display(Name = "Date of Birth")]
+        [Display(Name = "Date of Birth", Description = "Please enter this as \"yyyy-mm-dd\". That way, it's less ambiguous for our international visitors!")]
         public DateTime DateOfBirth { get; set; }
 
         // TODO: A real dietary requirements field

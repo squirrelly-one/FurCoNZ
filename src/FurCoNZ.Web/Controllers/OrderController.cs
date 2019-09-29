@@ -167,17 +167,9 @@ namespace FurCoNZ.Web.Controllers
 
                 EmailAddress = ticketViewModel.EmailAddress,
 
-                // Address
-                // Suburb
-                // CityTown
-                // Country
-
-                // PhoneNumber
-
                 // MealRequirements
                 KnownAllergens = ticketViewModel.KnownAllergies,
                 CabinGrouping = ticketViewModel.CabinPreferences,
-                // CabinNoisePreference
 
                 AdditionalNotes = ticketViewModel.OtherNotes,
             };
