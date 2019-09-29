@@ -173,8 +173,7 @@ namespace FurCoNZ.Web
             services.Configure<SendGridEmailServiceOptions>(options => Configuration.GetSection("SendGrid").Bind(options));
             services.Configure<ReminderServiceOptions>(options =>
             {
-                options.UnpaidOrderExpiryDays = Configuration.GetValue<int>("Orders:UnpaidOrderExpiryDays");
-                options.UnpaidOrderReminderDays = Configuration.GetValue<int[]>("Orders:UnpaidOrderReminderDays");
+                options.RemindUserOfUnpaidOrderEveryXDays = Configuration.GetValue<int>("Orders:RemindUserOfUnpaidOrderEveryXDays");
             });
 
             services.AddTransient<ISendGridClient>(c => new SendGridClient(Configuration["SendGrid:ApiKey"]));

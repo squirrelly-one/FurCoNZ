@@ -34,5 +34,16 @@ namespace FurCoNZ.Web.Models
         public virtual ICollection<StripeSession> StripeSessions { get; set; }
 
         public virtual ICollection<OrderAudit> Audits { get; set; }
+
+        /// <summary>
+        /// The date that the latest notification was sent informing the user that their order has not yet been paid for.
+        /// </summary>
+        public DateTimeOffset? LastReminderSent { get; set; }
+
+        /// <summary>
+        /// The date that the latest notification was sent informing the user that their order has expired.
+        /// </summary>
+        /// <remarks>Note: This does not incidate if the order has expired, only if a notification was sent to the user informing them it has.</remarks>
+        public DateTimeOffset? ExpiredNotificationSent { get; set; }
     }
 }

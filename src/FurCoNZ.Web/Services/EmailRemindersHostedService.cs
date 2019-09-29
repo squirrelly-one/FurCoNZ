@@ -27,7 +27,7 @@ namespace FurCoNZ.Web.Services
         {
             _logger.LogInformation("Email Reminders hosted service is starting.");
 
-            const int triggerHour24Hour = 9; // 9am
+            const int triggerHour24Hour = 17; // 5pm
 
             var todayTriggerTime = DateTime.Now.Date.AddHours(triggerHour24Hour); 
             var nextTriggerTime = DateTime.Now <= todayTriggerTime ? todayTriggerTime : todayTriggerTime.AddDays(1);
