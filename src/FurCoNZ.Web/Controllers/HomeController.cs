@@ -35,6 +35,16 @@ namespace FurCoNZ.Web.Controllers
         {
             return View();
         }
+        public IActionResult Terms()
+        {
+            return View();
+        }
+
+        public IActionResult ParentalConsent()
+        {
+            return View();
+        }
+
 
         public IActionResult FAQ()
         {

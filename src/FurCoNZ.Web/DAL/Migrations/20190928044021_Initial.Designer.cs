@@ -5,20 +5,23 @@ using Microsoft.EntityFrameworkCore;
 using Microsoft.EntityFrameworkCore.Infrastructure;
 using Microsoft.EntityFrameworkCore.Migrations;
 using Microsoft.EntityFrameworkCore.Storage.ValueConversion;
+using Npgsql.EntityFrameworkCore.PostgreSQL.Metadata;
 
 namespace FurCoNZ.Web.DAL.Migrations
 {
     [DbContext(typeof(FurCoNZDbContext))]
-    [Migration("20190629081357_Initial")]
+    [Migration("20190928044021_Initial")]
     partial class Initial
     {
         protected override void BuildTargetModel(ModelBuilder modelBuilder)
         {
 #pragma warning disable 612, 618
             modelBuilder
-                .HasAnnotation("ProductVersion", "2.2.4-servicing-10062");
+                .HasAnnotation("Npgsql:ValueGenerationStrategy", NpgsqlValueGenerationStrategy.SerialColumn)
+                .HasAnnotation("ProductVersion", "2.2.6-servicing-10079")
+                .HasAnnotation("Relational:MaxIdentifierLength", 63);
 
-            modelBuilder.Entity("FurCoNZ.Models.LinkedAccount", b =>
+            modelBuilder.Entity("FurCoNZ.Web.Models.LinkedAccount", b =>
                 {
                     b.Property<int>("Id")
                         .ValueGeneratedOnAdd();
@@ -38,12 +41,14 @@ namespace FurCoNZ.Web.DAL.Migrations
                     b.ToTable("LinkedAccounts");
                 });
 
-            modelBuilder.Entity("FurCoNZ.Models.Order", b =>
+            modelBuilder.Entity("FurCoNZ.Web.Models.Order", b =>
                 {
                     b.Property<int>("Id")
                         .ValueGeneratedOnAdd();
 
                     b.Property<int>("AmountPaidCents");
+
+                    b.Property<DateTimeOffset>("CreatedAt");
 
                     b.Property<int>("OrderedById");
 
@@ -54,7 +59,7 @@ namespace FurCoNZ.Web.DAL.Migrations
                     b.ToTable("Orders");
                 });
 
-            modelBuilder.Entity("FurCoNZ.Models.OrderAudit", b =>
+            modelBuilder.Entity("FurCoNZ.Web.Models.OrderAudit", b =>
                 {
                     b.Property<int>("Id")
                         .ValueGeneratedOnAdd();
@@ -82,7 +87,19 @@ namespace FurCoNZ.Web.DAL.Migrations
                     b.ToTable("OrderAudits");
                 });
 
-            modelBuilder.Entity("FurCoNZ.Models.StripeSession", b =>
+            modelBuilder.Entity("FurCoNZ.Web.Models.RemindersLastRun", b =>
+                {
+                    b.Property<string>("ReminderService")
+                        .ValueGeneratedOnAdd();
+
+                    b.Property<DateTimeOffset>("LastRun");
+
+                    b.HasKey("ReminderService");
+
+                    b.ToTable("RemindersLastRuns");
+                });
+
+            modelBuilder.Entity("FurCoNZ.Web.Models.StripeSession", b =>
                 {
                     b.Property<string>("Id");
 
@@ -101,7 +118,7 @@ namespace FurCoNZ.Web.DAL.Migrations
                     b.ToTable("StripeSessions");
                 });
 
-            modelBuilder.Entity("FurCoNZ.Models.Ticket", b =>
+            modelBuilder.Entity("FurCoNZ.Web.Models.Ticket", b =>
                 {
                     b.Property<int>("Id")
                         .ValueGeneratedOnAdd();
@@ -155,7 +172,7 @@ namespace FurCoNZ.Web.DAL.Migrations
                     b.ToTable("Tickets");
                 });
 
-            modelBuilder.Entity("FurCoNZ.Models.TicketType", b =>
+            modelBuilder.Entity("FurCoNZ.Web.Models.TicketType", b =>
                 {
                     b.Property<int>("Id")
                         .ValueGeneratedOnAdd();
@@ -173,7 +190,7 @@ namespace FurCoNZ.Web.DAL.Migrations
                     b.ToTable("TicketTypes");
                 });
 
-            modelBuilder.Entity("FurCoNZ.Models.User", b =>
+            modelBuilder.Entity("FurCoNZ.Web.Models.User", b =>
                 {
                     b.Property<int>("Id")
                         .ValueGeneratedOnAdd();
@@ -191,50 +208,50 @@ namespace FurCoNZ.Web.DAL.Migrations
                     b.ToTable("Users");
                 });
 
-            modelBuilder.Entity("FurCoNZ.Models.LinkedAccount", b =>
+            modelBuilder.Entity("FurCoNZ.Web.Models.LinkedAccount", b =>
                 {
-                    b.HasOne("FurCoNZ.Models.User", "User")
+                    b.HasOne("FurCoNZ.Web.Models.User", "User")
                         .WithMany("LinkedAccounts")
                         .HasForeignKey("UserId")
                         .OnDelete(DeleteBehavior.Cascade);
                 });
 
-            modelBuilder.Entity("FurCoNZ.Models.Order", b =>
+            modelBuilder.Entity("FurCoNZ.Web.Models.Order", b =>
                 {
-                    b.HasOne("FurCoNZ.Models.User", "OrderedBy")
+                    b.HasOne("FurCoNZ.Web.Models.User", "OrderedBy")
                         .WithMany()
                         .HasForeignKey("OrderedById")
                         .OnDelete(DeleteBehavior.Cascade);
                 });
 
-            modelBuilder.Entity("FurCoNZ.Models.OrderAudit", b =>
+            modelBuilder.Entity("FurCoNZ.Web.Models.OrderAudit", b =>
                 {
-                    b.HasOne("FurCoNZ.Models.Order", "Order")
+                    b.HasOne("FurCoNZ.Web.Models.Order", "Order")
                         .WithMany("Audits")
                         .HasForeignKey("OrderId")
                         .OnDelete(DeleteBehavior.Cascade);
                 });
 
-            modelBuilder.Entity("FurCoNZ.Models.StripeSession", b =>
+            modelBuilder.Entity("FurCoNZ.Web.Models.StripeSession", b =>
                 {
-                    b.HasOne("FurCoNZ.Models.Order", "Order")
+                    b.HasOne("FurCoNZ.Web.Models.Order", "Order")
                         .WithMany("StripeSessions")
                         .HasForeignKey("OrderId")
                         .OnDelete(DeleteBehavior.Cascade);
                 });
 
-            modelBuilder.Entity("FurCoNZ.Models.Ticket", b =>
+            modelBuilder.Entity("FurCoNZ.Web.Models.Ticket", b =>
                 {
-                    b.HasOne("FurCoNZ.Models.User", "AttendeeAccount")
+                    b.HasOne("FurCoNZ.Web.Models.User", "AttendeeAccount")
                         .WithMany()
                         .HasForeignKey("AttendeeAccountId");
 
-                    b.HasOne("FurCoNZ.Models.Order", "Order")
+                    b.HasOne("FurCoNZ.Web.Models.Order", "Order")
                         .WithMany("TicketsPurchased")
                         .HasForeignKey("OrderId")
                         .OnDelete(DeleteBehavior.Cascade);
 
-                    b.HasOne("FurCoNZ.Models.TicketType", "TicketType")
+                    b.HasOne("FurCoNZ.Web.Models.TicketType", "TicketType")
                         .WithMany()
                         .HasForeignKey("TicketTypeId")
                         .OnDelete(DeleteBehavior.Cascade);
