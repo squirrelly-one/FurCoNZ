@@ -52,10 +52,12 @@ body {
   min-height: calc(100vh - 60px);
   
   background-image: url('/assets/blackgoldsmall.jpg');
+  background-attachment: fixed;
   
   &:before {
+    z-index: -1;
     content: '';
-    position: absolute;
+    position: fixed;
     width: 100vw;
     height: 100vh;
 
@@ -67,6 +69,18 @@ body {
         rgba(0,0,0, 1) calc(100% - 60px)
       );
   }
+  &:after {
+    content: '';
+    position: absolute;
+    z-index: -1;
+    top: 63px;
+    width: 100vw;
+    height: 360px;
+    background-image: url('/assets/goldmediumslowfall.gif');
+    background-size: 360px;
+    background-repeat: repeat-x;
+    background-attachment: fixed;
+  }
 
 }
 .footer {
@@ -76,11 +90,52 @@ body {
   white-space: nowrap;
   /* Set the fixed height of the footer here */
   height: 60px;
-  line-height: 60px; /* Vertically center the text there */
 }
 
 .container {
-  background-color: $black;
+  background-color: rgba(0,0,0, .7);
+}
+
+.navbar {
+  font-size: 1.4em; 
+}
+
+.navbar.bg-dark {
+  border-width: 0;
+  border-bottom-width: 1px;
+}
+
+.navbar-brand {
+  position: relative;
+}
+
+.navbar-brand-image {
+  position: absolute;
+  top: -17px;
+  left: -49px;
+  width: 150px;
+}
+
+.nav-link.dropdown-toggle {
+  color: $primary;
+}
+
+.main-container {
+  border: 1px solid $primary;
+  border-bottom: none;
+  padding: 3rem 0;
+  min-height: calc(100vh - 130px);
+}
+.footer-container {
+  border: 1px solid $primary;
+  border-top: none;
+  padding: 1em 0;
+  white-space: initial;
+}
+
+h1, .h1 {
+  @extend .shimmer;
+  font-size: 3rem;
 }
 
 h2 {

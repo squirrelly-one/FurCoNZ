@@ -9,65 +9,79 @@
 </head>
 <body>
     <header>
-        <nav class="navbar navbar-expand-sm navbar-toggleable-sm navbar-primary box-shadow mb-3">
+        <nav class="navbar navbar-expand-sm navbar-toggleable-sm navbar-primary box-shadow mb-3 navbar-dark bg-dark">
             <div class="container">
-                <a class="navbar-brand" asp-area="" asp-controller="Home" asp-action="Index">FurCoNZ</a>
+                <a class="navbar-brand" asp-area="" asp-controller="Home" asp-action="Index">
+                    FurCoNZ
+                    <img class="d-none d-lg-block navbar-brand-image" src="/assets/2020FlavourSmalldrop.png" alt="" />
+                </a>
                 <button class="navbar-toggler" type="button" data-toggle="collapse" data-target=".navbar-collapse" aria-controls="navbarSupportedContent"
                         aria-expanded="false" aria-label="Toggle navigation">
                     <span class="navbar-toggler-icon"></span>
                 </button>
-                <div class="navbar-collapse collapse d-sm-inline-flex flex-sm-row-reverse">
-                    <ul class="navbar-nav flex-grow-1">
+                <div class="navbar-collapse collapse">
+                    <ul class="navbar-nav mr-auto">
                         <li class="nav-item">
                             <a class="nav-link text-dark" asp-area="" asp-controller="Home" asp-action="Index" asp-active-controllers="Home" asp-active-actions="Index">Home</a>
                         </li>
                         <li class="nav-item">
                             <a class="nav-link text-dark" asp-area="" asp-controller="Home" asp-action="News" asp-active-controllers="Home" asp-active-actions="News">News</a>
                         </li>
-                        <li class="nav-item">
-                            <a class="nav-link text-dark" asp-area="" asp-controller="Home" asp-action="About" asp-active-controllers="Home" asp-active-actions="About">About</a>
+                        <li class="nav-item dropdown">
+                            <!-- <a class="nav-link text-dark" asp-area="" asp-controller="Home" asp-action="About" asp-active-controllers="Home" asp-active-actions="About">About</a> -->
+                            <a class="nav-link dropdown-toggle" role="button" data-toggle="dropdown" href="#" aria-haspopup="true" aria-expanded="false">Info</a>
+                            <div class="dropdown-menu">
+                                <a class="dropdown-item" asp-area="" asp-controller="Home" asp-action="About" asp-active-controllers="Home" asp-active-actions="About">About FurCoNZ</a>
+                                <a class="dropdown-item" asp-area="" asp-controller="Home" asp-action="FAQ" asp-active-controllers="Home" asp-active-actions="FAQ">FurCoNZ 2020 FAQ</a>
+                                <a class="dropdown-item" asp-area="" asp-controller="Home" asp-action="Terms" asp-active-controllers="Home" asp-active-actions="Terms">Attendee Terms & Conditions</a>
+                            </div>
                         </li>
+
+                        <li class="nav-item dropdown">
+                            <a class="nav-link dropdown-toggle" role="button" data-toggle="dropdown" href="#" asp-active-controllers="Contact" aria-haspopup="true" aria-expanded="false">Get Involved</a>
+                            <div class="dropdown-menu">
+                                <a class="dropdown-item" asp-area="" asp-controller="Contact" asp-action="ActivityOrTalk">Activity or Talk</a>
+                                <a class="dropdown-item" asp-area="" asp-controller="Contact" asp-action="DealersDen">Dealers' Den</a>
+                                <a class="dropdown-item" asp-area="" asp-controller="Contact" asp-action="Volunteer">Volunteer</a>
+                                <div class="dropdown-divider"></div>
+                                <a class="dropdown-item" asp-area="" asp-controller="Contact" asp-action="Index">Contact Us</a>
+                            </div>
+                        </li>
+                        <li class="nav-item" asp-authorize asp-policy="AdminOnly">
+                            <a class="nav-link text-dark" asp-area="admin" asp-controller="Home" asp-action="Index">Admin</a>
+                        </li>
+                    </ul>
+                    <ul class="navbar-nav">
                         <li class="nav-item">
                             <a class="nav-link text-dark" asp-area="" asp-controller="Account" asp-action="Index" asp-active-controllers="Account">Account</a>
                         </li>
                         <li class="nav-item">
                             <a class="nav-link text-dark" asp-area="" asp-controller="Order" asp-action="Index" asp-active-controllers="Order">Order</a>
                         </li>
-                        <li class="nav-item dropdown">
-                            <a class="nav-link dropdown-toggle" role="button" data-toggle="dropdown" href="#" asp-active-controllers="Contact" aria-haspopup="true" aria-expanded="false">Contact</a>
-                            <div class="dropdown-menu">
-                                <a class="dropdown-item" asp-area="" asp-controller="Contact" asp-action="ActivityOrTalk">Activity Or Talk</a>
-                                <a class="dropdown-item" asp-area="" asp-controller="Contact" asp-action="Index">Contact Us</a>
-                                <a class="dropdown-item" asp-area="" asp-controller="Contact" asp-action="DealersDen">Dealers' Den</a>
-                                <a class="dropdown-item" asp-area="" asp-controller="Contact" asp-action="Volunteer">Volunteer</a>
-                            </div>
-                        </li>
-                        <li class="nav-item" asp-authorize asp-policy="AdminOnly">
-                            <a class="nav-link text-dark" asp-area="admin" asp-controller="Home" asp-action="Index">Admin</a>
-                        </li>
-                        <li class="nav-item">
-                            <a class="nav-link text-dark" asp-area="" asp-controller="Home" asp-action="FAQ" asp-active-controllers="Home" asp-active-actions="FAQ">FAQ</a>
-                        </li>
-                        <li class="nav-item">
-                            <a class="nav-link text-dark" asp-area="" asp-controller="Home" asp-action="Terms" asp-active-controllers="Home" asp-active-actions="Terms">Terms & Conditions</a>
-                        </li>
                     </ul>
                 </div>
             </div> 
         </nav>
     </header>
-    <div class="container">
+    <div class="container main-container">
         <partial name="_CookieConsentPartial" />
         <main role="main" class="pb-3">
-            @RenderBody()
+            <div class="page-header">
+                <div class="col-lg-8 offset-lg-2">
+                    @RenderBody()
+                </div>
+            </div>
         </main>
     </div>
 
     <footer class="footer text-muted">
-        <div class="container">
+        <div class="container footer-container text-center">
             © 2019 FurCoNZ
             - <a asp-area="" asp-controller="Home" asp-action="Privacy">Privacy</a>
+            - <a asp-area="" asp-controller="Home" asp-action="FAQ">FAQ</a>
+            - <a asp-area="" asp-controller="Home" asp-action="Terms">Terms & Conditions</a>
             - <a asp-area="" asp-controller="Home" asp-action="GetNotified">Get Notified</a>
+            - <a asp-area="" asp-controller="Home" asp-action="Contact">Contact</a>
         </div>
     </footer>
 

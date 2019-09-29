@@ -2,28 +2,22 @@
     ViewData["Title"] = "";
 }
 
-<div class="page-header" id="banner">
-  <div class="row">
-    <div class="col-lg-8 col-md-7 col-sm-6">
-      <h1>FurCoNZ 2020</h1>
-      <p class="lead">January 30th – February 2nd</p>
-      <p class="lead">Forest Lakes, Ōtaki, New Zealand</p>
-      
-      <p>
-        FurCoNZ is New Zealand’s furry convention held in the summer in NZ!
-      </p>
-      <p>
-        Join us for fun in the sun at a campground across New Zealand for fursuiting, acitivites, and dancing!
-      </p>
+<h1>FurCoNZ 2020</h1>
+<p class="lead">January 30th – February 2nd</p>
+<p class="lead">Forest Lakes, Ōtaki, New Zealand</p>
 
-      @*Include the News view*@
-      <partial name="News" />
+<p>
+  FurCoNZ is New Zealand’s furry convention held in the summer in NZ!
+</p>
+<p>
+  Join us for fun in the sun at a campground across New Zealand for fursuiting, acitivites, and dancing!
+</p>
 
-      @*Include the contact information view*@
-      <partial name="../Contact/Index" />
+@*Include the News view*@
+<partial name="News" />
 
-      @*Include the subscription form view*@
-      <partial name="GetNotified" />
-    </div>
-  </div>
-</div>
+@*Include the contact information view*@
+<partial name="../Contact/Index" />
+
+@*Include the subscription form view*@
+<partial name="GetNotified" />
