@@ -54,5 +54,6 @@ jobs:
       sshEndpoint: furconz-testing
       runOptions: inline
       inline: docker-compose --project-directory /opt/furconz/ -f /opt/furconz/docker-compose.yml up -d web-test
+      failOnStdErr: false
 
 
