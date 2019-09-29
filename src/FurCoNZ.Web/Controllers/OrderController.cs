@@ -58,7 +58,7 @@ namespace FurCoNZ.Web.Controllers
             if (ModelState.IsValid)
             {
                 var viewModel = new List<TicketDetailViewModel>();
-                var ticketTypes = await _orderService.GetTicketTypesAsync(false, cancellationToken);
+                var ticketTypes = await _orderService.GetTicketTypesAsync(false, false, cancellationToken);
 
                 var ticketIndex = 0;
                 foreach (var ticketTypeOrdered in orderIndexViewModel.AvailableTicketTypes.Where(x => x.Value.QuantityOrdered > 0))
@@ -138,7 +138,7 @@ namespace FurCoNZ.Web.Controllers
                         tickets.Add(GetTicketEntityFromViewModel(ticketViewModel));
                     }
 
-                    var order = await _orderService.CreateOrderAsync(user, tickets, cancellationToken);
+                    var order = await _orderService.CreateOrderAsync(user, tickets, cancellationToken: cancellationToken);
 
                     return RedirectToAction("Index", "Checkout", new { orderId = order.Id });
                 }
