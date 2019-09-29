@@ -43,11 +43,31 @@ button.accept-policy {
 html {
   position: relative;
   min-height: 100%;
+
 }
 
 body {
   /* Margin bottom by footer height */
   margin-bottom: 60px;
+  min-height: calc(100vh - 60px);
+  
+  background-image: url('/assets/blackgoldsmall.jpg');
+  
+  &:before {
+    content: '';
+    position: absolute;
+    width: 100vw;
+    height: 100vh;
+
+    background:
+      linear-gradient(
+        180deg,
+        rgba(0,0,0, 0) -5px,
+
+        rgba(0,0,0, 1) calc(100% - 60px)
+      );
+  }
+
 }
 .footer {
   position: absolute;
@@ -59,6 +79,11 @@ body {
   line-height: 60px; /* Vertically center the text there */
 }
 
+.container {
+  background-color: $black;
+}
+
 h2 {
   color: #fff;
+  font-size: 2rem;
 }
