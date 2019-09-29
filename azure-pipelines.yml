@@ -35,6 +35,8 @@ jobs:
 
 - job: deploy
   displayName: Deploy Test Site
+  dependsOn: 
+  - build
   variables:
     dockerId: nzfurs
     imageName: 'furconz'
