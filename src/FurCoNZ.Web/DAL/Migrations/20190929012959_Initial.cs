@@ -9,18 +9,6 @@ namespace FurCoNZ.Web.DAL.Migrations
         protected override void Up(MigrationBuilder migrationBuilder)
         {
             migrationBuilder.CreateTable(
-                name: "RemindersLastRuns",
-                columns: table => new
-                {
-                    ReminderService = table.Column<string>(nullable: false),
-                    LastRun = table.Column<DateTimeOffset>(nullable: false)
-                },
-                constraints: table =>
-                {
-                    table.PrimaryKey("PK_RemindersLastRuns", x => x.ReminderService);
-                });
-
-            migrationBuilder.CreateTable(
                 name: "TicketTypes",
                 columns: table => new
                 {
@@ -29,7 +17,8 @@ namespace FurCoNZ.Web.DAL.Migrations
                     Name = table.Column<string>(nullable: true),
                     Description = table.Column<string>(nullable: true),
                     PriceCents = table.Column<int>(nullable: false),
-                    TotalAvailable = table.Column<int>(nullable: false)
+                    TotalAvailable = table.Column<int>(nullable: false),
+                    SoldOutAt = table.Column<DateTimeOffset>(nullable: false)
                 },
                 constraints: table =>
                 {
@@ -80,7 +69,9 @@ namespace FurCoNZ.Web.DAL.Migrations
                         .Annotation("Npgsql:ValueGenerationStrategy", NpgsqlValueGenerationStrategy.SerialColumn),
                     OrderedById = table.Column<int>(nullable: false),
                     CreatedAt = table.Column<DateTimeOffset>(nullable: false),
-                    AmountPaidCents = table.Column<int>(nullable: false)
+                    AmountPaidCents = table.Column<int>(nullable: false),
+                    LastReminderSent = table.Column<DateTimeOffset>(nullable: true),
+                    ExpiredNotificationSent = table.Column<DateTimeOffset>(nullable: true)
                 },
                 constraints: table =>
                 {
@@ -244,9 +235,6 @@ namespace FurCoNZ.Web.DAL.Migrations
 
             migrationBuilder.DropTable(
                 name: "OrderAudits");
-
-            migrationBuilder.DropTable(
-                name: "RemindersLastRuns");
 
             migrationBuilder.DropTable(
                 name: "StripeSessions");
