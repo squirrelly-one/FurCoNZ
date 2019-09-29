@@ -9,8 +9,8 @@ namespace FurCoNZ.Web.Services
     public interface IOrderService
     {
         Task AddReceivedFundsForOrderAsync(int orderId, int amountCents, string paymentProvider, string paymentReference, DateTimeOffset when, CancellationToken cancellationToken = default);
-        Task<Order> CreateOrderAsync(User purchasingAccount, IEnumerable<Ticket> ticketsInBasket, CancellationToken cancellationToken = default);
-        Task<IEnumerable<TicketType>> GetTicketTypesAsync(bool IncludeUnavailableTickets = true, CancellationToken cancellationToken = default);
+        Task<Order> CreateOrderAsync(User purchasingAccount, IEnumerable<Ticket> ticketsInBasket, bool allowOrderingHiddenTickets = false, CancellationToken cancellationToken = default);
+        Task<IEnumerable<TicketType>> GetTicketTypesAsync(bool includeUnavailableTickets = true, bool includeHiddenTickets = false, CancellationToken cancellationToken = default);
         Task<Order> GetUserOrderAsync(User user, int orderId, CancellationToken cancellationToken = default);
         Task<IEnumerable<Order>> GetAllOrdersAsync(CancellationToken cancellationToken = default);
         Task<IEnumerable<Order>> GetUserOrdersAsync(User user, CancellationToken cancellationToken = default);

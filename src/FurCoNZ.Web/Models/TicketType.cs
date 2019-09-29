@@ -9,5 +9,6 @@ namespace FurCoNZ.Web.Models
         public int PriceCents { get; set; }
         public int TotalAvailable { get; set; }
         public DateTimeOffset SoldOutAt { get; set; }
+        public bool HiddenFromPublic { get; set; }
     }
 }

@@ -21,7 +21,7 @@ namespace FurCoNZ.Web.Services
             _db = db;
         }
 
-        public async Task<Order> CreateOrderAsync(User purchasingAccount, IEnumerable<Ticket> ticketsInBasket, CancellationToken cancellationToken = default)
+        public async Task<Order> CreateOrderAsync(User purchasingAccount, IEnumerable<Ticket> ticketsInBasket, bool allowOrderingHiddenTickets = false, CancellationToken cancellationToken = default)
         {
             if (purchasingAccount == null)
                 throw new ArgumentNullException(nameof(purchasingAccount), "Must supply a user when creating an order");
@@ -40,6 +40,11 @@ namespace FurCoNZ.Web.Services
             {
                 var ticketsOfTypeAvailable = ticketType.TotalAvailable;
                 var ticketsOfTypeOrdered = ticketList.Count(t => t.TicketTypeId == ticketType.Id);
+
+                if (!allowOrderingHiddenTickets && ticketType.HiddenFromPublic)
+                {
+                    throw new InvalidOperationException($"{ticketType.Name} tickets require special permission to be ordered.");
+                }
 
                 if (ticketsOfTypeOrdered > ticketsOfTypeAvailable)
                 {
@@ -68,20 +73,25 @@ namespace FurCoNZ.Web.Services
             _db.Orders.Add(order);
 
             // Commit to DB
-            await _db.SaveChangesAsync();
+            await _db.SaveChangesAsync(cancellationToken);
 
             return order;
         }
 
-        public async Task<IEnumerable<TicketType>> GetTicketTypesAsync(bool IncludeUnavailableTickets = true, CancellationToken cancellationToken = default)
+        public async Task<IEnumerable<TicketType>> GetTicketTypesAsync(bool includeUnavailableTickets = true, bool includeHiddenTickets = false, CancellationToken cancellationToken = default)
         {
             cancellationToken.ThrowIfCancellationRequested();
 
             var query = _db.TicketTypes.OrderByDescending(tt => tt.PriceCents);
 
-            if (!IncludeUnavailableTickets)
+            if (!includeUnavailableTickets)
             {
                 query.Where(tt => tt.TotalAvailable > 0 && tt.SoldOutAt > DateTimeOffset.Now);
+            }
+
+            if (!includeHiddenTickets)
+            {
+                query.Where(tt => !tt.HiddenFromPublic);
             }
 
             return await query.ToListAsync(cancellationToken);
