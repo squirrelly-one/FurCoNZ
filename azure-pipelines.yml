@@ -41,7 +41,7 @@ jobs:
     dockerId: nzfurs
     imageName: 'furconz'
     isPullRequest: eq(variables['Build.Reason'], 'PullRequest')
-  condition: ${{ variables.isPullRequest }}
+  condition: and(not(${{ variables.isPullRequest }}), not(in(variables['Build.SourceBranch'], 'refs/heads/release')))
   steps:
   - checkout: none #skip checking out the default repository resource
   - task: SSH@0
