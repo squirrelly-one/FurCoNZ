@@ -10,7 +10,7 @@ using Npgsql.EntityFrameworkCore.PostgreSQL.Metadata;
 namespace FurCoNZ.Web.DAL.Migrations
 {
     [DbContext(typeof(FurCoNZDbContext))]
-    [Migration("20190928044021_Initial")]
+    [Migration("20190929012959_Initial")]
     partial class Initial
     {
         protected override void BuildTargetModel(ModelBuilder modelBuilder)
@@ -50,6 +50,10 @@ namespace FurCoNZ.Web.DAL.Migrations
 
                     b.Property<DateTimeOffset>("CreatedAt");
 
+                    b.Property<DateTimeOffset?>("ExpiredNotificationSent");
+
+                    b.Property<DateTimeOffset?>("LastReminderSent");
+
                     b.Property<int>("OrderedById");
 
                     b.HasKey("Id");
@@ -85,18 +89,6 @@ namespace FurCoNZ.Web.DAL.Migrations
                     b.HasIndex("PaymentProvider", "PaymentProviderReference");
 
                     b.ToTable("OrderAudits");
-                });
-
-            modelBuilder.Entity("FurCoNZ.Web.Models.RemindersLastRun", b =>
-                {
-                    b.Property<string>("ReminderService")
-                        .ValueGeneratedOnAdd();
-
-                    b.Property<DateTimeOffset>("LastRun");
-
-                    b.HasKey("ReminderService");
-
-                    b.ToTable("RemindersLastRuns");
                 });
 
             modelBuilder.Entity("FurCoNZ.Web.Models.StripeSession", b =>
@@ -182,6 +174,8 @@ namespace FurCoNZ.Web.DAL.Migrations
                     b.Property<string>("Name");
 
                     b.Property<int>("PriceCents");
+
+                    b.Property<DateTimeOffset>("SoldOutAt");
 
                     b.Property<int>("TotalAvailable");
 

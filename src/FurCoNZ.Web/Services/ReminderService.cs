@@ -37,116 +37,91 @@ namespace FurCoNZ.Web.Services
 
         public async Task NotifyOfPendingOrderAsync(CancellationToken cancellationToken = default)
         {
-            // Get the last time the reminders were sent
-            var lastSend = await _dbContext.RemindersLastRuns.FindAsync(new[] { "SendUnpaidReminderForOrders" }, cancellationToken);
-            if (lastSend == null)
-            {
-                lastSend = new Models.RemindersLastRun
-                {
-                    ReminderService = "SendUnpaidReminderForOrders",
-                    LastRun = DateTimeOffset.MinValue,
-                };
-                _dbContext.RemindersLastRuns.Add(lastSend);
-            }
-            var lastRun = lastSend.LastRun;
             var currentRun = DateTimeOffset.Now;
 
             // Get the orders that we will send reminders for
             // TODO: Support multiple reminders before expiry
-            var expiredOrdersSinceLastSend = await _dbContext.Orders.AsNoTracking()
+            var unpaidOrdersDueForReminder = await _dbContext.Orders.AsNoTracking()
                 .Where(o =>
                     !o.Audits.Any() && // No payments have been made
-                    o.CreatedAt.AddDays(_options.UnpaidOrderReminderDays.First()) <= currentRun && // Order has expired
-                    o.CreatedAt.AddDays(_options.UnpaidOrderReminderDays.First()) >= lastRun // Reminder has not been sent
+                    o.TicketsPurchased.Min(t => t.TicketType.SoldOutAt) >= currentRun && // Order has not yet expired
+                    EF.Functions.DateDiffDay(currentRun, o.LastReminderSent.GetValueOrDefault(o.CreatedAt)) >= _options.RemindUserOfUnpaidOrderEveryXDays // Last notification was >= 14 days ago OR no notification has been sent AND >= 14 days since the order was created
                 )
-                .Select(o => new
+                .Select(o => new UnpaidReminderViewModel
                 {
-                    o.Id,
-                    o.CreatedAt,
-                    o.OrderedBy.Name,
-                    o.OrderedBy.Email
+                    Id = o.Id,
+                    CreatedAt = o.CreatedAt,
+                    Name = o.OrderedBy.Name,
+                    Email = o.OrderedBy.Email,
+                    ExpiresAt = o.TicketsPurchased.Min(t => t.TicketType.SoldOutAt),
                 })
                 .ToListAsync(cancellationToken);
 
             // Send emails for each order
-            foreach (var order in expiredOrdersSinceLastSend)
+            foreach (var viewModel in unpaidOrdersDueForReminder)
             {
                 // Gather metadata
                 var toAddresses = new MailAddressCollection
                 {
-                    new MailAddress (order.Email, order.Name),
+                    new MailAddress (viewModel.Email, viewModel.Name),
                 };
-                var subject = $"Order #{order.Id} has expired";
+                var subject = $"Order #{viewModel.Id} is still pending payment";
 
                 // Prepare template
-                var model = new OrderExpiredNotificationViewModel();
-                var message = await _viewRenderService.RenderToStringAsync("EmailTemplate/UnpaidReminder", model, cancellationToken: cancellationToken);
+                var message = await _viewRenderService.RenderToStringAsync("EmailTemplate/UnpaidReminder", viewModel, cancellationToken: cancellationToken);
 
                 // Send message
                 await _emailService.SendEmailAsync(toAddresses, subject, message, cancellationToken: cancellationToken);
+
+                // Update last run time so we don't resend messages
+                (await _dbContext.Orders.FirstAsync(o => o.Id == viewModel.Id, cancellationToken)).LastReminderSent = currentRun;
             }
 
-            // Update last run time so we don't resend messages
-            // TODO: Track individual reminders against orders so we don't resend all if one message in a batch is faulty
-            lastSend.LastRun = currentRun;
-
+            // Save last run times
             await _dbContext.SaveChangesAsync(cancellationToken);
         }
 
         public async Task NotifyOfCancelledOrderAsync(CancellationToken cancellationToken = default)
         {
-            // Get the last time the reminders were sent
-            var lastSend = await _dbContext.RemindersLastRuns.FindAsync(new[] { "SendCancelledOrders" }, cancellationToken);
-            if (lastSend == null)
-            {
-                lastSend = new Models.RemindersLastRun
-                {
-                    ReminderService = "SendCancelledOrders",
-                    LastRun = DateTimeOffset.MinValue,
-                };
-                _dbContext.RemindersLastRuns.Add(lastSend);
-            }
-            var lastRun = lastSend.LastRun;
             var currentRun = DateTimeOffset.Now;
 
             // Get the orders that we will send reminders for
             var expiredOrdersSinceLastSend = await _dbContext.Orders.AsNoTracking()
                 .Where(o =>
                     !o.Audits.Any() && // No payments have been made
-                    o.CreatedAt.AddDays(_options.UnpaidOrderExpiryDays) <= currentRun && // Order has expired
-                    o.CreatedAt.AddDays(_options.UnpaidOrderExpiryDays) >= lastRun // Reminder has not been sent
+                    o.TicketsPurchased.Min(t => t.TicketType.SoldOutAt) <= currentRun && // Order has expired
+                    o.ExpiredNotificationSent != null // Reminder has not been sent
                 )
-                .Select(o => new
+                .Select(o => new OrderExpiredNotificationViewModel
                 {
-                    o.Id,
-                    o.CreatedAt,
-                    o.OrderedBy.Name,
-                    o.OrderedBy.Email
+                    Id = o.Id,
+                    CreatedAt = o.CreatedAt,
+                    Name = o.OrderedBy.Name,
+                    Email = o.OrderedBy.Email,
                 })
                 .ToListAsync(cancellationToken);
 
             // Send emails for each order
-            foreach (var order in expiredOrdersSinceLastSend)
+            foreach (var viewModel in expiredOrdersSinceLastSend)
             {
                 // Gather metadata
                 var toAddresses = new MailAddressCollection
                 {
-                    new MailAddress (order.Email, order.Name),
+                    new MailAddress (viewModel.Email, viewModel.Name),
                 };
-                var subject = $"Order #{order.Id} has expired";
+                var subject = $"Order #{viewModel.Id} has expired";
 
                 // Prepare template
-                var model = new OrderExpiredNotificationViewModel();
-                var message = await _viewRenderService.RenderToStringAsync("EmailTemplate/ExpiredOrder", model, cancellationToken: cancellationToken);
+                var message = await _viewRenderService.RenderToStringAsync("EmailTemplate/ExpiredOrder", viewModel, cancellationToken: cancellationToken);
 
                 // Send message
                 await _emailService.SendEmailAsync(toAddresses, subject, message, cancellationToken: cancellationToken);
+
+                // Update last run time so we don't resend messages
+                (await _dbContext.Orders.FirstAsync(o => o.Id == viewModel.Id, cancellationToken)).LastReminderSent = currentRun;
             }
 
-            // Update last run time so we don't resend messages
-            // TODO: Track individual reminders against orders so we don't resend all if one message in a batch is faulty
-            lastSend.LastRun = currentRun;
-
+            // Save last run times
             await _dbContext.SaveChangesAsync(cancellationToken);
         }
     }
