@@ -43,6 +43,7 @@ jobs:
     isPullRequest: eq(variables['Build.Reason'], 'PullRequest')
   condition: ${{ variables.isPullRequest }}
   steps:
+  - checkout: none #skip checking out the default repository resource
   - task: SSH@0
     inputs:
       sshEndpoint: furconz-testing
