@@ -47,9 +47,12 @@ jobs:
   - task: SSH@0
     inputs:
       sshEndpoint: furconz-testing
-      runOptions: Commands
-      commands: |
-        docker pull nzfurs/furconz:latest
-        docker-compose --project-directory /opt/furconz/ up -d web-test
+      runOptions: inline
+      inline: docker pull nzfurs/furconz:latest
+  - task: SSH@0
+    inputs:
+      sshEndpoint: furconz-testing
+      runOptions: inline
+      inline: docker-compose --project-directory /opt/furconz/ -f /opt/furconz/docker-compose.yml up -d web-test
 
 
