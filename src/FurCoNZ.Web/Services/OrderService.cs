@@ -46,6 +46,11 @@ namespace FurCoNZ.Web.Services
                     throw new InvalidOperationException($"There are not enough {ticketType.Name} tickets available for this order to be created.");
                 }
 
+                if (ticketType.SoldOutAt <= DateTimeOffset.Now)
+                {
+                    throw new InvalidOperationException($"The cut-off date for {ticketType.Name} ticket has passed. They are no longer available for purchase.");
+                }
+
                 // Remove the appropriate number of tickets from the available pool
                 ticketType.TotalAvailable -= ticketsOfTypeOrdered;
             }
@@ -76,7 +81,7 @@ namespace FurCoNZ.Web.Services
 
             if (!IncludeUnavailableTickets)
             {
-                query.Where(tt => tt.TotalAvailable > 0);
+                query.Where(tt => tt.TotalAvailable > 0 && tt.SoldOutAt > DateTimeOffset.Now);
             }
 
             return await query.ToListAsync(cancellationToken);
