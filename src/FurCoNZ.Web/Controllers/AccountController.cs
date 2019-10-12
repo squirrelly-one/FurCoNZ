@@ -12,6 +12,8 @@ using FurCoNZ.Web.Helpers;
 using FurCoNZ.Web.Services;
 using FurCoNZ.Web.Models;
 using FurCoNZ.Web.ViewModels;
+using Microsoft.AspNetCore.Authentication;
+using Microsoft.AspNetCore.Authentication.Cookies;
 
 // For more information on enabling MVC for empty projects, visit https://go.microsoft.com/fwlink/?LinkID=397860
 
@@ -80,6 +82,15 @@ namespace FurCoNZ.Web.Controllers
                 {
                     Orders = orders.Select(o => new OrderViewModel(o)).ToList()
                 });
+        }
+
+        public async Task<IActionResult> Logout()
+        {
+            var callbackUrl = Url.Action("Index", "Home", values: null, protocol: Request.Scheme);
+            var signOut = SignOut(new AuthenticationProperties {
+                    RedirectUri = callbackUrl
+                }, CookieAuthenticationDefaults.AuthenticationScheme, "oidc");
+            return signOut;
         }
     }
 }
