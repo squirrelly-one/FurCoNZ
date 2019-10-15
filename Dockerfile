@@ -37,7 +37,7 @@ COPY src/FurCoNZ.Web/ ./
 RUN npm run build
 
 # "Runtime Stage" Container: "runtime"
-FROM mcr.microsoft.com/dotnet/core/aspnet:2.2 AS runtime
+FROM mcr.microsoft.com/dotnet/core/aspnet:3.0.0 AS runtime
 
 WORKDIR /app
 
