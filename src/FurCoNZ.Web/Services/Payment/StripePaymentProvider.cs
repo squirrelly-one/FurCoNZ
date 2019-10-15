@@ -175,7 +175,7 @@ namespace FurCoNZ.Web.Services.Payment
 
             var refund = await _refundService.CreateAsync(new RefundCreateOptions
             {
-                ChargeId = charge.Id,
+                Charge = charge.Id,
                 Amount = charge.Amount,
                 Reason = RefundReasons.RequestedByCustomer,
             }, cancellationToken: cancellationToken);
