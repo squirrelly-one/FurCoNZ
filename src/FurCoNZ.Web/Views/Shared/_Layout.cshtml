@@ -65,23 +65,32 @@
                     <ul class="navbar-nav">
                         @if (User.Identity.IsAuthenticated)
                         {
-                        <li class="nav-item dropdown">
-                            <a class="nav-link dropdown-toggle" role="button" data-toggle="dropdown" href="#" asp-active-controllers="Account" aria-haspopup="true" aria-expanded="false">Account</a>
-                            <div class="dropdown-menu">
-                                <a class="dropdown-item" asp-area="" asp-controller="Account" asp-action="Index">My Account</a>
-                                <a class="dropdown-item" asp-area="" asp-controller="Account" asp-action="Logout">Logout</a>
-                            </div>
-                        </li>
+                            <li class="nav-item dropdown">
+                                <a class="nav-link dropdown-toggle" role="button" data-toggle="dropdown" href="#" asp-active-controllers="Account" aria-haspopup="true" aria-expanded="false">Account</a>
+                                <div class="dropdown-menu">
+                                    <a class="dropdown-item" asp-area="" asp-controller="Account" asp-action="Index">My Account</a>
+                                    <a class="dropdown-item" asp-area="" asp-controller="Account" asp-action="Logout">Logout</a>
+                                </div>
+                            </li>
+                            <li class="nav-item">
+                                <a class="nav-link text-dark" asp-area="" asp-controller="Order" asp-action="Index" asp-active-controllers="Order">
+                                    <h5 class="m-0 d-inline">Order</h5>
+                                </a>
+                            </li>
                         }
                         else
                         {
-                        <li class="nav-item">
-                            <a class="nav-link text-dark" asp-area="" asp-controller="Account" asp-action="Index" asp-active-controllers="Account">Login</a>
-                        </li>
+                            <li class="nav-item">
+                                <a class="nav-link text-dark" asp-area="" asp-controller="Account" asp-action="Index" asp-active-controllers="Account" data-toggle="tooltip" data-placement="bottom" title="With NZFurs Account">
+                                    Login <span class="d-sm-none">- With NZFurs Account</span>
+                                </a>
+                            </li>
+                            <li class="nav-item">
+                                <a class="nav-link text-dark" asp-area="" asp-controller="Order" asp-action="Index" asp-active-controllers="Order" data-toggle="tooltip" data-placement="bottom" title="You'll first be redirected to NZFurs to login">
+                                    <h5 class="m-0 d-inline">Order</h5> <span class="d-sm-none">- Requires NZFurs Login</span>
+                                </a>
+                            </li>
                         }
-                        <li class="nav-item">
-                            <a class="nav-link text-dark" asp-area="" asp-controller="Order" asp-action="Index" asp-active-controllers="Order">Order</a>
-                        </li>
                     </ul>
                 </div>
             </div> 
@@ -162,8 +171,11 @@
 
     @RenderSection("Scripts", required: false)
     <script>
-        // Configure flatpickr as the default javascript date picker for all <input type="date"> fields
         $(function () {
+            // Tooltips are opt-in for performance reasons, so you must initialize them yourself. https://getbootstrap.com/docs/4.3/components/tooltips/
+            $('[data-toggle="tooltip"]').tooltip()
+
+            // Configure flatpickr as the default javascript date picker for all <input type="date"> fields
             flatpickr("input[type=date]", {
                 dateFormat: "Y-m-d",
                 allowInput: true
