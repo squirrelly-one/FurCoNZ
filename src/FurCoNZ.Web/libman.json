@@ -29,7 +29,7 @@
       "destination": "wwwroot/lib/bootstrap/"
     },
     {
-      "library": "popper.js@1.14.7",
+      "library": "popper.js@1.15.0",
       "files": [
         "esm/popper.min.js",
         "esm/popper.js"
