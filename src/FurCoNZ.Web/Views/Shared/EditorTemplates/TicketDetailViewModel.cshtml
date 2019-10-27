@@ -55,7 +55,7 @@
 
             <div class="form-group">
                 <label asp-for="DateOfBirth">Date of Birth</label>
-                <input asp-for="DateOfBirth" class="form-control" placeholder="yyyy-mm-dd" data-date-format="yyyy-mm-dd" min="1903-01-02" max="@DateTime.Today.ToString()" onchange="dateOfBirthChanged(this, @Model.Id)" />
+                <input asp-for="DateOfBirth" class="form-control" placeholder="yyyy-mm-dd" data-date-format="Y-m-d" min="1903-01-02" max="@DateTime.Today.ToString()" onchange="dateOfBirthChanged(this, @Model.Id)" />
                 <small class="form-text text-muted">Please enter this as "yyyy-mm-dd". That way, it's less ambiguous for our international visitors!</small>
             </div>
 

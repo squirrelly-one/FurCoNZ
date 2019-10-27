@@ -35,7 +35,7 @@ namespace FurCoNZ.Web.ViewModels
 
         [DataType(DataType.Date)]
         [Display(Name = "Date of Birth", Description = "Please enter this as \"yyyy-mm-dd\". That way, it's less ambiguous for our international visitors!")]
-        public DateTime DateOfBirth { get; set; }
+        public DateTime DateOfBirth { get; set; } = new DateTime(1900, 1, 1);
 
         // TODO: A real dietary requirements field
 

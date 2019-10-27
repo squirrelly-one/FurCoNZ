@@ -5,7 +5,11 @@
     <meta name="viewport" content="width=device-width, initial-scale=1.0" />
     <title>@(ViewData["Title"] != "" ? ViewData["Title"] + " - " : "") FurCoNZ 2020</title>
     <link rel="stylesheet" href="~/css/bundle.css" />
-    
+
+    <!-- flatpickr - a lightweight and powerful datetime picker -->
+    <link rel="stylesheet" href="~/lib/flatpickr/flatpickr.css" />
+    <link rel="stylesheet" href="~/lib/flatpickr/themes/dark.css" />
+
     <link rel="apple-touch-icon" sizes="180x180" href="/assets/apple-touch-icon.png">
     <link rel="icon" type="image/png" sizes="32x32" href="/assets/favicon-32x32.png">
     <link rel="icon" type="image/png" sizes="16x16" href="/assets/favicon-16x16.png">
@@ -113,7 +117,7 @@
         <script src="~/lib/jquery-validation-unobtrusive/jquery.validate.unobtrusive.js"></script>
         <script src="~/lib/popper/esm/popper.js"></script>
         <script src="~/lib/bootstrap/js/bootstrap.bundle.js"></script>
-        <script src="~/lib/date-input-polyfill/date-input-polyfill.dist.js"></script>
+        <script src="~/lib/flatpickr/flatpickr.js"></script>
     </environment>
     <environment exclude="Development">
         <script src="~/lib/jquery/jquery.min.js"
@@ -148,14 +152,23 @@
                 crossorigin="anonymous"
                 integrity="sha384-xrRywqdh3PHs8keKZN+8zzc5TX0GRTLCcmivcbNJWm2rs5C8PRhcEn3czEjhAO9o">
         </script>
-        <script src="~/lib/date-input-polyfill/date-input-polyfill.dist.js"
-                asp-fallback-src="https://unpkg.com/date-input-polyfill@2.14.0/date-input-polyfill.dist.js"
+        <script src="~/lib/flatpickr/flatpickr.min.js"
+                asp-fallback-src="https://cdnjs.cloudflare.com/ajax/libs/flatpickr/4.6.3/flatpickr.min.js"
                 crossorigin="anonymous"
-                integrity="sha384-fTgm+s0mz0wgL3gvJ8qu/uz+uAZxL51k7w9K18+UP9VrrR4ZbE3SIEyyOuInlpxN">
+                integrity="sha384-UiZzAA+k9B6Xr4SykueV26lljeUk/hTx/fFNONRwB3Dt3dLDOXg8lQlbf/j8rB7B">
         </script>
     </environment>
     <script src="~/js/site.js" asp-append-version="true"></script>
 
     @RenderSection("Scripts", required: false)
+    <script>
+        // Configure flatpickr as the default javascript date picker for all <input type="date"> fields
+        $(function () {
+            flatpickr("input[type=date]", {
+                dateFormat: "Y-m-d",
+                allowInput: true
+            });
+        });
+    </script>
 </body>
 </html>
