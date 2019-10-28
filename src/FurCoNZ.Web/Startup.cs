@@ -71,6 +71,7 @@ namespace FurCoNZ.Web
 
             services.AddHttpClient();
 
+            // Add Entity Framework DB Context
             services.AddDbContext<FurCoNZDbContext>(options =>
             {
                 switch (Configuration.GetValue("Data:Database:Provider", string.Empty).ToLowerInvariant())
@@ -93,7 +94,8 @@ namespace FurCoNZ.Web
                             DataSource = Path.Combine(
                                 Environment.CurrentDirectory,
                                 Configuration.GetValue("Paths:Database", "data/database"),
-                                Configuration.GetValue("Data:Database:Filename", "data.db"))
+                                Configuration.GetValue("Data:Database:Filename", "data.db")
+                            ),
                         };
                         options.UseSqlite(connectionStringBuilder.ToString());
                         break;
@@ -103,8 +105,7 @@ namespace FurCoNZ.Web
                     default:
                     case "postgres":
                     case "postgresql":
-                        var NpgsqlConnectionStringBuilder =
-                            new NpgsqlConnectionStringBuilder(Configuration.GetValue("Data:Database:ConnectionString", string.Empty));
+                        var NpgsqlConnectionStringBuilder = new NpgsqlConnectionStringBuilder(Configuration.GetValue("Data:Database:ConnectionString", string.Empty));
 
                         NpgsqlConnectionStringBuilder.Database = Configuration.GetValue<string>("Data:Database:Database", NpgsqlConnectionStringBuilder.Database);
                         NpgsqlConnectionStringBuilder.Host = Configuration.GetValue<string>("Data:Database:Host", NpgsqlConnectionStringBuilder.Host);
@@ -117,88 +118,88 @@ namespace FurCoNZ.Web
                                 ? SslMode.Require
                                 : SslMode.Prefer;
 
-                        options.UseNpgsql(
-                            NpgsqlConnectionStringBuilder.ToString(),
-                            npgsqlOptions =>
+                        options.UseNpgsql(NpgsqlConnectionStringBuilder.ToString(), npgsqlOptions =>
+                        {
+                            npgsqlOptions.RemoteCertificateValidationCallback((object sender, X509Certificate certificate, X509Chain chain, SslPolicyErrors sslPolicyErrors) =>
                             {
-                                npgsqlOptions.RemoteCertificateValidationCallback((object sender, X509Certificate certificate, X509Chain chain, SslPolicyErrors sslPolicyErrors) =>
+                                var caFingerprint = Configuration.GetValue("Data:Database:CAFingerprint", string.Empty);
+                                // Perform default validation if a fingerprint was not provided.
+                                if (string.IsNullOrEmpty(caFingerprint))
+                                    return new X509Certificate2(certificate).Verify();
+
+                                bool hasRecognisedCA = false;
+                                var certsLog = new StringBuilder();
+                                // Check to see if any CA matches a stored fingerprint
+                                foreach (var chainElement in chain.ChainElements)
                                 {
-                                    var caFingerprint = Configuration.GetValue("Data:Database:CAFingerprint", string.Empty);
-                                    // Perform default validation if a fingerprint was not provided.
-                                    if (string.IsNullOrEmpty(caFingerprint))
-                                        return new X509Certificate2(certificate).Verify();
-
-                                    bool hasRecognisedCA = false;
-                                    var certsLog = new StringBuilder();
-                                    // Check to see if any CA matches a stored fingerprint
-                                    foreach (var chainElement in chain.ChainElements)
+                                    certsLog.AppendLine($"- Certificate {chainElement.Certificate.SubjectName}: {chainElement.Certificate.GetCertHashString(HashAlgorithmName.SHA256)}");
+                                    if (chainElement.Certificate.GetCertHashString(HashAlgorithmName.SHA256).Equals(caFingerprint, StringComparison.OrdinalIgnoreCase))
                                     {
-                                        certsLog.AppendLine($"- Certificate {chainElement.Certificate.SubjectName}: {chainElement.Certificate.GetCertHashString(HashAlgorithmName.SHA256)}");
-                                        if (chainElement.Certificate.GetCertHashString(HashAlgorithmName.SHA256).Equals(caFingerprint, StringComparison.OrdinalIgnoreCase))
-                                        {
-                                            hasRecognisedCA = true;
-                                            break;
-                                        }
+                                        hasRecognisedCA = true;
+                                        break;
                                     }
+                                }
 
-                                    if (!hasRecognisedCA)
-                                    {
-                                        certsLog.Insert(0, $"Could not verify certificate. did not match. Expecting {caFingerprint}.\n");
-                                        _logger.LogCritical(certsLog.ToString());
-                                        return false;
-                                    }
-                                    else if (sslPolicyErrors == SslPolicyErrors.RemoteCertificateChainErrors)
-                                    {
-                                        // Clear ssl policy error as we now trust the certificate chain.
-                                        sslPolicyErrors = SslPolicyErrors.None;
-                                    }
+                                if (!hasRecognisedCA)
+                                {
+                                    certsLog.Insert(0, $"Could not verify certificate. did not match. Expecting {caFingerprint}.\n");
+                                    _logger.LogCritical(certsLog.ToString());
+                                    return false;
+                                }
 
-                                    if (sslPolicyErrors != SslPolicyErrors.None)
-                                    {
-                                        _logger.LogCritical($"certificate failed validation: {sslPolicyErrors}");
-                                        return false;
-                                    }
+                                if (sslPolicyErrors == SslPolicyErrors.RemoteCertificateChainErrors)
+                                {
+                                    // Clear ssl policy error as we now trust the certificate chain.
+                                    sslPolicyErrors = SslPolicyErrors.None;
+                                }
 
-                                    return true;
-                                });
+                                if (sslPolicyErrors != SslPolicyErrors.None)
+                                {
+                                    _logger.LogCritical($"certificate failed validation: {sslPolicyErrors}");
+                                    return false;
+                                }
+
+                                return true;
                             });
-                        break;
+                        });
+                    break;
                 }
             });
 
             // Allow accessing the HTTPContext from services.
             services.AddHttpContextAccessor();
 
-            // Configure SendGrid
-            services.Configure<SendGridEmailServiceOptions>(options => Configuration.GetSection("SendGrid").Bind(options));
-            services.Configure<ReminderServiceOptions>(options =>
-            {
-                options.RemindUserOfUnpaidOrderEveryXDays = Configuration.GetValue<int>("Orders:RemindUserOfUnpaidOrderEveryXDays");
-            });
-
-            services.AddTransient<ISendGridClient>(c => new SendGridClient(Configuration["SendGrid:ApiKey"]));
-            services.AddTransient<IEmailService, SendGridEmailService>();
-            services.AddTransient<IReminderService, ReminderService>();
-            services.AddTransient<IViewRenderService, ViewRenderService>();
-            services.AddHostedService<EmailRemindersHostedService>();
-
-            services.AddTransient<IUserService, EntityFrameworkUserService>();
-            services.AddTransient<IOrderService, OrderService>();
-
-            services.AddTransient<IPaymentService, PaymentService>();
-            services.AddTransient<IPaymentProvider, Services.Payment.StripeService>();
-            services.AddTransient<IPaymentProvider, Services.Payment.BankPaymentProvider>();
-
-            services.AddTransient<Services.Payment.StripeService>();
-            services.AddHostedService<Services.Payment.Stripe.StripeHostedService>();
-
+            // Configure Options
             services.Configure<CookiePolicyOptions>(options =>
             {
                 // This lambda determines whether user consent for non-essential cookies is needed for a given request.
                 options.CheckConsentNeeded = context => true;
                 options.MinimumSameSitePolicy = SameSiteMode.None;
             });
+            services.Configure<SendGridEmailServiceOptions>(options => Configuration.GetSection("SendGrid").Bind(options));
+            services.Configure<ReminderServiceOptions>(options =>
+            {
+                options.RemindUserOfUnpaidOrderEveryXDays = Configuration.GetValue<int>("Orders:RemindUserOfUnpaidOrderEveryXDays");
+            });
+            services.Configure<StripeSettings>(Configuration.GetSection("Stripe"));
 
+            // Add application services to DI
+            services.AddTransient<ISendGridClient>(c => new SendGridClient(Configuration["SendGrid:ApiKey"]));
+            services.AddTransient<IEmailService, SendGridEmailService>();
+            services.AddTransient<IReminderService, ReminderService>();
+            services.AddTransient<IViewRenderService, ViewRenderService>();
+            services.AddTransient<IUserService, EntityFrameworkUserService>();
+            services.AddTransient<IOrderService, OrderService>();
+            services.AddTransient<IPaymentService, PaymentService>();
+            services.AddTransient<IPaymentProvider, Services.Payment.StripeService>();
+            services.AddTransient<IPaymentProvider, Services.Payment.BankPaymentProvider>();
+            services.AddTransient<Services.Payment.StripeService>();
+
+            // Add background services
+            services.AddHostedService<EmailRemindersHostedService>();
+            services.AddHostedService<Services.Payment.Stripe.StripeHostedService>();
+
+            // Authentication settings for OIDC integration
             services.AddAuthentication(options =>
             {
                 options.DefaultScheme = CookieAuthenticationDefaults.AuthenticationScheme;
@@ -234,6 +235,7 @@ namespace FurCoNZ.Web
                 options.Events.OnUserInformationReceived = NzFursOpenIdConnectEvents.OnUserInformationReceived;
             });
 
+            // Add authorisation policies
             services.AddAuthorization(options => 
             {
                 options.AddPolicy("AdminOnly", policyBuilder =>
@@ -264,7 +266,6 @@ namespace FurCoNZ.Web
                 app.UseExceptionHandler("/Error");
                 // The default HSTS value is 30 days. You may want to change this for production scenarios, see https://aka.ms/aspnetcore-hsts.
                 app.UseHsts();
-
             }
             var forwardedHeaderOptions = new ForwardedHeadersOptions
             {
