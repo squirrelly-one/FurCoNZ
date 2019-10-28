@@ -21,6 +21,7 @@
     <PackageReference Include="SauceControl.Blake2Fast" Version="1.0.0" />
     <PackageReference Include="Sendgrid" Version="9.12.0" />
     <PackageReference Include="HtmlAgilityPack" Version="1.11.16" />
+    <PackageReference Include="NWebsec.AspNetCore.Middleware" Version="2.0.0" />
   </ItemGroup>
 
   <ItemGroup Condition=" '$(Configuration)' == 'Debug' ">

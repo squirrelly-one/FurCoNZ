@@ -279,6 +279,27 @@ namespace FurCoNZ.Web
             }
             app.UseForwardedHeaders(forwardedHeaderOptions);
 
+            app.UseXContentTypeOptions();
+            app.UseReferrerPolicy(opts => opts.NoReferrer());
+
+            app.UseCsp(options =>
+            { 
+                options.BlockAllMixedContent()
+                    .ConnectSources(c => c.None())
+                    .FontSources(f => f.Self())
+                    .FontSources(f => f.CustomSources("https://fonts.gstatic.com"))
+                    .FrameAncestors(f => f.Self())
+                    .ImageSources(i => i.Self())
+                    .ImageSources(i => i.CustomSources("data:"))
+                    .ManifestSources(m => m.None())
+                    .MediaSources(m => m.Self())
+                    .ObjectSources(o => o.None())
+                    .ScriptSources(s => s.Self())
+                    .StyleSources(s => s.Self())
+                    .StyleSources(s => s.CustomSources("https://fonts.googleapis.com", "https://js.stripe.com"))
+                    .WorkerSources(w => w.None());
+            });
+
             app.UseSession();
             app.UseAuthentication();
             app.UseHttpsRedirection();
