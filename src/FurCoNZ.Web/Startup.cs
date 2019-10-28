@@ -297,8 +297,9 @@ namespace FurCoNZ.Web
                     .MediaSources(m => m.Self())
                     .ObjectSources(o => o.None())
                     .ScriptSources(s => s.Self())
+                    .ScriptSources(s => s.CustomSources("https://js.stripe.com"))
                     .StyleSources(s => s.Self())
-                    .StyleSources(s => s.CustomSources("https://fonts.googleapis.com", "https://js.stripe.com"))
+                    .StyleSources(s => s.CustomSources("https://fonts.googleapis.com"))
                     .WorkerSources(w => w.None());
             });
 
