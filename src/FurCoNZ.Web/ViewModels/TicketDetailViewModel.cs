@@ -51,9 +51,18 @@ namespace FurCoNZ.Web.ViewModels
         [Display(Name = "Other Notes")]
         public string OtherNotes { get; set; }
 
+        public bool AcceptToS { get; set; }
+
         public IEnumerable<ValidationResult> Validate(ValidationContext validationContext)
         {
-            return new List<ValidationResult>();
+            var validationErrors = new List<ValidationResult>();
+
+            if (!AcceptToS)
+            {
+                validationErrors.Add(new ValidationResult("Ticket Holder must accept the Terms and Conditions before the order can be placed.", new List<string> { nameof(AcceptToS) }));
+            }
+
+            return validationErrors;
         }
 
         public TicketDetailViewModel()
