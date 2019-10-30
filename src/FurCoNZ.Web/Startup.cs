@@ -300,6 +300,7 @@ namespace FurCoNZ.Web
                     .ScriptSources(s => s.CustomSources("https://js.stripe.com"))
                     .StyleSources(s => s.Self())
                     .StyleSources(s => s.CustomSources("https://fonts.googleapis.com"))
+                    .StyleSources(s => s.UnsafeInline()) // TODO: Temporary while Stripe payments are refactored, see #117
                     .WorkerSources(w => w.None());
             });
 
