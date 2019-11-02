@@ -55,6 +55,10 @@
                         <td style="width: 99%;" width="99%">@ticket.PreferredFullName</td>
                     </tr>
                     <tr>
+                        <th style="width: auto; text-align: right; padding-right: 8px; white-space: nowrap;" align="right">Dietry Requirements:</th>
+                        <td style="width: 99%;" width="99%">@(string.Join(", ", ticket.DietryRequirements.Select(f => f.ToString())))</td>
+                    </tr>
+                    <tr>
                         <th style="width: auto; text-align: right; padding-right: 8px; white-space: nowrap;" align="right">Known Allergies:</th>
                         <td style="width: 99%;" width="99%">@ticket.KnownAllergies</td>
                     </tr>

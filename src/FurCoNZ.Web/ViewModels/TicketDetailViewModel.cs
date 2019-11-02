@@ -1,6 +1,7 @@
 ﻿using System;
 using System.Collections.Generic;
 using System.ComponentModel.DataAnnotations;
+using System.Linq;
 
 using FurCoNZ.Web.Models;
 
@@ -53,6 +54,9 @@ namespace FurCoNZ.Web.ViewModels
 
         public bool AcceptToS { get; set; }
 
+        [Display(Name = "Dietary Requirements")]
+        public IEnumerable<FoodMenu> DietryRequirements { get; set; }
+
         public IEnumerable<ValidationResult> Validate(ValidationContext validationContext)
         {
             var validationErrors = new List<ValidationResult>();
@@ -82,10 +86,37 @@ namespace FurCoNZ.Web.ViewModels
 
             DateOfBirth = ticket.DateOfBirth;
 
+            var diet = new List<FoodMenu>();
+            if (ticket.MealRequirements != Models.FoodMenu.Regular)
+            {
+                foreach (var value in Enum.GetValues(ticket.MealRequirements.GetType()))
+                {
+                    if (ticket.MealRequirements.HasFlag(value as Enum) && (int)value != 0)
+                        diet.Add((FoodMenu)value);
+                }
+            }
+            else
+            {
+                diet.Add(FoodMenu.Regular);
+            }
+
+            DietryRequirements = diet;
             KnownAllergies = ticket.KnownAllergens;
             CabinPreferences = ticket.CabinGrouping;
 
             OtherNotes = ticket.AdditionalNotes;
         }
+    }
+
+    /// <summary>
+    /// Non [Flags] version of <see cref="Models.FoodMenu"/>
+    /// </summary>
+    public enum FoodMenu
+    {
+        Regular = 0,
+        Vegetarian = 1,
+        Vegan = 2,
+        DairyFree = 4,
+        GlutenFree = 8
     }
 }

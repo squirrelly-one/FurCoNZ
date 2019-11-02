@@ -181,12 +181,14 @@ namespace FurCoNZ.Web.Controllers
                 PreferredName = ticketViewModel.PreferredFullName,
                 // PreferredPronouns
 
+
                 LegalName = String.IsNullOrWhiteSpace(ticketViewModel.IdentificationFullName) ? ticketViewModel.PreferredFullName : ticketViewModel.IdentificationFullName,
                 DateOfBirth = ticketViewModel.DateOfBirth,
 
                 EmailAddress = ticketViewModel.EmailAddress,
 
                 // MealRequirements
+                MealRequirements = ticketViewModel.DietryRequirements.Select(f => (Models.FoodMenu)f).Aggregate((a,b) => a | b),
                 KnownAllergens = ticketViewModel.KnownAllergies,
                 CabinGrouping = ticketViewModel.CabinPreferences,
 

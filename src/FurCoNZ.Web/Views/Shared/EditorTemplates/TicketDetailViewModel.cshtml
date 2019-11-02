@@ -69,14 +69,8 @@
 
             @* TODO: A real dietary requirements field *@
             <div class="form-group">
-                <label for="exampleDietaryRequirements">Dietary Preferences (example)</label>
-                <select class="form-control" id="exampleDietaryRequirements">
-                    <option>None</option>
-                    <option>Vegetarian</option>
-                    <option>Vegan</option>
-                    <option>Gluten Free</option>
-                    <option>Dairy Free</option>
-                </select>
+                <label asp-for="DietryRequirements">Dietary Preferences</label>
+                <select multiple class="form-control" asp-for="DietryRequirements" asp-items="Html.GetEnumSelectList<FurCoNZ.Web.ViewModels.FoodMenu>()"></select>
                 <small class="form-text text-muted">Be sure to detail any allergens in the "Known Allergies" section below.</small>
             </div>
 

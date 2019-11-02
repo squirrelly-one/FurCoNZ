@@ -27,6 +27,9 @@
                 <dt class="col-lg-3">@Html.DisplayNameFor(x => x.DateOfBirth)</dt>
                 <dd class="col-lg-9">@Html.DisplayFor(x => x.DateOfBirth)</dd>
 
+                <dt class="col-lg-3">@Html.DisplayNameFor(x => x.DietryRequirements)</dt>
+                <dd class="col-lg-9">@(string.Join(", ", Model.DietryRequirements.Select(f => f.ToString())))</dd>
+
                 <dt class="col-lg-3">@Html.DisplayNameFor(x => x.KnownAllergies)</dt>
                 <dd class="col-lg-9">@Html.DisplayFor(x => x.KnownAllergies)</dd>
 
