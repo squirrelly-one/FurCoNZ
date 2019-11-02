@@ -3,29 +3,36 @@
     ViewData["Title"] = "Order Tickets";
 }
 
-<form asp-action="Index" method="post">
-    <table class="table">
-        <thead>
-            <tr>
-                <th scope="col">Type</th>
-                <th scope="col">Price</th>
-                <th scope="col">Quantity</th>
-                <th scope="col">Purchase</th>
-            </tr>
-        </thead>
-        <tbody>
-            @foreach (var ticketType in Model.AvailableTicketTypes)
-            {
-                <tr>
-                    <td>@ticketType.Value.Name</td>
-                    <td>$@((ticketType.Value.PriceCents / 100).ToString("f2"))</td>
-                    <td>@ticketType.Value.TotalAvailable remaining</td>
-                    <td>
-                        <input asp-for="AvailableTicketTypes[ticketType.Key].QuantityOrdered" min="0" max="@ticketType.Value.TotalAvailable" />
-                    </td>
-                </tr>
-            }
-        </tbody>
-    </table>
-    <button type="submit" class="btn btn-primary float-md-right">Details &gt;</button>
-</form>
+<div class="card">
+    <div class="card-header">
+        <p class="h4">Make Your Selection</p>
+    </div>
+    <div class="card-body">
+        <form asp-action="Index" method="post">
+            <table class="table table-light">
+                <thead>
+                    <tr>
+                        <th scope="col">Type</th>
+                        <th scope="col">Price</th>
+                        <th scope="col">Quantity</th>
+                        <th scope="col">Purchase</th>
+                    </tr>
+                </thead>
+                <tbody>
+                    @foreach (var ticketType in Model.AvailableTicketTypes)
+                    {
+                        <tr>
+                            <td>@ticketType.Value.Name</td>
+                            <td>$@((ticketType.Value.PriceCents / 100).ToString("f2"))</td>
+                            <td>@ticketType.Value.TotalAvailable remaining</td>
+                            <td>
+                                <input class="form-control" asp-for="AvailableTicketTypes[ticketType.Key].QuantityOrdered" min="0" max="@ticketType.Value.TotalAvailable" />
+                            </td>
+                        </tr>
+                    }
+                </tbody>
+            </table>
+            <button type="submit" class="btn btn-primary float-md-right">Details &gt;</button>
+        </form>
+    </div>
+</div>
