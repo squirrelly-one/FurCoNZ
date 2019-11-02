@@ -49,7 +49,7 @@
             </tfoot>
             </table>
             <div class="float-right">
-                @if (order.AmountOwingCents > 0)
+                @if (order.Status == "Owing")
                 {
                     <a role="button" class="btn btn-warning" asp-controller="Checkout" asp-action="Index" asp-route-orderid="@order.Id">Pay</a>
                 }
