@@ -4,21 +4,56 @@
     Layout = "_AccountLayout.cshtml";
 }
 
-<table class="table">
-
-    <tbody>
-        @foreach (var order in Model.Orders)
-        {
-            <tr>
-                <td scope="row">@Html.DisplayFor(_ => order)</td>
-                <td>
-                    <a role="button" class="btn btn-info" asp-controller="Order" asp-action="Index">View</a>
-                    @if (order.AmountOwingCents > 0)
-                    {
-                        <a role="button" class="btn btn-warning" asp-controller="Checkout" asp-action="Index" asp-route-orderid="@order.Id">Pay</a>
-                    }
-                </td>
-            </tr>
-        }
-    </tbody>
-</table>
+@foreach (var order in Model.Orders)
+{
+    <div class="card">
+        <div class="card-header">
+            <p class="h4">Order #@order.Id <small class="text-muted"> - @order.Status</small></p>
+        </div>
+        <div class="card-body">
+            <table class="table table-borderless table-sm">
+                <thead>
+                    <tr>
+                        <th scope="col">Ticket</th>
+                        <th scope="col">Recipient</th>
+                        <th scope="col">Cost</th>
+                    </tr>
+                </thead>
+                @foreach (var ticket in order.Tickets)
+                {
+                    <tr>
+                        <td>@ticket.TicketType.Name</td>
+                        <td>@ticket.PreferredFullName</td>
+                        <td>@ticket.TicketType.Price.ToString("C")</td>
+                    </tr>
+                }
+            <tfoot>
+                <tr>
+                    <td colspan="3"><hr class="m-0" /></td>
+                </tr>
+                <tr>
+                    <td>&nbsp;</td>
+                    <th scope="row" class="text-right">Total</th>
+                    <th>@order.AmountTotal.ToString("C")</th>
+                </tr>
+                <tr>
+                    <td>&nbsp;</td>
+                    <th scope="row" class="text-right">GST (included)</th>
+                    <th>@((order.AmountTotal * 3 / 23).ToString("C"))</th>
+                </tr>
+                <tr>
+                    <td>&nbsp;</td>
+                    <th scope="row" class="text-right">Amount Paid</th>
+                    <th>@order.AmountPaid.ToString("C")</th>
+                </tr>
+            </tfoot>
+            </table>
+            <div class="float-right">
+                @if (order.AmountOwingCents > 0)
+                {
+                    <a role="button" class="btn btn-warning" asp-controller="Checkout" asp-action="Index" asp-route-orderid="@order.Id">Pay</a>
+                }
+            </div>
+        </div>
+    </div>
+}
