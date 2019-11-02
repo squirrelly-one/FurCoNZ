@@ -1,6 +1,7 @@
 ﻿using System;
 using System.Collections.Generic;
 using System.Linq;
+using System.Net.Mail;
 using System.Threading;
 using System.Threading.Tasks;
 using FurCoNZ.Web.Helpers; // Required for SessionExtensions
@@ -20,11 +21,15 @@ namespace FurCoNZ.Web.Controllers
 
         private readonly IOrderService _orderService;
         private readonly IUserService _userService;
+        private readonly IEmailService _emailService;
+        private readonly IViewRenderService _viewRenderService;
 
-        public OrderController(IOrderService orderService, IUserService userService)
+        public OrderController(IOrderService orderService, IUserService userService, IEmailService emailService, IViewRenderService viewRenderService)
         {
             _orderService = orderService;
             _userService = userService;
+            _emailService = emailService;
+            _viewRenderService = viewRenderService;
         }
 
         [HttpGet]
@@ -129,7 +134,7 @@ namespace FurCoNZ.Web.Controllers
 
                 if (sessionHasNotChanged)
                 {
-                    Models.User user = await _userService.GetCurrentUserAsync(cancellationToken);
+                    var user = await _userService.GetCurrentUserAsync(cancellationToken);
 
                     var tickets = new List<Models.Ticket>();
 
@@ -139,6 +144,20 @@ namespace FurCoNZ.Web.Controllers
                     }
 
                     var order = await _orderService.CreateOrderAsync(user, tickets, cancellationToken: cancellationToken);
+
+                    // Gather metadata
+                    var toAddresses = new MailAddressCollection
+                    {
+                        new MailAddress (user.Email, user.Name),
+                    };
+
+                     var subject = $"Order #{order.Id} has been confirmed";
+
+                    // Prepare template
+                    var message = await _viewRenderService.RenderToStringAsync("EmailTemplates/OrderConfirmed", new OrderViewModel(order), cancellationToken: cancellationToken);
+
+                    // Send message
+                    await _emailService.SendEmailAsync(toAddresses, subject, message, cancellationToken: cancellationToken);
 
                     return RedirectToAction("Index", "Checkout", new { orderId = order.Id });
                 }

@@ -1,10 +1,12 @@
 ﻿using System.Linq;
+using System.Net.Http;
 using System.Net.Mail;
 using System.Threading;
 using System.Threading.Tasks;
 using FurCoNZ.Web.Helpers;
 using FurCoNZ.Web.Options;
 using HtmlAgilityPack;
+using Microsoft.Extensions.Logging;
 using Microsoft.Extensions.Options;
 using SendGrid;
 using SendGrid.Helpers.Mail;
@@ -14,11 +16,13 @@ namespace FurCoNZ.Web.Services
     public class SendGridEmailService : IEmailService
     {
         private readonly ISendGridClient _sendGridClient;
+        private readonly ILogger _logger;
         private readonly SendGridEmailServiceOptions _options;
 
-        public SendGridEmailService(ISendGridClient sendGridClient, IOptions<SendGridEmailServiceOptions> options)
+        public SendGridEmailService(ISendGridClient sendGridClient, IOptions<SendGridEmailServiceOptions> options, ILogger<SendGridEmailService> logger)
         {
             _sendGridClient = sendGridClient;
+            _logger = logger;
             _options = options.Value;
         }
 
@@ -36,8 +40,19 @@ namespace FurCoNZ.Web.Services
             {
                 await sendGridMessage.AddAttachmentsAsync(attachments, cancellationToken);
             }
-            
-            await _sendGridClient.SendEmailAsync(sendGridMessage, cancellationToken);
+
+            try
+            {
+
+                var response = await _sendGridClient.SendEmailAsync(sendGridMessage, cancellationToken);
+                if(response.StatusCode != System.Net.HttpStatusCode.Accepted)
+                {
+                    _logger.LogError($"Failed to send email to {to}. Sendgrid response: {response.Body}");
+                }
+            }
+            catch (HttpRequestException ex) {
+                _logger.LogError(ex, $"Failed to send email to {to}.");
+            }
         }
 
         /// <summary>
