@@ -7,6 +7,7 @@
         <p class="card-text">
             Stripe supports Credit/Debit cards, Apple Pay, and uh... magic!
         </p>
+
         <table class="table table-light">
             @if (Model.Fee > 0)
             {
@@ -20,7 +21,13 @@
                 <td>@Model.Total.ToString("C")</td>
             </tr>
         </table>
-
+        
+        @if (Model.Fee > 0)
+        {
+            <p class="card-text">
+                <i>Please note that an convenience fee has been included.</i>
+            </p>
+        }
         <button id="payWithStripeButton" type="button" class="btn btn-primary float-right">Pay with Stripe</button>
 
         <script src="https://js.stripe.com/v3/"></script>

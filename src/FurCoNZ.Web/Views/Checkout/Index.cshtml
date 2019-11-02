@@ -42,8 +42,8 @@
     {
     <div class="card">
         <div class="card-header" id="@Html.FormatValue(payment.Name, "payment{0}")" data-toggle="collapse" data-target="#@Html.FormatValue(payment.Name, "payment{0}View")" aria-controls="@Html.FormatValue(payment.Name, "payment{0}View")">
-            <p class="h4 mb-0">
-                @payment.Name
+            <p class="h5 mb-0">
+                @payment.Name <small class="text-muted">- @payment.Methods</small>
             </p>
         </div>
 
