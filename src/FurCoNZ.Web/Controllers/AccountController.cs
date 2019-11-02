@@ -98,7 +98,12 @@ namespace FurCoNZ.Web.Controllers
 
             return View(new AccountTicketsViewModel
             {
-                Tickets = orders.SelectMany(o => o.TicketsPurchased).Select(t => new TicketDetailViewModel(t)).OrderBy(t => t.Id).ToList(),
+                Tickets = orders
+                    // Filter out refunded tickets
+                    .Where(o => o.Audits.All(a => a.Type != AuditType.Refunded))
+                    .SelectMany(o => o.TicketsPurchased)
+                    .Select(t => new TicketDetailViewModel(t))
+                    .OrderBy(t => t.Id).ToList(),
             });
         }
 
