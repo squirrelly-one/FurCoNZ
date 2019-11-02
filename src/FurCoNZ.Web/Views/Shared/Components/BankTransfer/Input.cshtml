@@ -1,5 +1,24 @@
-﻿<div class="card">
+﻿@model BankTransferViewModel
+<div class="card">
     <div class="card-body">
-        Instructions for transferring credits directly into FurCoNZ will go here.
+        <p>Below are the details for a direct bank transfer.</p>
+        <table class="table table-light">
+            <tr>
+                <th scope="row">Account Name</th>
+                <td>@Model.BankAccountName</td>
+            </tr>
+            <tr>
+                <th scope="row">Bank Account</th>
+                <td>@Model.BankAccountNumber</td>
+            </tr>
+            <tr>
+                <th scope="row">Reference Number</th>
+                <td>@Model.PaymentReference</td>
+            </tr>
+            <tr>
+                <th scope="row">Amount</th>
+                <td>@Model.Total.ToString("C")</td>
+            </tr>
+        </table>
     </div>
 </div>

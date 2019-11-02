@@ -181,6 +181,7 @@ namespace FurCoNZ.Web
             {
                 options.RemindUserOfUnpaidOrderEveryXDays = Configuration.GetValue<int>("Orders:RemindUserOfUnpaidOrderEveryXDays");
             });
+            services.Configure<BankSettings>(Configuration.GetSection("BankTransfer"));
             services.Configure<StripeSettings>(Configuration.GetSection("Stripe"));
 
             // Add application services to DI

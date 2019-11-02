@@ -15,10 +15,12 @@ namespace FurCoNZ.Web.Services
     public class OrderService : IOrderService
     {
         private readonly FurCoNZDbContext _db;
+        private readonly IEmailService _emailService;
 
-        public OrderService(FurCoNZDbContext db)
+        public OrderService(FurCoNZDbContext db, IEmailService emailService)
         {
             _db = db;
+            _emailService = emailService;
         }
 
         public async Task<Order> CreateOrderAsync(User purchasingAccount, IEnumerable<Ticket> ticketsInBasket, bool allowOrderingHiddenTickets = false, CancellationToken cancellationToken = default)
