@@ -1,14 +1,17 @@
 ﻿@model TicketDetailViewModel
 
 <div class="card">
-    <h4 class="card-header">Ticket #@Model.Id</h4>
+    <div class="card-header">
+        <p class="h4">Ticket #@Model.Id <small class="text-muted"> - @Model.BadgeName</small></p>
+    </div>
 
     <div id="attendee-@Model.Id-detail" aria-labelledby="attendee-@Model.Id-header">
         <div class="card-body">
-            <h5 class="card-title">@Model.BadgeName</h5>
-            <h6 class="card-subtitle mb-2 text-muted">@Model.TicketType.Name</h6>
+            <h5 class="card-title">@Model.TicketType.Name</h5>
             <hr/>
             <dl class="row">
+                <dt class="col-lg-3">@Html.DisplayNameFor(x => x.BadgeName)</dt>
+                <dd class="col-lg-9">@Html.DisplayFor(x => x.BadgeName)</dd>
                 <dt class="col-lg-3">@Html.DisplayNameFor(x => x.EmailAddress)</dt>
                 <dd class="col-lg-9">@Html.DisplayFor(x => x.EmailAddress)</dd>
 
@@ -26,6 +29,12 @@
 
                 <dt class="col-lg-3">@Html.DisplayNameFor(x => x.KnownAllergies)</dt>
                 <dd class="col-lg-9">@Html.DisplayFor(x => x.KnownAllergies)</dd>
+
+                @if (!String.IsNullOrWhiteSpace(Model.CabinPreferences))
+                {
+                    <dt class="col-lg-3">@Html.DisplayNameFor(x => x.CabinPreferences)</dt>
+                    <dd class="col-lg-9">@Html.DisplayFor(x => x.CabinPreferences)</dd>
+                }
 
                 @if (!String.IsNullOrWhiteSpace(Model.OtherNotes))
                 {

@@ -78,6 +78,7 @@ namespace FurCoNZ.Web.ViewModels
             EmailAddress = ticket.EmailAddress;
             BadgeName = ticket.TicketName;
             PreferredFullName = ticket.PreferredName;
+            IdentificationFullName = ticket.LegalName;
 
             DateOfBirth = ticket.DateOfBirth;
 
