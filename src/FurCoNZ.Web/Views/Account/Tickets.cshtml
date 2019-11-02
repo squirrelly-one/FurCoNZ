@@ -1,0 +1,10 @@
+﻿@model AccountTicketsViewModel
+@{
+    ViewData["Title"] = "Tickets";
+    Layout = "_AccountLayout.cshtml";
+}
+
+@foreach (var ticket in Model.Tickets)
+{
+    @Html.DisplayFor(_ => ticket)
+}

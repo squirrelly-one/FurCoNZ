@@ -23,7 +23,7 @@
                 {
                     <tr>
                         <td>@ticket.TicketType.Name</td>
-                        <td>@ticket.PreferredFullName</td>
+                        <td>@(string.IsNullOrWhiteSpace(ticket.PreferredFullName) ? ticket.IdentificationFullName : ticket.PreferredFullName)</td>
                         <td>@ticket.TicketType.Price.ToString("C")</td>
                     </tr>
                 }
