@@ -56,6 +56,7 @@ namespace FurCoNZ.Web.Controllers
                 PaymentProviders = _paymentProvider.PaymentServicees.Select(p => new PaymentProviderViewmodel
                 {
                     Name = p.Name,
+                    DisplayName = p.DisplayName,
                     Methods = p.SupportedMethods,
                     Description = p.Description,
                 }).ToList(),
