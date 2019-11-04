@@ -105,19 +105,19 @@ namespace FurCoNZ.Web.Services
         {
             cancellationToken.ThrowIfCancellationRequested();
 
-            var query = _db.TicketTypes.OrderByDescending(tt => tt.PriceCents);
+            var query = _db.TicketTypes.AsQueryable();
 
             if (!includeUnavailableTickets)
             {
-                query.Where(tt => tt.TotalAvailable > 0 && tt.SoldOutAt > DateTimeOffset.Now);
+                query = query.Where(tt => tt.TotalAvailable > 0 && tt.SoldOutAt > DateTimeOffset.Now);
             }
 
             if (!includeHiddenTickets)
             {
-                query.Where(tt => !tt.HiddenFromPublic);
+                query = query.Where(tt => !tt.HiddenFromPublic);
             }
 
-            return await query.ToListAsync(cancellationToken);
+            return await query.OrderByDescending(tt => tt.PriceCents).ToListAsync(cancellationToken);
         }
 
         public Task<DateTimeOffset> ReserveTicketsForPurchaseAsync(IDictionary<int, int> ticketsToReserveById, CancellationToken cancellationToken = default)
