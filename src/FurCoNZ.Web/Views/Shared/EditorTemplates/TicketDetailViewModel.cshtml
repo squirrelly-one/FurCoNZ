@@ -19,16 +19,19 @@
             <div class="form-group">
                 <label asp-for="EmailAddress">Email address</label>
                 <input type="email" class="form-control" asp-for="EmailAddress" />
+                @Html.ValidationMessageFor(m => m.EmailAddress,null,new { @class="text-danger"},"div")
             </div>
 
             <div class="form-group">
                 <label asp-for="BadgeName">Badge Name</label>
                 <input class="form-control" asp-for="BadgeName">
+                @Html.ValidationMessageFor(m => m.BadgeName, null, new { @class = "invalid-feedback" }, "div")
             </div>
 
             <div class="form-group">
                 <label asp-for="IdentificationFullName">Full Name (as it appears on your offical identification)</label>
                 <input asp-for="IdentificationFullName" class="form-control" />
+                @Html.ValidationMessageFor(m => m.IdentificationFullName, null, new { @class = "invalid-feedback" }, "div")
             </div>
 
             <div class="form-check">
@@ -50,13 +53,17 @@
                         </ul>
                     </p>
                     <input asp-for="PreferredFullName" class="form-control" />
+                    @Html.ValidationMessageFor(m => m.PreferredFullName, null, new { @class = "invalid-feedback" }, "div")
                 </div>
             </div>
 
             <div class="form-group">
                 <label asp-for="DateOfBirth">Date of Birth</label>
-                <input asp-for="DateOfBirth" class="form-control order-dob-field" placeholder="yyyy-mm-dd" data-date-format="Y-m-d" min="1903-01-02" max="@DateTime.Today.ToString()" data-order-id="@Model.Id" />
+                @* The altFormat and altInput attributes inform flatpickr to display an alternative <input> to the user with the yyyy-mm-dd date format *@
+                @* TODO: Use a flatpickr specific tag helper to clean up the date of birth input setup *@
+                <input asp-for="DateOfBirth" class="form-control order-dob-field" placeholder="yyyy-mm-dd" data-date-format="d/m/Y" data-default-date="@Model.DateOfBirth.ToString("dd/MM/yyyy")" data-min-date="02-01-1903" data-max-date="@DateTime.Today.ToString("dd/MM/yyyy")" data-order-id="@Model.Id" />
                 <small class="form-text text-muted">Please enter this as "yyyy-mm-dd". That way, it's less ambiguous for our international visitors!</small>
+                @Html.ValidationMessageFor(m => m.DateOfBirth, null, new { @class = "invalid-feedback" }, "div")
             </div>
 
             <div id="attendee-@Model.Id-under18Notice" class="alert alert-info d-none" role="alert">
@@ -72,32 +79,37 @@
                 <label asp-for="DietryRequirements">Dietary Preferences</label>
                 <select multiple class="form-control" asp-for="DietryRequirements" asp-items="Html.GetEnumSelectList<FurCoNZ.Web.ViewModels.FoodMenu>()"></select>
                 <small class="form-text text-muted">Be sure to detail any allergens in the "Known Allergies" section below.</small>
+                @Html.ValidationMessageFor(m => m.DietryRequirements,null,new { @class="text-danger"},"div")
             </div>
 
             <div class="form-group">
                 <label asp-for="KnownAllergies">Known Allergies / Medical Conditions</label>
                 <textarea asp-for="KnownAllergies" class="form-control" aria-describedby="attendee-@Model.Id-knownAllergiesHelp" rows="6"></textarea>
                 <small id="attendee-@Model.Id-knownAllergiesHelp" class="form-text text-muted">Please include any dietary requirements, medical allergies or other health and safety issues that staff need to be aware of.</small>
+                @Html.ValidationMessageFor(m => m.KnownAllergies, null, new { @class = "invalid-feedback" }, "div")
             </div>
 
             <div class="form-group">
                 <label asp-for="CabinPreferences">Cabin Preferences</label>
                 <textarea asp-for="CabinPreferences" class="form-control" aria-describedby="attendee-@Model.Id-cabinPrefencesHelp" rows="6"></textarea>
                 <small id="attendee-@Model.Id-cabinPrefencesHelp" class="form-text text-muted">If you have any preferences in who you want to room with, let us know here.</small>
+                @Html.ValidationMessageFor(m => m.CabinPreferences, null, new { @class = "invalid-feedback" }, "div")
             </div>
 
             <div class="form-group">
                 <label asp-for="OtherNotes">Other Notes</label>
                 <textarea asp-for="OtherNotes" class="form-control" aria-describedby="attendee-@Model.Id-otherNotesHelp" rows="6"></textarea>
                 <small id="attendee-@Model.Id-otherNotesHelp" class="form-text text-muted">Please let us know if there is anything else you can think of that you'd like us to know!</small>
+                @Html.ValidationMessageFor(m => m.OtherNotes, null, new { @class = "invalid-feedback" }, "div")
             </div>
 
             <div class="form-group">
                 <div class="form-check">
-                    <input class="form-check-input" type="checkbox" asp-for="AcceptToS">
+                    <input class="form-check-input " type="checkbox" asp-for="AcceptToS">
                     <label class="form-check-label" asp-for="AcceptToS">
                         I have read and accept the <a href="#">terms and conditions of attending FurCoNZ 2019</a>
                     </label>
+                    @Html.ValidationMessageFor(m => m.AcceptToS, null, new { @class = "invalid-feedback" }, "div")
                 </div>
             </div>
 

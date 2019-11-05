@@ -9,7 +9,13 @@ $(function () {
 
     // Configure flatpickr as the default javascript date picker for all <input type="date"> fields
     flatpickr("input[type=date]", {
-        dateFormat: "Y-m-d",
-        allowInput: true
+        dateFormat: "d/m/Y",
+        altFormat: "Y-m-d",
+        altInput: true,
+        allowInput: true,
+        // 🎉: https://github.com/flatpickr/flatpickr/issues/1551#issuecomment-522942541
+        onClose(dates, currentdatestring, picker) {
+            picker.setDate(picker.altInput.value, true, picker.config.altFormat)
+        }
     });
 });

@@ -90,18 +90,19 @@ namespace FurCoNZ.Web.Controllers
         [ValidateAntiForgeryToken]
         public async Task<IActionResult> Validate(IList<TicketDetailViewModel> model, CancellationToken cancellationToken)
         {
+            // Repopulate ticket type as that information isn't submitted back to us.
+            var ticketTypes = await _orderService.GetTicketTypesAsync(cancellationToken: cancellationToken);
+            foreach (var ticket in model)
+            {
+                var ticketType = ticketTypes.FirstOrDefault(x => x.Id == ticket.TicketType.Id);
+                ticket.TicketType = ticketType != null
+                    ? new TicketTypeViewModel(ticketType)
+                    : null;
+            }
+
             if (ModelState.IsValid)
             {
                 HttpContext.Session.Set(ActiveOrderSessionKey, model);
-
-                var ticketTypes = await _orderService.GetTicketTypesAsync(cancellationToken: cancellationToken);
-                foreach (var ticket in model)
-                {
-                    var ticketType = ticketTypes.FirstOrDefault(x => x.Id == ticket.TicketType.Id);
-                    ticket.TicketType = ticketType != null 
-                        ? new TicketTypeViewModel(ticketType) 
-                        : null;
-                }
 
                 var viewModel = new ValidateOrderViewModel
                 {
