@@ -45,7 +45,7 @@ else
                                 </td>
                             </tr>
                             <tr>
-                                <td colspan="5">
+                                <td colspan="5" class="p-0 border-top-0">
                                     <div class="collapse" id="ticketdetails-@ticketType.Key">
                                         <div class="card card-body">
                                             @Html.Raw(ticketType.Value.Description) @* SECURITY: This is an XSS vector. Do not allow untrusted input. See #119 for details. *@
