@@ -13,13 +13,13 @@ using SendGrid.Helpers.Mail;
 
 namespace FurCoNZ.Web.Services
 {
-    public class SendGridEmailService : IEmailService
+    public class SendGridEmailProvider : IEmailProvider
     {
         private readonly ISendGridClient _sendGridClient;
         private readonly ILogger _logger;
         private readonly SendGridEmailServiceOptions _options;
 
-        public SendGridEmailService(ISendGridClient sendGridClient, IOptions<SendGridEmailServiceOptions> options, ILogger<SendGridEmailService> logger)
+        public SendGridEmailProvider(ISendGridClient sendGridClient, IOptions<SendGridEmailServiceOptions> options, ILogger<SendGridEmailProvider> logger)
         {
             _sendGridClient = sendGridClient;
             _logger = logger;

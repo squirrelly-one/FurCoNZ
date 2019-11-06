@@ -187,7 +187,8 @@ namespace FurCoNZ.Web
 
             // Add application services to DI
             services.AddTransient<ISendGridClient>(c => new SendGridClient(Configuration["SendGrid:ApiKey"]));
-            services.AddTransient<IEmailService, SendGridEmailService>();
+            services.AddTransient<IEmailProvider, SendGridEmailProvider>();
+            services.AddTransient<IEmailService, EmailService>();
             services.AddTransient<IReminderService, ReminderService>();
             services.AddTransient<IViewRenderService, ViewRenderService>();
             services.AddTransient<IUserService, EntityFrameworkUserService>();

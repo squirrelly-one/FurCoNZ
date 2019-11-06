@@ -5,13 +5,11 @@ using System.Threading;
 using System.Threading.Tasks;
 
 using Microsoft.EntityFrameworkCore;
+using Microsoft.Extensions.Logging;
 
 using FurCoNZ.Web.DAL;
 using FurCoNZ.Web.Helpers;
 using FurCoNZ.Web.Models;
-using System.Net.Mail;
-using FurCoNZ.Web.ViewModels;
-using Microsoft.Extensions.Logging;
 
 namespace FurCoNZ.Web.Services
 {
@@ -19,14 +17,12 @@ namespace FurCoNZ.Web.Services
     {
         private readonly FurCoNZDbContext _db;
         private readonly IEmailService _emailService;
-        private readonly IViewRenderService _viewRenderService;
         private readonly ILogger _logger;
 
-        public OrderService(FurCoNZDbContext db, IEmailService emailService, IViewRenderService viewRenderService, ILogger<OrderService> logger)
+        public OrderService(FurCoNZDbContext db, IEmailService emailService, ILogger<OrderService> logger)
         {
             _db = db;
             _emailService = emailService;
-            _viewRenderService = viewRenderService;
             _logger = logger;
         }
 
@@ -84,19 +80,7 @@ namespace FurCoNZ.Web.Services
             // Commit to DB
             await _db.SaveChangesAsync(cancellationToken);
 
-            // Generate email to send to purchasing account
-            var toAddresses = new MailAddressCollection
-            {
-                new MailAddress (purchasingAccount.Email, purchasingAccount.Name),
-            };
-
-            var subject = $"Order #{order.Id} has been confirmed";
-
-            // Prepare template
-            var message = await _viewRenderService.RenderToStringAsync("EmailTemplates/OrderConfirmed", new OrderViewModel(order), cancellationToken: cancellationToken);
-
-            // Send message
-            await _emailService.SendEmailAsync(toAddresses, subject, message, cancellationToken: cancellationToken);
+            await _emailService.SendOrderConfirmationAsync(order, cancellationToken);
 
             return order;
         }
@@ -186,19 +170,7 @@ namespace FurCoNZ.Web.Services
                 await _db.SaveChangesAsync(cancellationToken);
             }
 
-            // Generate email to send to purchasing account
-            var toAddresses = new MailAddressCollection
-            {
-                new MailAddress (order.OrderedBy.Email, order.OrderedBy.Name),
-            };
-
-            var subject = $"Payment received for order #{order.Id}";
-
-            // Prepare template
-            var message = await _viewRenderService.RenderToStringAsync("EmailTemplates/PaymentReceived", new OrderViewModel(order), cancellationToken: cancellationToken);
-
-            // Send message
-            await _emailService.SendEmailAsync(toAddresses, subject, message, cancellationToken: cancellationToken);
+            await _emailService.SendPaymentReceivedAsync(order, cancellationToken);
         }
 
         public async Task RefundFundsForOrderAsync(int orderId, int amountCents, string paymentProvider, string paymentReference, DateTimeOffset when, CancellationToken cancellationToken = default)
@@ -233,19 +205,7 @@ namespace FurCoNZ.Web.Services
                 await _db.SaveChangesAsync(cancellationToken);
             }
 
-            // Generate email to send to purchasing account
-            var toAddresses = new MailAddressCollection
-            {
-                new MailAddress (order.OrderedBy.Email, order.OrderedBy.Name),
-            };
-
-            var subject = $"Your order #{order.Id} has been refunded";
-
-            // Prepare template
-            var message = await _viewRenderService.RenderToStringAsync("EmailTemplates/OrderRefunded", new OrderViewModel(order), cancellationToken: cancellationToken);
-
-            // Send message
-            await _emailService.SendEmailAsync(toAddresses, subject, message, cancellationToken: cancellationToken);
+            await _emailService.SendPaymentRefundedAsync(order, cancellationToken);
         }
 
         public async Task<IEnumerable<Order>> GetAllOrdersAsync(CancellationToken cancellationToken = default)
