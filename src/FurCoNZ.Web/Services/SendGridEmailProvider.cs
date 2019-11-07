@@ -1,15 +1,18 @@
-﻿using System.Linq;
+﻿using System.Collections.Generic;
+using System.Linq;
 using System.Net.Http;
 using System.Net.Mail;
 using System.Threading;
 using System.Threading.Tasks;
-using FurCoNZ.Web.Helpers;
-using FurCoNZ.Web.Options;
+
 using HtmlAgilityPack;
 using Microsoft.Extensions.Logging;
 using Microsoft.Extensions.Options;
 using SendGrid;
 using SendGrid.Helpers.Mail;
+
+using FurCoNZ.Web.Helpers;
+using FurCoNZ.Web.Options;
 
 namespace FurCoNZ.Web.Services
 {
@@ -26,7 +29,7 @@ namespace FurCoNZ.Web.Services
             _options = options.Value;
         }
 
-        public async Task SendEmailAsync(MailAddressCollection to, string subject, string htmlBody, AttachmentCollection attachments = null, CancellationToken cancellationToken = default)
+        public async Task SendEmailAsync(MailAddressCollection to, string subject, string htmlBody, IEnumerable<System.Net.Mail.Attachment> attachments = null, CancellationToken cancellationToken = default)
         {
             var sendGridMessage = MailHelper.CreateSingleEmailToMultipleRecipients(
                 from: new EmailAddress(_options.FromAddress, _options.FromName),

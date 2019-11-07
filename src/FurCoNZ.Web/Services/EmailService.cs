@@ -1,12 +1,15 @@
 ﻿using System;
 using System.Collections.Generic;
+using System.IO;
 using System.Linq;
 using System.Net.Mail;
+using System.Net.Mime;
 using System.Threading;
 using System.Threading.Tasks;
-
+using FurCoNZ.Web.Helpers;
 using FurCoNZ.Web.Models;
 using FurCoNZ.Web.ViewModels;
+using Microsoft.AspNetCore.Hosting;
 
 namespace FurCoNZ.Web.Services
 {
@@ -14,11 +17,13 @@ namespace FurCoNZ.Web.Services
     {
         private readonly IEmailProvider _emailProvider;
         private readonly IViewRenderService _viewRenderService;
+        private readonly IHostingEnvironment _environment;
 
-        public EmailService(IEmailProvider emailProvider, IViewRenderService viewRenderService)
+        public EmailService(IEmailProvider emailProvider, IViewRenderService viewRenderService, IHostingEnvironment environment)
         {
             _emailProvider = emailProvider;
             _viewRenderService = viewRenderService;
+            _environment = environment;
         }
 
         public async Task SendOrderCancelledNotificationAsync(Order order, CancellationToken cancellationToken = default)
@@ -63,9 +68,21 @@ namespace FurCoNZ.Web.Services
                 ? message.ViewData["Subject"] as string
                 : $"Order #{order.Id} has been confirmed";
 
-            AttachmentCollection attachments = null;
-            if (message.ViewData.TryGetValue("Attachments", out var vdAattachments))
-                attachments = vdAattachments as AttachmentCollection;
+            var dateOfCon = DateTime.Parse("2020-01-30");
+
+            var requireParentalConsent = order.TicketsPurchased.Any(t =>
+            {
+                var ageAtCon = t.DateOfBirth.GetAgeAtDate(dateOfCon);
+                return ageAtCon < 18 && ageAtCon >= 16;
+            });
+
+            var attachments = new List<Attachment>();
+            if (requireParentalConsent)
+            {
+                var consentForm = new Attachment(Path.Join(_environment.WebRootPath, "assets/FurCoNZ-Parental_Consent_Form-2020.pdf"), MediaTypeNames.Application.Pdf);
+                consentForm.ContentDisposition.Inline = false;
+                attachments.Add(consentForm);
+            }
 
             // Send message
             await _emailProvider.SendEmailAsync(toAddresses, subject, message.Output, attachments: attachments, cancellationToken: cancellationToken);
