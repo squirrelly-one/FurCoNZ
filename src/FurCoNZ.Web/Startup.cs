@@ -294,9 +294,9 @@ namespace FurCoNZ.Web
             app.UseReferrerPolicy(opts => opts.NoReferrer());
 
             app.UseCsp(options =>
-            { 
+            {
                 options.BlockAllMixedContent()
-                    .ConnectSources(c => c.None())
+                    .ConnectSources(s => s.Self()) // Allow ajax queries
                     .FontSources(f => f.Self())
                     .FontSources(f => f.CustomSources("https://fonts.gstatic.com"))
                     .FrameAncestors(f => f.Self())
