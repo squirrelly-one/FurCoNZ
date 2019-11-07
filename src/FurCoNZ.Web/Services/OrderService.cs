@@ -170,7 +170,15 @@ namespace FurCoNZ.Web.Services
                 await _db.SaveChangesAsync(cancellationToken);
             }
 
-            await _emailService.SendPaymentReceivedAsync(order, cancellationToken);
+            if (order.AmountPaidCents >= order.TotalAmountCents)
+            {
+                await _emailService.SendOrderPaidAsync(order, cancellationToken);
+            }
+            else
+            {
+                await _emailService.SendPaymentReceivedAsync(order, cancellationToken);
+            }
+
         }
 
         public async Task RefundFundsForOrderAsync(int orderId, int amountCents, string paymentProvider, string paymentReference, DateTimeOffset when, CancellationToken cancellationToken = default)

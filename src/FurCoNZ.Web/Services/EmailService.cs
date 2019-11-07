@@ -88,6 +88,41 @@ namespace FurCoNZ.Web.Services
             await _emailProvider.SendEmailAsync(toAddresses, subject, message.Output, attachments: attachments, cancellationToken: cancellationToken);
         }
 
+        public async Task SendOrderPaidAsync(Order order, CancellationToken cancellationToken = default)
+        {
+            // Generate email to send to purchasing account
+            var toAddresses = new MailAddressCollection
+            {
+                new MailAddress(order.OrderedBy.Email, order.OrderedBy.Name),
+            };
+
+            // Prepare template
+            var message = await _viewRenderService.RenderToStringAsync("EmailTemplates/OrderPaid", new OrderViewModel(order), cancellationToken: cancellationToken);
+
+            var subject = message.ViewData.ContainsKey("Subject")
+                ? message.ViewData["Subject"] as string
+                : $"Order #{order.Id} has been paid";
+
+            var dateOfCon = DateTime.Parse("2020-01-30");
+
+            var requireParentalConsent = order.TicketsPurchased.Any(t =>
+            {
+                var ageAtCon = t.DateOfBirth.GetAgeAtDate(dateOfCon);
+                return ageAtCon < 18 && ageAtCon >= 16;
+            });
+
+            var attachments = new List<Attachment>();
+            if (requireParentalConsent)
+            {
+                var consentForm = new Attachment(Path.Join(_environment.WebRootPath, "assets/FurCoNZ-Parental_Consent_Form-2020.pdf"), MediaTypeNames.Application.Pdf);
+                consentForm.ContentDisposition.Inline = false;
+                attachments.Add(consentForm);
+            }
+
+            // Send message
+            await _emailProvider.SendEmailAsync(toAddresses, subject, message.Output, attachments: attachments, cancellationToken: cancellationToken);
+        }
+
         public async Task SendPaymentReceivedAsync(Order order, CancellationToken cancellationToken)
         {
             // Generate email to send to purchasing account

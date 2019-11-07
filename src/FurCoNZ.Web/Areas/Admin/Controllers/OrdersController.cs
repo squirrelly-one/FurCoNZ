@@ -79,6 +79,21 @@ namespace FurCoNZ.Web.Areas.Admin.Controllers
             return RedirectToAction(nameof(Index), new { id = order.Id });
         }
 
+        [HttpPost]
+        public async Task<IActionResult> SendPaidEmail(OrderViewModel orderViewModel)
+        {
+            // TODO: Refund a select payment
+            var order = await _orderService.GetOrderById(orderViewModel.Id, HttpContext.RequestAborted);
+            if (order == null)
+            {
+                return NotFound();
+            }
+
+            await _emailService.SendOrderPaidAsync(order, HttpContext.RequestAborted);
+
+            return RedirectToAction(nameof(Index), new { id = order.Id });
+        }
+
         /// <summary>
         /// Refunds entire order.
         /// </summary>

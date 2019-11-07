@@ -19,6 +19,13 @@
                             <input type="hidden" asp-for="Id" />
                             <button class="dropdown-item" type="submit">Resend Confirmation Email</button>
                         </form>
+                        @if (Model.AmountPaidCents >= Model.AmountTotalCents)
+                        {
+                        <form asp-action="SendPaidEmail" method="post">
+                            <input type="hidden" asp-for="Id" />
+                            <button class="dropdown-item" type="submit">Resend Order Paid Email</button>
+                        </form>
+                        }
                         <form asp-action="Refund" method="post">
                             <input type="hidden" asp-for="Id" />
                             <button class="dropdown-item text-danger" type="submit">Refund</button>
