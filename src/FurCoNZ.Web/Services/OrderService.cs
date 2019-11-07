@@ -225,6 +225,7 @@ namespace FurCoNZ.Web.Services
                 .Include(o => o.TicketsPurchased)
                 .ThenInclude(t => t.TicketType)
                 .Include(o => o.Audits)
+                .Include(o => o.OrderedBy)
                 .SingleOrDefaultAsync(o => o.Id == orderId, cancellationToken);
         }
 

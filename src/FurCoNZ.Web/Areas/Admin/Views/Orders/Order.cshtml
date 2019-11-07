@@ -15,6 +15,10 @@
                         Actions
                     </button>
                     <div class="dropdown-menu">
+                        <form asp-action="SendConfirmationEmail" method="post">
+                            <input type="hidden" asp-for="Id" />
+                            <button class="dropdown-item" type="submit">Resend Confirmation Email</button>
+                        </form>
                         <form asp-action="Refund" method="post">
                             <input type="hidden" asp-for="Id" />
                             <button class="dropdown-item text-danger" type="submit">Refund</button>
