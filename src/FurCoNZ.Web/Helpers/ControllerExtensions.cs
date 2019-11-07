@@ -12,14 +12,16 @@ namespace FurCoNZ.Web.Helpers
         {
             var viewRenderService = controller.HttpContext.RequestServices.GetService(typeof(IViewRenderService)) as IViewRenderService;
 
-            return await viewRenderService.RenderToStringAsync(controller, viewName, model, partial);
+            var result = await viewRenderService.RenderToStringAsync(controller, viewName, model, partial);
+            return result.Output;
         }
 
         public static async Task<string> RenderViewAsync<TModel>(this Controller controller, TModel model, bool partial = false)
         {
             var viewRenderService = controller.HttpContext.RequestServices.GetService(typeof(IViewRenderService)) as IViewRenderService;
 
-            return await viewRenderService.RenderToStringAsync(controller, model, partial);
+            var result = await viewRenderService.RenderToStringAsync(controller, model, partial);
+            return result.Output;
         }
     }
 }
