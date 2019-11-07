@@ -39,7 +39,7 @@ namespace FurCoNZ.Web.Services
             _serviceProvider = serviceProvider;
         }
 
-        public async Task<string> RenderToStringAsync<TModel>(Controller controller, TModel model, bool partial = false)
+        public async Task<(string Output, ViewDataDictionary ViewData)> RenderToStringAsync<TModel>(Controller controller, TModel model, bool partial = false)
         {
             if (controller == null)
             {
@@ -48,7 +48,7 @@ namespace FurCoNZ.Web.Services
             return await RenderToStringAsync(controller, controller.ControllerContext.ActionDescriptor.ActionName, model, partial);
         }
 
-        public async Task<string> RenderToStringAsync<TModel>(Controller controller, string viewName, TModel model, bool partial = false)
+        public async Task<(string Output, ViewDataDictionary ViewData)> RenderToStringAsync<TModel>(Controller controller, string viewName, TModel model, bool partial = false)
         {
             if (controller == null)
             {
@@ -64,7 +64,7 @@ namespace FurCoNZ.Web.Services
             return await RenderToStringAsync(controller.ControllerContext, viewName, controller.ViewData, controller.TempData, partial);
         }
 
-        public async Task<string> RenderToStringAsync<TModel>(string viewName, TModel model, bool partial = false, CancellationToken cancellationToken = default)
+        public async Task<(string Output, ViewDataDictionary ViewData)> RenderToStringAsync<TModel>(string viewName, TModel model, bool partial = false, CancellationToken cancellationToken = default)
         {
             using (var serviceScope = _serviceProvider.CreateScope())
             {
@@ -94,7 +94,7 @@ namespace FurCoNZ.Web.Services
             }
         }
 
-        private async Task<string> RenderToStringAsync(ActionContext actionContext, string viewName, ViewDataDictionary viewData, ITempDataDictionary tempData, bool partial = false)
+        private async Task<(string Output, ViewDataDictionary ViewData)> RenderToStringAsync(ActionContext actionContext, string viewName, ViewDataDictionary viewData, ITempDataDictionary tempData, bool partial = false)
         {
             var viewResult = _razorViewEngine.FindView(actionContext, viewName, !partial);
 
@@ -116,7 +116,7 @@ namespace FurCoNZ.Web.Services
                 );
 
                 await viewResult.View.RenderAsync(viewContext);
-                return stringWriter.ToString();
+                return (stringWriter.ToString(), viewData);
             }
         }
     }

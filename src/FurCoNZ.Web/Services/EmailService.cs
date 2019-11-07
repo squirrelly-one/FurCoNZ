@@ -36,13 +36,16 @@ namespace FurCoNZ.Web.Services
                 {
                     new MailAddress (viewModel.Email, viewModel.Name),
                 };
-            var subject = $"Order #{viewModel.Id} has expired";
 
             // Prepare template
             var message = await _viewRenderService.RenderToStringAsync("EmailTemplate/ExpiredOrder", viewModel, cancellationToken: cancellationToken);
 
+            var subject = message.ViewData.ContainsKey("Subject")
+                ? message.ViewData["Subject"] as string
+                : $"Order #{viewModel.Id} has expired";
+
             // Send message
-            await _emailProvider.SendEmailAsync(toAddresses, subject, message, cancellationToken: cancellationToken);
+            await _emailProvider.SendEmailAsync(toAddresses, subject, message.Output, cancellationToken: cancellationToken);
         }
 
         public async Task SendOrderConfirmationAsync(Order order, CancellationToken cancellationToken = default)
@@ -53,13 +56,19 @@ namespace FurCoNZ.Web.Services
                 new MailAddress(order.OrderedBy.Email, order.OrderedBy.Name),
             };
 
-            var subject = $"Order #{order.Id} has been confirmed";
-
             // Prepare template
             var message = await _viewRenderService.RenderToStringAsync("EmailTemplates/OrderConfirmed", new OrderViewModel(order), cancellationToken: cancellationToken);
 
+            var subject = message.ViewData.ContainsKey("Subject")
+                ? message.ViewData["Subject"] as string
+                : $"Order #{order.Id} has been confirmed";
+
+            AttachmentCollection attachments = null;
+            if (message.ViewData.TryGetValue("Attachments", out var vdAattachments))
+                attachments = vdAattachments as AttachmentCollection;
+
             // Send message
-            await _emailProvider.SendEmailAsync(toAddresses, subject, message, cancellationToken: cancellationToken);
+            await _emailProvider.SendEmailAsync(toAddresses, subject, message.Output, attachments: attachments, cancellationToken: cancellationToken);
         }
 
         public async Task SendPaymentReceivedAsync(Order order, CancellationToken cancellationToken)
@@ -70,13 +79,19 @@ namespace FurCoNZ.Web.Services
                 new MailAddress (order.OrderedBy.Email, order.OrderedBy.Name),
             };
 
-            var subject = $"Payment received for order #{order.Id}";
-
             // Prepare template
             var message = await _viewRenderService.RenderToStringAsync("EmailTemplates/PaymentReceived", new OrderViewModel(order), cancellationToken: cancellationToken);
 
+            var subject = message.ViewData.ContainsKey("Subject")
+                ? message.ViewData["Subject"] as string
+                : $"Payment received for order #{order.Id}";
+
+            AttachmentCollection attachments = null;
+            if (message.ViewData.TryGetValue("Attachments", out var vdAattachments))
+                attachments = vdAattachments as AttachmentCollection;
+
             // Send message
-            await _emailProvider.SendEmailAsync(toAddresses, subject, message, cancellationToken: cancellationToken);
+            await _emailProvider.SendEmailAsync(toAddresses, subject, message.Output, attachments: attachments, cancellationToken: cancellationToken);
         }
 
         public async Task SendPaymentRefundedAsync(Order order, CancellationToken cancellationToken)
@@ -87,13 +102,19 @@ namespace FurCoNZ.Web.Services
                 new MailAddress (order.OrderedBy.Email, order.OrderedBy.Name),
             };
 
-            var subject = $"Your order #{order.Id} has been refunded";
-
             // Prepare template
             var message = await _viewRenderService.RenderToStringAsync("EmailTemplates/OrderRefunded", new OrderViewModel(order), cancellationToken: cancellationToken);
 
+            var subject = message.ViewData.ContainsKey("Subject")
+                ? message.ViewData["Subject"] as string
+                : $"Your order #{order.Id} has been refunded";
+
+            AttachmentCollection attachments = null;
+            if (message.ViewData.TryGetValue("Attachments", out var vdAattachments))
+                attachments = vdAattachments as AttachmentCollection;
+
             // Send message
-            await _emailProvider.SendEmailAsync(toAddresses, subject, message, cancellationToken: cancellationToken);
+            await _emailProvider.SendEmailAsync(toAddresses, subject, message.Output, attachments: attachments, cancellationToken: cancellationToken);
         }
 
         public async Task SendPendingOrderNotificationAsync(Order order, CancellationToken cancellationToken)
@@ -113,13 +134,19 @@ namespace FurCoNZ.Web.Services
                 new MailAddress (viewModel.Email, viewModel.Name),
             };
 
-            var subject = $"Order #{viewModel.Id} is still pending payment";
-
             // Prepare template
             var message = await _viewRenderService.RenderToStringAsync("EmailTemplate/UnpaidReminder", viewModel, cancellationToken: cancellationToken);
 
+            var subject = message.ViewData.ContainsKey("Subject")
+                ? message.ViewData["Subject"] as string
+                : $"Order #{viewModel.Id} is still pending payment";
+
+            AttachmentCollection attachments = null;
+            if (message.ViewData.TryGetValue("Attachments", out var vdAattachments))
+                attachments = vdAattachments as AttachmentCollection;
+
             // Send message
-            await _emailProvider.SendEmailAsync(toAddresses, subject, message, cancellationToken: cancellationToken);
+            await _emailProvider.SendEmailAsync(toAddresses, subject, message.Output, attachments: attachments, cancellationToken: cancellationToken);
         }
     }
 }
