@@ -28,16 +28,8 @@
                 <i>Please note that an convenience fee has been included.</i>
             </p>
         }
-        <button id="payWithStripeButton" type="button" class="btn btn-primary float-right">Pay with Stripe</button>
+        <button id="payWithStripeButton" type="button" class="btn btn-primary float-right" data-session-id="@Model.CheckoutSessionId" data-stripe-key="@Stripe.Value.PublishableKey">Pay with Stripe</button>
 
         <script src="https://js.stripe.com/v3/"></script>
-        <script>
-        const stripe = Stripe('@Stripe.Value.PublishableKey');
-        document.getElementById('payWithStripeButton').addEventListener('click', (event) => {
-            stripe.redirectToCheckout({
-                sessionId: '@Model.CheckoutSessionId',
-            });
-        })
-        </script>
     </div>
 </div>

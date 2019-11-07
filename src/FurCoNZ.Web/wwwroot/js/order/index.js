@@ -26,6 +26,16 @@ function getAgeAtDate(dateOfBirthString, dateOfEventString) {
     return age;
 }
 
+function beginStripPayment(e) {
+    const stripe = Stripe($(e.target).data("stripe-key"));
+    const sessionId = $(e.target).data("session-id");
+
+    stripe.redirectToCheckout({
+        sessionId: sessionId,
+    });
+}
+
 $(function () {
     $(".order-dob-field").on("change", dateOfBirthChanged);
+    $("#payWithStripeButton").on("click", beginStripPayment);
 });
