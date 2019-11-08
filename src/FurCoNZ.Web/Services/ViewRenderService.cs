@@ -1,4 +1,5 @@
 ﻿using System;
+using System.Globalization;
 using System.IO;
 using System.Threading;
 using System.Threading.Tasks;
@@ -33,6 +34,7 @@ namespace FurCoNZ.Web.Services
         private readonly IServiceProvider _serviceProvider;
         private readonly IConfiguration _configuration;
         private readonly HttpRequestFeature _defaultRequestFeature;
+        private readonly CultureInfo _cultureInfo;
 
         public ViewRenderService(
             IHttpContextAccessor httpContextAccessor,
@@ -49,6 +51,9 @@ namespace FurCoNZ.Web.Services
 
             var emailBaseUrl = _configuration.GetSection("Email:BaseUrl").Get<string>();
             var url = new Uri(emailBaseUrl);
+
+            _cultureInfo = CultureInfo.GetCultureInfo("en-NZ");
+
             _defaultRequestFeature = new HttpRequestFeature
             {
                 Headers =
@@ -103,6 +108,9 @@ namespace FurCoNZ.Web.Services
                 }
                 else
                 {
+                    CultureInfo.DefaultThreadCurrentCulture = _cultureInfo;
+                    CultureInfo.DefaultThreadCurrentUICulture = _cultureInfo;
+
                     var features = new FeatureCollection();
                     features.Set<IHttpRequestFeature>(_defaultRequestFeature);
 
