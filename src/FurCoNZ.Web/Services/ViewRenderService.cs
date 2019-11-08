@@ -16,6 +16,7 @@ using Microsoft.AspNetCore.Server.Kestrel.Core;
 using Microsoft.Extensions.Configuration;
 using Microsoft.Extensions.DependencyInjection;
 using Microsoft.Extensions.Options;
+using Microsoft.Net.Http.Headers;
 
 namespace FurCoNZ.Web.Services
 {
@@ -52,7 +53,8 @@ namespace FurCoNZ.Web.Services
             {
                 Headers =
                 {
-                    {"Host", url.Authority }
+                    {HeaderNames.Host, url.Authority },
+                    {HeaderNames.AcceptLanguage, "en-NZ" },
                 },
                 Scheme = url.Scheme,
                 QueryString = url.Query,
