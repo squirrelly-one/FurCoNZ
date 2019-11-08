@@ -56,7 +56,7 @@ namespace FurCoNZ.Web.ViewModels
         public bool AcceptToS { get; set; }
 
         [Display(Name = "Dietary Requirements")]
-        public IEnumerable<FoodMenu> DietryRequirements { get; set; }
+        public IEnumerable<FoodMenu> DietryRequirements { get; set; } = new List<FoodMenu>();
 
         public IEnumerable<ValidationResult> Validate(ValidationContext validationContext)
         {

@@ -171,7 +171,9 @@ namespace FurCoNZ.Web.Controllers
                 EmailAddress = ticketViewModel.EmailAddress,
 
                 // MealRequirements
-                MealRequirements = ticketViewModel.DietryRequirements.Select(f => (Models.FoodMenu)f).Aggregate((a,b) => a | b),
+                MealRequirements = ticketViewModel.DietryRequirements.Any() 
+                    ? ticketViewModel.DietryRequirements.Select(f => (Models.FoodMenu)f).Aggregate((a,b) => a | b)
+                    : Models.FoodMenu.Regular,
                 KnownAllergens = ticketViewModel.KnownAllergies,
                 CabinGrouping = ticketViewModel.CabinPreferences,
 
