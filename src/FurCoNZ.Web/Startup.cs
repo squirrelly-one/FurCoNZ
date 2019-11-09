@@ -301,7 +301,7 @@ namespace FurCoNZ.Web
                     .FontSources(f => f.CustomSources("https://fonts.gstatic.com"))
                     .FrameAncestors(f => f.Self())
                     .ImageSources(i => i.Self())
-                    .ImageSources(i => i.CustomSources("data:"))
+                    .ImageSources(i => i.CustomSources("data:", "photos.furco.nz"))
                     .ManifestSources(m => m.None())
                     .MediaSources(m => m.Self())
                     .ObjectSources(o => o.None())
