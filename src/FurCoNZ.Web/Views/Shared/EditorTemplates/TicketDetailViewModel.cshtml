@@ -92,7 +92,7 @@
             <div class="form-group">
                 <label asp-for="CabinPreferences">Cabin Preferences</label>
                 <textarea asp-for="CabinPreferences" class="form-control" aria-describedby="attendee-@Model.Id-cabinPrefencesHelp" rows="6"></textarea>
-                <small id="attendee-@Model.Id-cabinPrefencesHelp" class="form-text text-muted">If you have any preferences in who you want to room with, let us know here.</small>
+                <small id="attendee-@Model.Id-cabinPrefencesHelp" class="form-text text-muted">If you have any preferences in who you want to room with, let us know here (i.e. Quiet cabin, social cabin, noise cabin). <strong>IF NO PREFERENCE IS GIVEN, YOU WILL BE PLACED ON AVAILABILITY.</strong></small>
                 @Html.ValidationMessageFor(m => m.CabinPreferences, null, new { @class = "invalid-feedback" }, "div")
             </div>
 
