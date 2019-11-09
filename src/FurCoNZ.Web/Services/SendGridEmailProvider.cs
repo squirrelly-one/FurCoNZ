@@ -1,27 +1,35 @@
-﻿using System.Net.Mail;
+﻿using System.Collections.Generic;
+using System.Linq;
+using System.Net.Http;
+using System.Net.Mail;
 using System.Threading;
 using System.Threading.Tasks;
-using FurCoNZ.Web.Helpers;
-using FurCoNZ.Web.Options;
+
 using HtmlAgilityPack;
+using Microsoft.Extensions.Logging;
 using Microsoft.Extensions.Options;
 using SendGrid;
 using SendGrid.Helpers.Mail;
 
+using FurCoNZ.Web.Helpers;
+using FurCoNZ.Web.Options;
+
 namespace FurCoNZ.Web.Services
 {
-    public class SendGridEmailService : IEmailService
+    public class SendGridEmailProvider : IEmailProvider
     {
         private readonly ISendGridClient _sendGridClient;
+        private readonly ILogger _logger;
         private readonly SendGridEmailServiceOptions _options;
 
-        public SendGridEmailService(ISendGridClient sendGridClient, IOptions<SendGridEmailServiceOptions> options)
+        public SendGridEmailProvider(ISendGridClient sendGridClient, IOptions<SendGridEmailServiceOptions> options, ILogger<SendGridEmailProvider> logger)
         {
             _sendGridClient = sendGridClient;
+            _logger = logger;
             _options = options.Value;
         }
 
-        public async Task SendEmailAsync(MailAddressCollection to, string subject, string htmlBody, AttachmentCollection attachments = null, CancellationToken cancellationToken = default)
+        public async Task SendEmailAsync(MailAddressCollection to, string subject, string htmlBody, IEnumerable<System.Net.Mail.Attachment> attachments = null, CancellationToken cancellationToken = default)
         {
             var sendGridMessage = MailHelper.CreateSingleEmailToMultipleRecipients(
                 from: new EmailAddress(_options.FromAddress, _options.FromName),
@@ -31,9 +39,23 @@ namespace FurCoNZ.Web.Services
                 htmlContent: htmlBody
             );
 
-            await sendGridMessage.AddAttachmentsAsync(attachments, cancellationToken);
+            if (attachments != null && attachments.Any())
+            {
+                await sendGridMessage.AddAttachmentsAsync(attachments, cancellationToken);
+            }
 
-            await _sendGridClient.SendEmailAsync(sendGridMessage, cancellationToken);
+            try
+            {
+
+                var response = await _sendGridClient.SendEmailAsync(sendGridMessage, cancellationToken);
+                if(response.StatusCode != System.Net.HttpStatusCode.Accepted)
+                {
+                    _logger.LogError($"Failed to send email to {to}. Sendgrid response: {response.Body}");
+                }
+            }
+            catch (HttpRequestException ex) {
+                _logger.LogError(ex, $"Failed to send email to {to}.");
+            }
         }
 
         /// <summary>

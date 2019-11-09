@@ -12,6 +12,8 @@ using FurCoNZ.Web.Helpers;
 using FurCoNZ.Web.Services;
 using FurCoNZ.Web.Models;
 using FurCoNZ.Web.ViewModels;
+using Microsoft.AspNetCore.Authentication;
+using Microsoft.AspNetCore.Authentication.Cookies;
 
 // For more information on enabling MVC for empty projects, visit https://go.microsoft.com/fwlink/?LinkID=397860
 
@@ -80,6 +82,38 @@ namespace FurCoNZ.Web.Controllers
                 {
                     Orders = orders.Select(o => new OrderViewModel(o)).ToList()
                 });
+        }
+
+        public async Task<IActionResult> Tickets()
+        {
+            var user = await _userService.GetCurrentUserAsync(HttpContext.RequestAborted);
+            if (user == null)
+            {
+                throw new Exception("We are unable to find your user details within our database. Which may indicate that you did not log in properly");
+            }
+
+            HttpContext.RequestAborted.ThrowIfCancellationRequested();
+
+            var orders = await _orderService.GetUserOrdersAsync(user, HttpContext.RequestAborted);
+
+            return View(new AccountTicketsViewModel
+            {
+                Tickets = orders
+                    // Filter out refunded tickets
+                    .Where(o => o.Audits.All(a => a.Type != AuditType.Refunded))
+                    .SelectMany(o => o.TicketsPurchased)
+                    .Select(t => new TicketDetailViewModel(t))
+                    .OrderBy(t => t.Id).ToList(),
+            });
+        }
+
+        public async Task<IActionResult> Logout()
+        {
+            var callbackUrl = Url.Action("Index", "Home", values: null, protocol: Request.Scheme);
+            var signOut = SignOut(new AuthenticationProperties {
+                    RedirectUri = callbackUrl
+                }, CookieAuthenticationDefaults.AuthenticationScheme, "oidc");
+            return signOut;
         }
     }
 }

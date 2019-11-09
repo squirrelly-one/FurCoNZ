@@ -13,6 +13,7 @@ namespace FurCoNZ.Web.ViewModels
         public string Description { get; set; }
         public int PriceCents { get; set; }
         public int TotalAvailable { get; set; }
+        public DateTimeOffset SoldOutAt { get; set; }
 
         public decimal Price => (decimal)PriceCents / 100;
 
@@ -32,6 +33,7 @@ namespace FurCoNZ.Web.ViewModels
             Description = ticketType.Description;
             PriceCents = ticketType.PriceCents;
             TotalAvailable = ticketType.TotalAvailable;
+            SoldOutAt = ticketType.SoldOutAt;
         }
     }
 }

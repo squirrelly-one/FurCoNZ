@@ -43,13 +43,14 @@ namespace FurCoNZ.Web.Models
     /// <summary>
     /// Describes the type of menu that the attendee wishes for. This is heavily dependent on the venue.
     /// </summary>
+    [Flags]
     public enum FoodMenu
     {
         Regular = 0,
         Vegetarian = 1,
         Vegan = 2,
-        DairyFree = 3,
-        GlutenFree = 4
+        DairyFree = 4,
+        GlutenFree = 8
     }
 
     /// <summary>

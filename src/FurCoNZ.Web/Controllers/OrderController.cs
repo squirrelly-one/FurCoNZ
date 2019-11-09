@@ -1,6 +1,7 @@
 ﻿using System;
 using System.Collections.Generic;
 using System.Linq;
+using System.Net.Mail;
 using System.Threading;
 using System.Threading.Tasks;
 using FurCoNZ.Web.Helpers; // Required for SessionExtensions
@@ -58,7 +59,7 @@ namespace FurCoNZ.Web.Controllers
             if (ModelState.IsValid)
             {
                 var viewModel = new List<TicketDetailViewModel>();
-                var ticketTypes = await _orderService.GetTicketTypesAsync(false, cancellationToken);
+                var ticketTypes = await _orderService.GetTicketTypesAsync(false, false, cancellationToken);
 
                 var ticketIndex = 0;
                 foreach (var ticketTypeOrdered in orderIndexViewModel.AvailableTicketTypes.Where(x => x.Value.QuantityOrdered > 0))
@@ -89,18 +90,19 @@ namespace FurCoNZ.Web.Controllers
         [ValidateAntiForgeryToken]
         public async Task<IActionResult> Validate(IList<TicketDetailViewModel> model, CancellationToken cancellationToken)
         {
+            // Repopulate ticket type as that information isn't submitted back to us.
+            var ticketTypes = await _orderService.GetTicketTypesAsync(cancellationToken: cancellationToken);
+            foreach (var ticket in model)
+            {
+                var ticketType = ticketTypes.FirstOrDefault(x => x.Id == ticket.TicketType.Id);
+                ticket.TicketType = ticketType != null
+                    ? new TicketTypeViewModel(ticketType)
+                    : null;
+            }
+
             if (ModelState.IsValid)
             {
                 HttpContext.Session.Set(ActiveOrderSessionKey, model);
-
-                var ticketTypes = await _orderService.GetTicketTypesAsync(cancellationToken: cancellationToken);
-                foreach (var ticket in model)
-                {
-                    var ticketType = ticketTypes.FirstOrDefault(x => x.Id == ticket.TicketType.Id);
-                    ticket.TicketType = ticketType != null 
-                        ? new TicketTypeViewModel(ticketType) 
-                        : null;
-                }
 
                 var viewModel = new ValidateOrderViewModel
                 {
@@ -129,7 +131,7 @@ namespace FurCoNZ.Web.Controllers
 
                 if (sessionHasNotChanged)
                 {
-                    Models.User user = await _userService.GetCurrentUserAsync(cancellationToken);
+                    var user = await _userService.GetCurrentUserAsync(cancellationToken);
 
                     var tickets = new List<Models.Ticket>();
 
@@ -138,7 +140,7 @@ namespace FurCoNZ.Web.Controllers
                         tickets.Add(GetTicketEntityFromViewModel(ticketViewModel));
                     }
 
-                    var order = await _orderService.CreateOrderAsync(user, tickets, cancellationToken);
+                    var order = await _orderService.CreateOrderAsync(user, tickets, cancellationToken: cancellationToken);
 
                     return RedirectToAction("Index", "Checkout", new { orderId = order.Id });
                 }
@@ -162,22 +164,18 @@ namespace FurCoNZ.Web.Controllers
                 PreferredName = ticketViewModel.PreferredFullName,
                 // PreferredPronouns
 
+
                 LegalName = String.IsNullOrWhiteSpace(ticketViewModel.IdentificationFullName) ? ticketViewModel.PreferredFullName : ticketViewModel.IdentificationFullName,
                 DateOfBirth = ticketViewModel.DateOfBirth,
 
                 EmailAddress = ticketViewModel.EmailAddress,
 
-                // Address
-                // Suburb
-                // CityTown
-                // Country
-
-                // PhoneNumber
-
                 // MealRequirements
+                MealRequirements = ticketViewModel.DietryRequirements.Any() 
+                    ? ticketViewModel.DietryRequirements.Select(f => (Models.FoodMenu)f).Aggregate((a,b) => a | b)
+                    : Models.FoodMenu.Regular,
                 KnownAllergens = ticketViewModel.KnownAllergies,
                 CabinGrouping = ticketViewModel.CabinPreferences,
-                // CabinNoisePreference
 
                 AdditionalNotes = ticketViewModel.OtherNotes,
             };

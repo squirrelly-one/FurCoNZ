@@ -31,6 +31,8 @@ namespace FurCoNZ.Web.Services.Payment
 
         public string Name => NAME;
 
+        public string DisplayName => "Stripe";
+
         public string SupportedMethods => "Credit Card";
 
         public string Description => "Online payment processor for credit cards.";
@@ -175,7 +177,7 @@ namespace FurCoNZ.Web.Services.Payment
 
             var refund = await _refundService.CreateAsync(new RefundCreateOptions
             {
-                ChargeId = charge.Id,
+                Charge = charge.Id,
                 Amount = charge.Amount,
                 Reason = RefundReasons.RequestedByCustomer,
             }, cancellationToken: cancellationToken);

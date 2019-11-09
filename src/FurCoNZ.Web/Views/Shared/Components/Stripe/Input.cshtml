@@ -3,30 +3,33 @@
 
 <div class="card">
     <div class="card-body">
-        <h5 class="card-title">Pay with Stripe</h5>
+        <h5 class="h5 card-title">Pay with Stripe</h5>
         <p class="card-text">
-            Stripe supports paying by card, Apple Pay, and uh... magic!
+            Stripe supports Credit/Debit cards, Apple Pay, and uh... magic!
         </p>
+
+        <table class="table table-light">
+            @if (Model.Fee > 0)
+            {
+                <tr>
+                    <th scope="row" class="text-right">Stripe convenience fee</th>
+                    <td>@Model.Fee.ToString("C")</td>
+                </tr>
+            }
+            <tr>
+                <th scope="row" class="text-right">Total</th>
+                <td>@Model.Total.ToString("C")</td>
+            </tr>
+        </table>
+        
         @if (Model.Fee > 0)
         {
-        <p class="card-text">
-            <i>Includes Stripe convenience fee of @Model.Fee.ToString("C").</i>
-        </p>
-        <p class="card-text">
-            Total: <strong>@Model.Total.ToString("C")</strong>
-        </p>
+            <p class="card-text">
+                <i>Please note that an convenience fee has been included.</i>
+            </p>
         }
-
-        <button id="payWithStripeButton" type="button" class="btn btn-primary">Pay with Stripe</button>
+        <button id="payWithStripeButton" type="button" class="btn btn-primary float-right" data-session-id="@Model.CheckoutSessionId" data-stripe-key="@Stripe.Value.PublishableKey">Pay with Stripe</button>
 
         <script src="https://js.stripe.com/v3/"></script>
-        <script>
-        const stripe = Stripe('@Stripe.Value.PublishableKey');
-        document.getElementById('payWithStripeButton').addEventListener('click', (event) => {
-            stripe.redirectToCheckout({
-                sessionId: '@Model.CheckoutSessionId',
-            });
-        })
-        </script>
     </div>
 </div>

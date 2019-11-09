@@ -16,7 +16,37 @@ namespace FurCoNZ.Web.Controllers
             return View();
         }
 
+        public IActionResult GetNotified()
+        {
+            return View();
+        }
+
+        public IActionResult News()
+        {
+            return View();
+        }
+
         public IActionResult Privacy()
+        {
+            return View();
+        }
+
+        public IActionResult About()
+        {
+            return View();
+        }
+        public IActionResult Terms()
+        {
+            return View();
+        }
+
+        public IActionResult ParentalConsent()
+        {
+            return View();
+        }
+
+
+        public IActionResult FAQ()
         {
             return View();
         }

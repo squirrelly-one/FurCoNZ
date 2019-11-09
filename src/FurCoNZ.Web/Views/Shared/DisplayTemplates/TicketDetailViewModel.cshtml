@@ -1,38 +1,67 @@
-﻿@model TicketDetailViewModel
+﻿@using FurCoNZ.Web.Helpers
+@model TicketDetailViewModel
+@{
+    var dateAtCon = Model.DateOfBirth.GetAgeAtDate(DateTime.Parse("2020-01-30"));
+}
 
-<div class="card">
-    <h4 class="card-header">Ticket #@Model.Id</h4>
+    <div class="card">
+        <div class="card-header">
+            <p class="h4">Ticket #@Model.Id <small class="text-muted"> - @Model.BadgeName</small></p>
+        </div>
 
-    <div id="attendee-@Model.Id-detail" aria-labelledby="attendee-@Model.Id-header">
-        <div class="card-body">
-            <h5 class="card-title">@Model.BadgeName</h5>
-            <h6 class="card-subtitle mb-2 text-muted">@Model.TicketType.Name</h6>
-            <hr/>
-            <dl class="row">
-                <dt class="col-lg-3">@Html.DisplayNameFor(x => x.EmailAddress)</dt>
-                <dd class="col-lg-9">@Html.DisplayFor(x => x.EmailAddress)</dd>
+        @if (dateAtCon < 18 && dateAtCon >= 16)
+        {
+        <div class="alert alert-info" role="alert">
+            <strong>A parental consent form will be required to attend this event, or be accompanied by a parent or legal guardian.</strong> A copy will be sent out with your confirmed order, or <a href="~/assets/FurCoNZ-Parental_Consent_Form-2020.pdf" class="alert-link">you can download it from here</a>.
+        </div>
+        }
+        else if (dateAtCon < 16)
+        {
+        <div class="alert alert-warning" role="alert">
+            <strong>A parent or legal guardian will be required to attend this event along with this attendee.</strong> Attendence will be refused during registration if this attendee's parent or legal guardian is not present. <a asp-action="Terms" asp-controller="Home" asp-fragment="age-restriction" target="_blank" class="alert-link">Further information is available here</a>.
+        </div>
+        }
 
-                @if (!String.IsNullOrWhiteSpace(Model.PreferredFullName))
-                {
-                    <dt class="col-lg-3">@Html.DisplayNameFor(x => x.PreferredFullName)</dt>
-                    <dd class="col-lg-9">@Html.DisplayFor(x => x.PreferredFullName)</dd>
-                }
+        <div id="attendee-@Model.Id-detail" aria-labelledby="attendee-@Model.Id-header">
+            <div class="card-body">
+                <h5 class="card-title">@Model.TicketType.Name</h5>
+                <hr />
+                <dl class="row">
+                    <dt class="col-lg-3">@Html.DisplayNameFor(x => x.BadgeName)</dt>
+                    <dd class="col-lg-9">@Html.DisplayFor(x => x.BadgeName)</dd>
+                    <dt class="col-lg-3">@Html.DisplayNameFor(x => x.EmailAddress)</dt>
+                    <dd class="col-lg-9">@Html.DisplayFor(x => x.EmailAddress)</dd>
 
-                <dt class="col-lg-3">@Html.DisplayNameFor(x => x.IdentificationFullName)</dt>
-                <dd class="col-lg-9">@Html.DisplayFor(x => x.IdentificationFullName)</dd>
+                    @if (!String.IsNullOrWhiteSpace(Model.PreferredFullName))
+                    {
+                        <dt class="col-lg-3">@Html.DisplayNameFor(x => x.PreferredFullName)</dt>
+                        <dd class="col-lg-9">@Html.DisplayFor(x => x.PreferredFullName)</dd>
+                    }
 
-                <dt class="col-lg-3">@Html.DisplayNameFor(x => x.DateOfBirth)</dt>
-                <dd class="col-lg-9">@Html.DisplayFor(x => x.DateOfBirth)</dd>
+                    <dt class="col-lg-3">@Html.DisplayNameFor(x => x.IdentificationFullName)</dt>
+                    <dd class="col-lg-9">@Html.DisplayFor(x => x.IdentificationFullName)</dd>
 
-                <dt class="col-lg-3">@Html.DisplayNameFor(x => x.KnownAllergies)</dt>
-                <dd class="col-lg-9">@Html.DisplayFor(x => x.KnownAllergies)</dd>
+                    <dt class="col-lg-3">@Html.DisplayNameFor(x => x.DateOfBirth)</dt>
+                    <dd class="col-lg-9">@Html.DisplayFor(x => x.DateOfBirth)</dd>
 
-                @if (!String.IsNullOrWhiteSpace(Model.OtherNotes))
-                {
-                    <dt class="col-lg-3">@Html.DisplayNameFor(x => x.OtherNotes)</dt>
-                    <dd class="col-lg-9">@Html.DisplayFor(x => x.OtherNotes)</dd>
-                }
-            </dl>
+                    <dt class="col-lg-3">@Html.DisplayNameFor(x => x.DietryRequirements)</dt>
+                    <dd class="col-lg-9">@(string.Join(", ", Model.DietryRequirements.Select(f => f.ToString())))</dd>
+
+                    <dt class="col-lg-3">@Html.DisplayNameFor(x => x.KnownAllergies)</dt>
+                    <dd class="col-lg-9">@Html.DisplayFor(x => x.KnownAllergies)</dd>
+
+                    @if (!String.IsNullOrWhiteSpace(Model.CabinPreferences))
+                    {
+                        <dt class="col-lg-3">@Html.DisplayNameFor(x => x.CabinPreferences)</dt>
+                        <dd class="col-lg-9">@Html.DisplayFor(x => x.CabinPreferences)</dd>
+                    }
+
+                    @if (!String.IsNullOrWhiteSpace(Model.OtherNotes))
+                    {
+                        <dt class="col-lg-3">@Html.DisplayNameFor(x => x.OtherNotes)</dt>
+                        <dd class="col-lg-9">@Html.DisplayFor(x => x.OtherNotes)</dd>
+                    }
+                </dl>
+            </div>
         </div>
     </div>
-</div>

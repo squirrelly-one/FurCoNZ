@@ -1,6 +1,7 @@
-﻿function dateOfBirthChanged(e, modelId) {
-    var dateOfBirthString = e.value;
-    var age = getAgeAtDate(dateOfBirthString, '2020-03-01'); // TODO: Get date from config
+﻿function dateOfBirthChanged(e) {
+    var modelId = $(e.target).data("order-id");
+    var dateOfBirthString = e.target.value;
+    var age = getAgeAtDate(dateOfBirthString, '2020-01-30'); // TODO: Get date from config
 
     if (age < 18 && age >= 16) {
         $("#attendee-" + modelId + "-under18Notice").removeClass('d-none');
@@ -24,3 +25,17 @@ function getAgeAtDate(dateOfBirthString, dateOfEventString) {
     }
     return age;
 }
+
+function beginStripPayment(e) {
+    const stripe = Stripe($(e.target).data("stripe-key"));
+    const sessionId = $(e.target).data("session-id");
+
+    stripe.redirectToCheckout({
+        sessionId: sessionId,
+    });
+}
+
+$(function () {
+    $(".order-dob-field").on("change", dateOfBirthChanged);
+    $("#payWithStripeButton").on("click", beginStripPayment);
+});

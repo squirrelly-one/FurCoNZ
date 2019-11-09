@@ -32,7 +32,9 @@ using SendGrid;
 using FurCoNZ.Web.Auth;
 using FurCoNZ.Web.Configuration;
 using FurCoNZ.Web.DAL;
+using FurCoNZ.Web.Options;
 using FurCoNZ.Web.Services;
+using Microsoft.AspNetCore.Localization;
 
 namespace FurCoNZ.Web
 {
@@ -70,6 +72,7 @@ namespace FurCoNZ.Web
 
             services.AddHttpClient();
 
+            // Add Entity Framework DB Context
             services.AddDbContext<FurCoNZDbContext>(options =>
             {
                 switch (Configuration.GetValue("Data:Database:Provider", string.Empty).ToLowerInvariant())
@@ -92,7 +95,8 @@ namespace FurCoNZ.Web
                             DataSource = Path.Combine(
                                 Environment.CurrentDirectory,
                                 Configuration.GetValue("Paths:Database", "data/database"),
-                                Configuration.GetValue("Data:Database:Filename", "data.db"))
+                                Configuration.GetValue("Data:Database:Filename", "data.db")
+                            ),
                         };
                         options.UseSqlite(connectionStringBuilder.ToString());
                         break;
@@ -102,8 +106,7 @@ namespace FurCoNZ.Web
                     default:
                     case "postgres":
                     case "postgresql":
-                        var NpgsqlConnectionStringBuilder =
-                            new NpgsqlConnectionStringBuilder(Configuration.GetValue("Data:Database:ConnectionString", string.Empty));
+                        var NpgsqlConnectionStringBuilder = new NpgsqlConnectionStringBuilder(Configuration.GetValue("Data:Database:ConnectionString", string.Empty));
 
                         NpgsqlConnectionStringBuilder.Database = Configuration.GetValue<string>("Data:Database:Database", NpgsqlConnectionStringBuilder.Database);
                         NpgsqlConnectionStringBuilder.Host = Configuration.GetValue<string>("Data:Database:Host", NpgsqlConnectionStringBuilder.Host);
@@ -116,80 +119,90 @@ namespace FurCoNZ.Web
                                 ? SslMode.Require
                                 : SslMode.Prefer;
 
-                        options.UseNpgsql(
-                            NpgsqlConnectionStringBuilder.ToString(),
-                            npgsqlOptions =>
+                        options.UseNpgsql(NpgsqlConnectionStringBuilder.ToString(), npgsqlOptions =>
+                        {
+                            npgsqlOptions.RemoteCertificateValidationCallback((object sender, X509Certificate certificate, X509Chain chain, SslPolicyErrors sslPolicyErrors) =>
                             {
-                                npgsqlOptions.RemoteCertificateValidationCallback((object sender, X509Certificate certificate, X509Chain chain, SslPolicyErrors sslPolicyErrors) =>
+                                var caFingerprint = Configuration.GetValue("Data:Database:CAFingerprint", string.Empty);
+                                // Perform default validation if a fingerprint was not provided.
+                                if (string.IsNullOrEmpty(caFingerprint))
+                                    return new X509Certificate2(certificate).Verify();
+
+                                bool hasRecognisedCA = false;
+                                var certsLog = new StringBuilder();
+                                // Check to see if any CA matches a stored fingerprint
+                                foreach (var chainElement in chain.ChainElements)
                                 {
-                                    var caFingerprint = Configuration.GetValue("Data:Database:CAFingerprint", string.Empty);
-                                    // Perform default validation if a fingerprint was not provided.
-                                    if (string.IsNullOrEmpty(caFingerprint))
-                                        return new X509Certificate2(certificate).Verify();
-
-                                    bool hasRecognisedCA = false;
-                                    var certsLog = new StringBuilder();
-                                    // Check to see if any CA matches a stored fingerprint
-                                    foreach (var chainElement in chain.ChainElements)
+                                    certsLog.AppendLine($"- Certificate {chainElement.Certificate.SubjectName}: {chainElement.Certificate.GetCertHashString(HashAlgorithmName.SHA256)}");
+                                    if (chainElement.Certificate.GetCertHashString(HashAlgorithmName.SHA256).Equals(caFingerprint, StringComparison.OrdinalIgnoreCase))
                                     {
-                                        certsLog.AppendLine($"- Certificate {chainElement.Certificate.SubjectName}: {chainElement.Certificate.GetCertHashString(HashAlgorithmName.SHA256)}");
-                                        if (chainElement.Certificate.GetCertHashString(HashAlgorithmName.SHA256).Equals(caFingerprint, StringComparison.OrdinalIgnoreCase))
-                                        {
-                                            hasRecognisedCA = true;
-                                            break;
-                                        }
+                                        hasRecognisedCA = true;
+                                        break;
                                     }
+                                }
 
-                                    if (!hasRecognisedCA)
-                                    {
-                                        certsLog.Insert(0, $"Could not verify certificate. did not match. Expecting {caFingerprint}.\n");
-                                        _logger.LogCritical(certsLog.ToString());
-                                        return false;
-                                    }
-                                    else if (sslPolicyErrors == SslPolicyErrors.RemoteCertificateChainErrors)
-                                    {
-                                        // Clear ssl policy error as we now trust the certificate chain.
-                                        sslPolicyErrors = SslPolicyErrors.None;
-                                    }
+                                if (!hasRecognisedCA)
+                                {
+                                    certsLog.Insert(0, $"Could not verify certificate. did not match. Expecting {caFingerprint}.\n");
+                                    _logger.LogCritical(certsLog.ToString());
+                                    return false;
+                                }
 
-                                    if (sslPolicyErrors != SslPolicyErrors.None)
-                                    {
-                                        _logger.LogCritical($"certificate failed validation: {sslPolicyErrors}");
-                                        return false;
-                                    }
+                                if (sslPolicyErrors == SslPolicyErrors.RemoteCertificateChainErrors)
+                                {
+                                    // Clear ssl policy error as we now trust the certificate chain.
+                                    sslPolicyErrors = SslPolicyErrors.None;
+                                }
 
-                                    return true;
-                                });
+                                if (sslPolicyErrors != SslPolicyErrors.None)
+                                {
+                                    _logger.LogCritical($"certificate failed validation: {sslPolicyErrors}");
+                                    return false;
+                                }
+
+                                return true;
                             });
-                        break;
+                        });
+                    break;
                 }
             });
 
             // Allow accessing the HTTPContext from services.
             services.AddHttpContextAccessor();
 
-            // Configure SendGrid
-            services.Configure<SendGridClientOptions>(options => Configuration.GetSection("SendGrid").Bind(options));
-            services.AddTransient<ISendGridClient, SendGridClient>();
-            services.AddTransient<IEmailService, SendGridEmailService>();
-
-            services.AddTransient<IUserService, EntityFrameworkUserService>();
-            services.AddTransient<IOrderService, OrderService>();
-
-            services.AddTransient<IPaymentService, PaymentService>();
-            services.AddTransient<IPaymentProvider, Services.Payment.StripeService>();
-            services.AddTransient<IPaymentProvider, Services.Payment.BankPaymentProvider>();
-
-            services.AddTransient<Services.Payment.StripeService>();
-            services.AddHostedService<Services.Payment.Stripe.StripeHostedService>();
-
+            // Configure Options
             services.Configure<CookiePolicyOptions>(options =>
             {
                 // This lambda determines whether user consent for non-essential cookies is needed for a given request.
                 options.CheckConsentNeeded = context => true;
                 options.MinimumSameSitePolicy = SameSiteMode.None;
             });
+            services.Configure<SendGridEmailServiceOptions>(options => Configuration.GetSection("SendGrid").Bind(options));
+            services.Configure<ReminderServiceOptions>(options =>
+            {
+                options.RemindUserOfUnpaidOrderEveryXDays = Configuration.GetValue<int>("Orders:RemindUserOfUnpaidOrderEveryXDays");
+            });
+            services.Configure<BankSettings>(Configuration.GetSection("BankTransfer"));
+            services.Configure<StripeSettings>(Configuration.GetSection("Stripe"));
 
+            // Add application services to DI
+            services.AddTransient<ISendGridClient>(c => new SendGridClient(Configuration["SendGrid:ApiKey"]));
+            services.AddTransient<IEmailProvider, SendGridEmailProvider>();
+            services.AddTransient<IEmailService, EmailService>();
+            services.AddTransient<IReminderService, ReminderService>();
+            services.AddTransient<IViewRenderService, ViewRenderService>();
+            services.AddTransient<IUserService, EntityFrameworkUserService>();
+            services.AddTransient<IOrderService, OrderService>();
+            services.AddTransient<IPaymentService, PaymentService>();
+            services.AddTransient<IPaymentProvider, Services.Payment.StripeService>();
+            services.AddTransient<IPaymentProvider, Services.Payment.BankPaymentProvider>();
+            services.AddTransient<Services.Payment.StripeService>();
+
+            // Add background services
+            services.AddHostedService<EmailRemindersHostedService>();
+            services.AddHostedService<Services.Payment.Stripe.StripeHostedService>();
+
+            // Authentication settings for OIDC integration
             services.AddAuthentication(options =>
             {
                 options.DefaultScheme = CookieAuthenticationDefaults.AuthenticationScheme;
@@ -225,6 +238,7 @@ namespace FurCoNZ.Web
                 options.Events.OnUserInformationReceived = NzFursOpenIdConnectEvents.OnUserInformationReceived;
             });
 
+            // Add authorisation policies
             services.AddAuthorization(options => 
             {
                 options.AddPolicy("AdminOnly", policyBuilder =>
@@ -235,26 +249,35 @@ namespace FurCoNZ.Web
                 });
             });
 
-            services.AddMvc()
-                .SetCompatibilityVersion(CompatibilityVersion.Version_2_2);
-
-            services.Configure<StripeSettings>(Configuration.GetSection("Stripe"));
+            // Finally, configure MVC
+            services.AddMvc(options =>
+            {
+                options.Filters.Add(new AutoValidateAntiforgeryTokenAttribute());
+            })
+            .SetCompatibilityVersion(CompatibilityVersion.Version_2_2);
         }
 
         // This method gets called by the runtime. Use this method to configure the HTTP request pipeline.
         public void Configure(IApplicationBuilder app, IHostingEnvironment env)
         {
-            if (env.IsDevelopment())
+            if (env.IsDevelopment() || env.IsEnvironment("Testing"))
             {
                 app.UseDeveloperExceptionPage();
+                app.UseDatabaseErrorPage();
             }
             else
             {
                 app.UseExceptionHandler("/Error");
                 // The default HSTS value is 30 days. You may want to change this for production scenarios, see https://aka.ms/aspnetcore-hsts.
                 app.UseHsts();
-
             }
+
+            app.UseRequestLocalization(new RequestLocalizationOptions
+            {
+                DefaultRequestCulture = new RequestCulture("en-NZ")
+            });
+
+
             var forwardedHeaderOptions = new ForwardedHeadersOptions
             {
                 ForwardedHeaders = ForwardedHeaders.XForwardedFor | ForwardedHeaders.XForwardedProto,
@@ -267,11 +290,33 @@ namespace FurCoNZ.Web
             }
             app.UseForwardedHeaders(forwardedHeaderOptions);
 
+            app.UseXContentTypeOptions();
+            app.UseReferrerPolicy(opts => opts.NoReferrer());
+
+            app.UseCsp(options =>
+            {
+                options.BlockAllMixedContent()
+                    .ConnectSources(s => s.Self()) // Allow ajax queries
+                    .FontSources(f => f.Self())
+                    .FontSources(f => f.CustomSources("https://fonts.gstatic.com"))
+                    .FrameAncestors(f => f.Self())
+                    .ImageSources(i => i.Self())
+                    .ImageSources(i => i.CustomSources("data:", "photos.furco.nz"))
+                    .ManifestSources(m => m.None())
+                    .MediaSources(m => m.Self())
+                    .ObjectSources(o => o.None())
+                    .ScriptSources(s => s.Self())
+                    .ScriptSources(s => s.CustomSources("https://js.stripe.com"))
+                    .StyleSources(s => s.Self())
+                    .StyleSources(s => s.CustomSources("https://fonts.googleapis.com"))
+                    .StyleSources(s => s.UnsafeInline()) // TODO: Temporary while Stripe payments are refactored, see #117
+                    .WorkerSources(w => w.None());
+            });
+
             app.UseSession();
             app.UseAuthentication();
             app.UseHttpsRedirection();
             app.UseStaticFiles();
-            app.UseCookiePolicy();
 
             app.UseMvc(routes =>
             {
@@ -295,7 +340,7 @@ namespace FurCoNZ.Web
             });
 
             // Aparently stripe uses a singleton pattern 😟
-            Stripe.StripeConfiguration.SetApiKey(Configuration.GetValue<string>("Stripe:SecretKey"));
+            Stripe.StripeConfiguration.ApiKey = Configuration.GetValue<string>("Stripe:SecretKey");
         }
     }
 }

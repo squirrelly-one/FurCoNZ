@@ -29,7 +29,7 @@
       "destination": "wwwroot/lib/bootstrap/"
     },
     {
-      "library": "popper.js@1.14.7",
+      "library": "popper.js@1.15.0",
       "files": [
         "esm/popper.min.js",
         "esm/popper.js"
@@ -37,12 +37,16 @@
       "destination": "wwwroot/lib/popper/"
     },
     {
-        "provider": "unpkg",
-        "library": "date-input-polyfill@2.14.0",
-        "files": [
-            "date-input-polyfill.dist.js"
-        ],
-        "destination": "wwwroot/lib/date-input-polyfill/"
+      "library": "flatpickr@4.6.3",
+      "files": [
+        "flatpickr.css",
+        "flatpickr.js",
+        "flatpickr.min.css",
+        "flatpickr.min.js",
+        "l10n/default.js",
+        "themes/dark.css"
+      ],
+      "destination": "wwwroot/lib/flatpickr/"
     }
   ]
 }

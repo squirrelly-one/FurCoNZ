@@ -31,14 +31,14 @@
             {
                 <tr>
                     <td>
-                        @Html.DisplayFor(modelItem => item.Id)
+                        @Html.DisplayFor(_ => item.Id)
                     </td>
                     <td>
-                        @Html.DisplayFor(modelItem => item.OrderId)
+                        @Html.DisplayFor(_ => item.OrderId)
                     </td>
 
                     <td>
-                        @Html.DisplayFor(modelItem => item.Type)
+                        @Html.DisplayFor(_ => item.Type)
                     </td>
                     <td>
                         @item.Amount.ToString("C")
@@ -47,11 +47,11 @@
                         @item.When.ToString("d")
                     </td>
                     <td>
-                        @Html.DisplayFor(modelItem => item.PaymentProvider)
+                        @Html.DisplayFor(_ => item.PaymentProvider)
 
                     </td>
                     <td>
-                        @Html.DisplayFor(modelItem => item.PaymentProviderReference)
+                        @Html.DisplayFor(_ => item.PaymentProviderReference)
                     </td>
                 </tr>
             }

@@ -12,6 +12,7 @@ namespace FurCoNZ.Web.Services.Payment
         private readonly IOrderService _orderService;
 
         public string Name => NAME;
+        public string DisplayName => "Bank Transfer";
 
         public string SupportedMethods => "Direct Bank Transfer";
 

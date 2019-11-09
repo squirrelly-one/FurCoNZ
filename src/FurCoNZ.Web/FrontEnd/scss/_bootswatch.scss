@@ -13,6 +13,7 @@ $web-font-path: "https://fonts.googleapis.com/css?family=Limelight|Raleway&displ
 
   &.bg-primary {
     border: 1px solid $gray-700;
+    color: $black;
   }
 
   &.bg-dark {
@@ -41,8 +42,10 @@ $web-font-path: "https://fonts.googleapis.com/css?family=Limelight|Raleway&displ
     &-#{$color} {
       @if $enable-gradients {
         background: $value linear-gradient(180deg, mix($white, $value, 15%), $value) repeat-x;
+        color: $black;
       } @else {
         background-color: $value;
+        color: $black;
       }
     }
   }

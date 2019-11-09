@@ -21,11 +21,13 @@ namespace FurCoNZ.Web.Areas.Admin.Controllers
     {
         private readonly IOrderService _orderService;
         private readonly IPaymentService _paymentService;
+        private readonly IEmailService _emailService;
 
-        public OrdersController(IOrderService orderService, IPaymentService paymentService)
+        public OrdersController(IOrderService orderService, IPaymentService paymentService, IEmailService emailService)
         {
             _orderService = orderService;
             _paymentService = paymentService;
+            _emailService = emailService;
         }
 
         public async Task<IActionResult> Index(int id = 0)
@@ -60,6 +62,36 @@ namespace FurCoNZ.Web.Areas.Admin.Controllers
                 Payments = payments.ToList(),
                 ReceivedPayment = new ReceivedPayment(),
             });
+        }
+
+        [HttpPost]
+        public async Task<IActionResult> SendConfirmationEmail(OrderViewModel orderViewModel)
+        {
+            // TODO: Refund a select payment
+            var order = await _orderService.GetOrderById(orderViewModel.Id, HttpContext.RequestAborted);
+            if (order == null)
+            {
+                return NotFound();
+            }
+
+            await _emailService.SendOrderConfirmationAsync(order, HttpContext.RequestAborted);
+
+            return RedirectToAction(nameof(Index), new { id = order.Id });
+        }
+
+        [HttpPost]
+        public async Task<IActionResult> SendPaidEmail(OrderViewModel orderViewModel)
+        {
+            // TODO: Refund a select payment
+            var order = await _orderService.GetOrderById(orderViewModel.Id, HttpContext.RequestAborted);
+            if (order == null)
+            {
+                return NotFound();
+            }
+
+            await _emailService.SendOrderPaidAsync(order, HttpContext.RequestAborted);
+
+            return RedirectToAction(nameof(Index), new { id = order.Id });
         }
 
         /// <summary>

@@ -27,5 +27,5 @@
 <h3>Tickets</h3>
 @foreach (var ticket in Model.Tickets)
 {
-    @Html.DisplayFor(order => ticket, "TicketDetailViewModel")
+    @Html.DisplayFor(_ => ticket, "TicketDetailViewModel")
 }

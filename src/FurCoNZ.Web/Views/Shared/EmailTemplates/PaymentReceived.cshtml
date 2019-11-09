@@ -1,0 +1,31 @@
+﻿@model OrderViewModel
+@{
+    ViewData["Title"] = "Payment Received";
+    Layout = "~/Views/Shared/EmailTemplates/_Layout.cshtml";
+
+    var audit = Model.Audits.OrderBy(a => a.Id).Last();
+}
+
+<tr>
+    <td align="left" style="font-size:0px;padding:10px 25px;word-break:break-word;">
+        <div style="font-family:Raleway;font-size:13px;line-height:1;text-align:left;color:#FFFFFF;"> A payment has been received for order #@Model.Id. </div>
+    </td>
+</tr>
+<tr>
+    <td align="left" class="ticket" style="font-size:0px;padding:10px 25px;word-break:break-word;">
+        <table cellpadding="0" cellspacing="0" width="100%" border="0" style="cellspacing:0;color:#FFFFFF;font-family:Raleway;font-size:13px;line-height:22px;table-layout:auto;width:100%;">
+            <tr>
+                <th style="width: auto; text-align: right; padding-right: 8px; white-space: nowrap;" align="right">Payment Method</th>
+                <td style="width: 99%;" width="99%">@audit.PaymentProvider</td>
+            </tr>
+            <tr>
+                <th style="width: auto; text-align: right; padding-right: 8px; white-space: nowrap;" align="right">Amount Received</th>
+                <td style="width: 99%;" width="99%">@audit.Amount.ToString("C")</td>
+            </tr>
+            <tr>
+                <th style="width: auto; text-align: right; padding-right: 8px; white-space: nowrap;" align="right">Date</th>
+                <td style="width: 99%;" width="99%">@audit.When.ToString("yyyy-MM-dd")</td>
+            </tr>
+        </table>
+    </td>
+</tr>

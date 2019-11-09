@@ -38,6 +38,12 @@ namespace FurCoNZ.Web.Controllers
             if (order == null)
                 return NotFound();
 
+            if (order.Audits.Any(a => a.Type == AuditType.Refunded))
+                return RedirectToAction(nameof(AccountController.Orders), "Account");
+
+            if (order.AmountOwingCents == 0)
+                return RedirectToAction(nameof(AccountController.Orders), "Account");
+
             return View(GetCheckoutViewModelFromOrder(order));
         }
 
@@ -50,6 +56,7 @@ namespace FurCoNZ.Web.Controllers
                 PaymentProviders = _paymentProvider.PaymentServicees.Select(p => new PaymentProviderViewmodel
                 {
                     Name = p.Name,
+                    DisplayName = p.DisplayName,
                     Methods = p.SupportedMethods,
                     Description = p.Description,
                 }).ToList(),

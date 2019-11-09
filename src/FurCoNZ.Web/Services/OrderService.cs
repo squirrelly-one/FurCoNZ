@@ -5,6 +5,7 @@ using System.Threading;
 using System.Threading.Tasks;
 
 using Microsoft.EntityFrameworkCore;
+using Microsoft.Extensions.Logging;
 
 using FurCoNZ.Web.DAL;
 using FurCoNZ.Web.Helpers;
@@ -15,13 +16,17 @@ namespace FurCoNZ.Web.Services
     public class OrderService : IOrderService
     {
         private readonly FurCoNZDbContext _db;
+        private readonly IEmailService _emailService;
+        private readonly ILogger _logger;
 
-        public OrderService(FurCoNZDbContext db)
+        public OrderService(FurCoNZDbContext db, IEmailService emailService, ILogger<OrderService> logger)
         {
             _db = db;
+            _emailService = emailService;
+            _logger = logger;
         }
 
-        public async Task<Order> CreateOrderAsync(User purchasingAccount, IEnumerable<Ticket> ticketsInBasket, CancellationToken cancellationToken = default)
+        public async Task<Order> CreateOrderAsync(User purchasingAccount, IEnumerable<Ticket> ticketsInBasket, bool allowOrderingHiddenTickets = false, CancellationToken cancellationToken = default)
         {
             if (purchasingAccount == null)
                 throw new ArgumentNullException(nameof(purchasingAccount), "Must supply a user when creating an order");
@@ -41,9 +46,19 @@ namespace FurCoNZ.Web.Services
                 var ticketsOfTypeAvailable = ticketType.TotalAvailable;
                 var ticketsOfTypeOrdered = ticketList.Count(t => t.TicketTypeId == ticketType.Id);
 
+                if (!allowOrderingHiddenTickets && ticketType.HiddenFromPublic)
+                {
+                    throw new InvalidOperationException($"{ticketType.Name} tickets require special permission to be ordered.");
+                }
+
                 if (ticketsOfTypeOrdered > ticketsOfTypeAvailable)
                 {
                     throw new InvalidOperationException($"There are not enough {ticketType.Name} tickets available for this order to be created.");
+                }
+
+                if (ticketType.SoldOutAt <= DateTimeOffset.Now)
+                {
+                    throw new InvalidOperationException($"The cut-off date for {ticketType.Name} ticket has passed. They are no longer available for purchase.");
                 }
 
                 // Remove the appropriate number of tickets from the available pool
@@ -57,28 +72,36 @@ namespace FurCoNZ.Web.Services
             var order = new Order
             {
                 OrderedById = purchasingAccount.Id,
+                CreatedAt = DateTimeOffset.Now,
                 TicketsPurchased = ticketList,
             };
             _db.Orders.Add(order);
 
             // Commit to DB
-            await _db.SaveChangesAsync();
+            await _db.SaveChangesAsync(cancellationToken);
+
+            await _emailService.SendOrderConfirmationAsync(order, cancellationToken);
 
             return order;
         }
 
-        public async Task<IEnumerable<TicketType>> GetTicketTypesAsync(bool IncludeUnavailableTickets = true, CancellationToken cancellationToken = default)
+        public async Task<IEnumerable<TicketType>> GetTicketTypesAsync(bool includeUnavailableTickets = true, bool includeHiddenTickets = false, CancellationToken cancellationToken = default)
         {
             cancellationToken.ThrowIfCancellationRequested();
 
-            var query = _db.TicketTypes.OrderByDescending(tt => tt.PriceCents);
+            var query = _db.TicketTypes.AsQueryable();
 
-            if (!IncludeUnavailableTickets)
+            if (!includeUnavailableTickets)
             {
-                query.Where(tt => tt.TotalAvailable > 0);
+                query = query.Where(tt => tt.TotalAvailable > 0 && tt.SoldOutAt > DateTimeOffset.Now);
             }
 
-            return await query.ToListAsync(cancellationToken);
+            if (!includeHiddenTickets)
+            {
+                query = query.Where(tt => !tt.HiddenFromPublic);
+            }
+
+            return await query.OrderByDescending(tt => tt.PriceCents).ToListAsync(cancellationToken);
         }
 
         public Task<DateTimeOffset> ReserveTicketsForPurchaseAsync(IDictionary<int, int> ticketsToReserveById, CancellationToken cancellationToken = default)
@@ -118,53 +141,79 @@ namespace FurCoNZ.Web.Services
         {
             var order = await _db.Orders
                 .Include(o => o.Audits)
+                .Include(o => o.OrderedBy)
+                .Include(o => o.TicketsPurchased)
+                .ThenInclude(t => t.TicketType)
                 .SingleAsync(o => o.Id == orderId, cancellationToken);
 
             if (order.Audits.Any(a => a.PaymentProvider == paymentProvider && a.PaymentProviderReference == paymentReference && a.Type == AuditType.Received))
-                throw new InvalidOperationException($"Received funds for order {orderId} has already been applied for {paymentProvider}: {paymentReference}");
-
-            var audit = new OrderAudit
             {
-                OrderId = orderId,
-                PaymentProvider = paymentProvider,
-                PaymentProviderReference = paymentReference,
-                Type = AuditType.Received,
-                When = when,
-                AmountCents = amountCents,
-            };
+                // What about back transfers?
+                _logger.LogError($"Received funds for order {orderId} has already been applied for {paymentProvider}: {paymentReference}");
+            }
+            else
+            {
+                var audit = new OrderAudit
+                {
+                    OrderId = orderId,
+                    PaymentProvider = paymentProvider,
+                    PaymentProviderReference = paymentReference,
+                    Type = AuditType.Received,
+                    When = when,
+                    AmountCents = amountCents,
+                };
 
-            // Recalculate amount paid
-            order.AmountPaidCents = order.Audits.Sum(a => a.AmountCents) + audit.AmountCents;
+                // Recalculate amount paid
+                order.AmountPaidCents = order.Audits.Sum(a => a.AmountCents) + audit.AmountCents;
 
-            await _db.OrderAudits.AddAsync(audit, cancellationToken);
-            await _db.SaveChangesAsync(cancellationToken);
+                await _db.OrderAudits.AddAsync(audit, cancellationToken);
+                await _db.SaveChangesAsync(cancellationToken);
+            }
+
+            if (order.AmountPaidCents >= order.TotalAmountCents)
+            {
+                await _emailService.SendOrderPaidAsync(order, cancellationToken);
+            }
+            else
+            {
+                await _emailService.SendPaymentReceivedAsync(order, cancellationToken);
+            }
+
         }
 
         public async Task RefundFundsForOrderAsync(int orderId, int amountCents, string paymentProvider, string paymentReference, DateTimeOffset when, CancellationToken cancellationToken = default)
         {
             var order = await _db.Orders
                 .Include(o => o.Audits)
+                .Include(o => o.OrderedBy)
+                .Include(o => o.TicketsPurchased)
+                .ThenInclude(t => t.TicketType)
                 .SingleAsync(o => o.Id == orderId, cancellationToken);
 
             if(order.Audits.Any(a => a.PaymentProvider == paymentProvider && a.PaymentProviderReference == paymentReference && a.Type == AuditType.Refunded))
-                throw new InvalidOperationException($"Refund for order {orderId} has already been applied for {paymentProvider}: {paymentReference}");
-            
-
-            var audit = new OrderAudit
             {
-                OrderId = orderId,
-                PaymentProvider = paymentProvider,
-                PaymentProviderReference = paymentReference,
-                Type = AuditType.Refunded,
-                When = when,
-                AmountCents = -amountCents,
-            };
+                _logger.LogError($"Refund for order {orderId} has already been applied for {paymentProvider}: {paymentReference}");
+            }
+            else
+            {
+                var audit = new OrderAudit
+                {
+                    OrderId = orderId,
+                    PaymentProvider = paymentProvider,
+                    PaymentProviderReference = paymentReference,
+                    Type = AuditType.Refunded,
+                    When = when,
+                    AmountCents = -amountCents,
+                };
+                // Recalculate amount paid
+                order.AmountPaidCents = order.Audits.Sum(a => a.AmountCents) + audit.AmountCents;
+                
+                _db.OrderAudits.Add(audit);
 
-            // Recalculate amount paid
-            order.AmountPaidCents = order.Audits.Sum(a => a.AmountCents) + audit.AmountCents;
+                await _db.SaveChangesAsync(cancellationToken);
+            }
 
-            _db.OrderAudits.Add(audit);
-            await _db.SaveChangesAsync(cancellationToken);
+            await _emailService.SendPaymentRefundedAsync(order, cancellationToken);
         }
 
         public async Task<IEnumerable<Order>> GetAllOrdersAsync(CancellationToken cancellationToken = default)
@@ -184,6 +233,7 @@ namespace FurCoNZ.Web.Services
                 .Include(o => o.TicketsPurchased)
                 .ThenInclude(t => t.TicketType)
                 .Include(o => o.Audits)
+                .Include(o => o.OrderedBy)
                 .SingleOrDefaultAsync(o => o.Id == orderId, cancellationToken);
         }
 

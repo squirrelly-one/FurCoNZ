@@ -46,7 +46,7 @@ namespace FurCoNZ.Web.ViewModels
                 if (Audits.Any(a => a.Type == nameof(AuditType.Refunded)))
                     return "Refunded";
 
-                if (AmountOwing == 0)
+                if (AmountOwing <= 0)
                     return "Paid";
 
                 return "Owing";

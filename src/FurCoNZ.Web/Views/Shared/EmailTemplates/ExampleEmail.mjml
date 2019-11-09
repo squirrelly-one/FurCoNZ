@@ -1,0 +1,125 @@
+﻿<mjml>
+  <mj-head>
+    <mj-font name="Raleway" href="https://fonts.googleapis.com/css?family=Raleway" />
+    <mj-font name="Limelight" href="https://fonts.googleapis.com/css?family=Limelight" />
+    <mj-attributes>
+    	<mj-class name="sub-heading" font-size="24px" color="#DAA520" font-family="Limelight" />
+      <mj-class name="default" color="#FFFFFF" font-family="Raleway" />
+		</mj-attributes>
+		<mj-style>
+      .sub-heading {
+      	font-size: 24px;
+      	font-family: "Limelight";
+      	color: #DAA520;
+      	margin: 10px 0;
+      }
+      .muted{
+      	color: #ADAFAE;
+      }
+      .ticket th{
+      	width: auto;
+      	text-align: right;
+      	padding-right: 8px;
+      	white-space: nowrap;
+      }
+      .ticket td{
+      	width: 99%;
+      }
+      .ticket hr{
+      	border-color:#fff;
+      	border-width: 1px;
+      }
+      .emblem {
+      	background-image: url("https://test.furco.nz/assets/2020FlavourSmalldrop.png");
+      	background-color: #000;
+        background-size: 130px;
+        background-repeat: no-repeat;
+      	background-position: top left;
+      }
+    </mj-style>
+  </mj-head>
+  <mj-body background-color="#000000">
+    <mj-section css-class="emblem">
+      <mj-column>
+        <mj-divider padding="30px 0px 10px 130px" border-color="#DAA520"></mj-divider>
+
+        <mj-text font-size="30px" padding="25px 0 25px 150px" color="#DAA520" font-family="Limelight">Email Template Header</mj-text>
+
+        <mj-table mj-class="default" css-class="ticket">
+          <tr>
+          <td colspan="2">
+            <h3 class="sub-heading">Premium<small class="muted"> - Ticket #12</small></h3>
+          </td>
+          </tr>
+        	<tr>
+          	<th>Name:</th>
+          	<td>Tequin Dragon</td>
+          </tr>
+          <tr>
+          	<th>Email Address:</th>
+            <td>dragon@tequ.in</td>
+          </tr>
+          <tr>
+            <th>Full Name:</th>
+            <td>Tequin Dragon</td>
+          </tr>
+          <tr>
+          	<th>Known Allergies:</th>
+            <td>None</td>
+        	</tr>
+          <tr>
+          	<th>Cost:</th>
+            <td>$20.00</td>
+        	</tr>
+          <tr>
+            <td colspan="2">
+              <hr />
+            </td>
+          </tr>
+          <tr>
+          	<th>Total:</th>
+            <td><b>$20.00</b></td>
+        	</tr>
+          <tr>
+          	<th>GST (included):</th>
+            <td><b>$2.61</b></td>
+        	</tr>
+        </mj-table>
+
+        <mj-text color="#FFFFFF" font-family="Raleway">
+          Don’t panic graeme souness brush, graeme souness don’t panic quis john cleese marquess of queensbury brush lorreto del mar el snort alpha trion. Mark lawrenson handsome alpha trion prostate cancer lemmy, educated ding-dong lemmy alpha trion helllloooo burt reynolds prostate cancer mark lawrenson handsome, helllloooo clive dunn educated by jingo. burt reynolds alpha trion albert einstein prostate cancer glorious facial hair ding-dong mouthbrow village people handsome lemmy mark lawrenson off-piste off-piste?
+        </mj-text>
+        <mj-text color="#FFFFFF" font-family="Raleway">
+          D’artagnan groucho marx charming villain Refined gentlemen prostate cancer, Refined gentlemen groucho marx d’artagnan charming villain prostate cancer movember brandy magnum pi cappuccino collector chevron man of the year 1986.
+        </mj-text>
+        <mj-text color="#FFFFFF" font-family="Raleway">
+          Ron jeremy groomed theodore roosevelt marquess of queensbury, marquess of queensbury ron jeremy horseshoe groomed dickie davies theodore roosevelt barber shop quartet cardinal richelieu, leslie phillips cardinal richelieu bruce forsyth barber shop quartet ron jeremy ned flanders erudite headmaster horseshoe lorreto del mar marquess of queensbury groomed dickie davies jolly good show theodore roosevelt. Blacksmith waxy gurn cigars cigars chevron, village people blacksmith cigars waxy gurn charlie chaplin saddam hussein cigars chevron.
+        </mj-text>
+
+        <mj-button font-size="20px" font-family="Limelight" background-color="#DAA520" color="#000000">
+          Link to somewhere
+        </mj-button>
+
+        <mj-divider border-color="#DAA520"></mj-divider>
+
+        <mj-text align="center" font-size="10px" color="#DAA520" font-family="Raleway">
+          Follow us on social media
+        </mj-text>
+        <mj-social font-size="12px" color="#FFFFFF" icon-size="18px" mode="horizontal" font-family="American Typewriter,courier new,courier,lucida sans typewriter,lucida typewriter,monospace">
+          <mj-social-element name="web" href="https://furco.nz" src="https://test.furco.nz/assets/favicon-32x32.png" background-color="#000">
+            FurCoNZ
+          </mj-social-element>
+          <mj-social-element name="facebook-noshare" href="https://facebook.com/furconz">
+            Facebook
+          </mj-social-element>
+          <mj-social-element  name="twitter-noshare" href="https://twitter.com/furconz">
+            Twitter
+          </mj-social-element>
+          <mj-social-element href="https://t.me/furconznews" background-color="#FF00FF" src="https://telegram.org/favicon.ico?4">
+            Telegram
+          </mj-social-element>
+        </mj-social>
+      </mj-column>
+    </mj-section>
+  </mj-body>
+</mjml>

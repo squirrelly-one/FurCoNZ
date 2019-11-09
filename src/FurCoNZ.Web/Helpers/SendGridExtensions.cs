@@ -1,4 +1,5 @@
 ﻿using System.Collections.Generic;
+using System.IO;
 using System.Linq;
 using System.Net.Mail;
 using System.Threading;
@@ -23,8 +24,9 @@ namespace FurCoNZ.Web.Helpers
 
         internal async static Task AddAttachmentAsync(this SendGridMessage sendGridMessage, System.Net.Mail.Attachment attachment, CancellationToken cancellationToken = default)
         {
+            var streamFileName = Path.GetFileName((attachment.ContentStream as FileStream)?.Name);
             await sendGridMessage.AddAttachmentAsync(
-                filename: attachment.ContentDisposition.FileName,
+                filename: attachment.ContentDisposition.FileName ?? streamFileName,
                 contentStream: attachment.ContentStream,
                 type: attachment.ContentType.Name,
                 disposition: attachment.ContentDisposition.Inline ? "inline" : "attachment",
