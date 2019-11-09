@@ -31,6 +31,11 @@ namespace FurCoNZ.Web.Controllers
             return View();
         }
 
+        public IActionResult Tickets()
+        {
+            return View();
+        }
+
         public IActionResult About()
         {
             return View();
