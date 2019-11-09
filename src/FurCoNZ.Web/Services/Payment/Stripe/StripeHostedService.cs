@@ -77,10 +77,14 @@ namespace FurCoNZ.Web.Services.Payment.Stripe
             var cancellationToken = _cancellationTokenSource?.Token 
                 ?? throw new Exception("CancellationTokenSource must not be null");
 
+            StripeConfiguration.ApiKey = _options.Value.SecretKey;
+
+            if (string.IsNullOrWhiteSpace(_options.Value.SecretKey))
+                return;
+
             using (var serviceScope = _services.CreateScope())
             {
                 var stripeService = serviceScope.ServiceProvider.GetRequiredService<StripeService>();
-                StripeConfiguration.ApiKey = _options.Value.SecretKey;
 
                 DateTime? lastEventDateTime = DateTime.Now.Subtract(TimeSpan.FromDays(1));
                 if (_eventListOptions.Created.Value is DateRangeOptions range)
