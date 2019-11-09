@@ -1,9 +1,12 @@
 ﻿@model ValidateOrderViewModel
 @{
     ViewData["Title"] = "Confirm Tickets";
+    var orderExpiryDate = Model.TicketDetails.Select(td => td.TicketType.SoldOutAt).OrderBy(soa => soa).FirstOrDefault();
 }
 
-<p>Please confirm the following order. Once you click "Confirm", an invoice will be generated and you will be required to pay within 7 days, else the order will be cancelled and the tickets will be released.</p>
+<p>Please confirm the following order. Once you click "Confirm", an invoice will be generated and you will be taken to the payments screen for payment.</p>
+
+<div class="alert alert-info" role="alert">You will be required to pay by <strong>@orderExpiryDate.ToString("MMMM dd, hh:mm tt")</strong>, else the order will be cancelled and the tickets will be released.</div>
 
 @for (int i = 0; i < Model.TicketDetails.Count; i++)
 {
